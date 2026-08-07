@@ -1,0 +1,31 @@
+{
+  "started_at": "20260807T032336Z",
+  "mode": "screen",
+  "csv": "providers\\Microsegmentation.csv",
+  "queue_file": null,
+  "model": null,
+  "count": 2,
+  "total_cost_usd": 0.0,
+  "results": [
+    {
+      "product_id": "zero-networks-segment",
+      "vendor": "Zero Networks",
+      "started_at": "2026-08-07T03:23:36Z",
+      "elapsed_seconds": 0,
+      "exit_code": 0,
+      "status": "dry-run",
+      "total_cost_usd": null,
+      "validator": null
+    },
+    {
+      "product_id": "akamai-guardicore-segmentation",
+      "vendor": "Akamai Technologies (Guardicore)",
+      "started_at": "2026-08-07T03:23:36Z",
+      "elapsed_seconds": 0,
+      "exit_code": 0,
+      "status": "dry-run",
+      "total_cost_usd": null,
+      "validator": null
+    }
+  ]
+}

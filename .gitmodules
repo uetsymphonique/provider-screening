@@ -1,0 +1,3 @@
+[submodule ".claude/skills/deep-research"]
+	path = .claude/skills/deep-research
+	url = https://github.com/199-biotechnologies/claude-deep-research-skill

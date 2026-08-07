@@ -1,0 +1,22 @@
+{
+  "run_id": "akamai-guardicore-segmentation-standard-2026-08-07",
+  "product_id": "akamai-guardicore-segmentation",
+  "vendor": "Akamai Technologies",
+  "product_name": "Akamai Guardicore Segmentation",
+  "mode": "standard",
+  "assessment_mode": "standard",
+  "checklist_version": 1,
+  "started_at": "2026-08-07T00:00:00Z",
+  "completed_at": "2026-08-07T00:00:00Z",
+  "supersedes": "akamai-guardicore-segmentation-2026-08-07 (screen)",
+  "assumptions": [
+    "Product refers to Akamai Guardicore Segmentation (formerly Guardicore Centra) as marketed in 2025-2026.",
+    "Full 33-item checklist. Screen-mode evidence for items 1.1, 2.1, 3.2, 4.4, 5.1, 6.4 was retained and re-checked against fresh searches.",
+    "Where a checklist requirement is quantitative (numeric_threshold) and no public number was found, verdict is 'unknown' rather than an inferred pass/fail."
+  ],
+  "provider_config": {
+    "web_search": "enabled",
+    "web_fetch": "enabled",
+    "pdf_helper": "scripts/pdf_to_text.py"
+  }
+}

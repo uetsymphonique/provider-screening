@@ -1,0 +1,124 @@
+===== PAGE 1 =====
+
+Solution Brief
+Heading
+Akamai Guardicore is a micro-segmentation and Zero Trust security platform designed to 
+protect critical assets across data centres, hybrid, and cloud environments. It provides deep 
+visibility into network traffic, enabling organisations to isolate workloads, prevent lateral 
+movement, and reduce attack surfaces.
+Unlike traditional firewalls, Guardicore enforces granular, identity-based security policies. With 
+real-time traffic mapping, automated policy workflows, and integrated breach detection, 
+enterprises can secure hybrid infrastructures, meet compliance requirements, and support 
+modern application architectures with ease.
+Guardicore delivers a single, unified view across environments — including on-premises, 
+Azure, AWS, GCP , Kubernetes, containers, and endpoints — ensuring consistent policies and 
+rapid response to threats, anomalies, or environmental changes.
+Why Data Sciences?
+Proven Expertise Across 
+Africa
+With decades of experience 
+and a footprint that spans the 
+continent, we bring deep 
+technical knowledge and real-
+world understanding to every 
+client engagement.
+Enterprise-Grade 
+Partnerships
+Our strategic alliances with 
+industry giants like Pure 
+Storage, VAST Data, NEC, and 
+NVIDIA enable us to deliver 
+next-gen technologies with 
+unmatched reliability.
+Certified Skills, Agile 
+Teams
+Our engineers are certified 
+across key technologies and 
+operate in nimble, client-
+focused teams to ensure rapid 
+delivery and continuous 
+support.
+Local Presence, Global 
+Standards
+Headquartered in Bryanston, 
+Johannesburg, we offer the 
+responsiveness of a local 
+partner with the service 
+excellence of a global IT 
+powerhouse.
+Solution Brief | Akamai Guardicore Segmentation 1
+Change the banner
+Solution Brief
+Akamai Guardicore Segmentation
+Zero Trust Microsegmentation
+For Modern Enterprises
+What is Akamai Guardicore Segmentation?
+
+
+===== PAGE 2 =====
+
+2
+Benefits to Your Business
+✓ Reduce Attack Surface – Contain breaches by isolating assets and blocking lateral movement.
+✓ Enhance Compliance – Gain the visibility and controls required for regulatory frameworks.
+✓ Safeguard Critical Applications – Ringfence high-value assets with minimal disruption.
+✓ Secure Cloud Adoption – Apply consistent policies across cloud, on-prem, and hybrid environments.
+✓ Prevent Ransomware Impact – Stop attackers from reaching critical systems.
+✓ Increase Operational Efficiency – Automate discovery, policy creation, and incident response.
+✓ Simplify Management – Centralise security operations with one unified Zero Trust platform.
+✓ Deliver ROI – Reduce downtime, optimise resources, and lower incident management costs.
+Business Challenges Solved
+Organisations face increasing risks as digital transformation expands the attack surface:
+o Lateral Movement & Ransomware – Attackers exploit flat networks to spread quickly.
+o Hybrid Complexity – Security policies often fragment across on-prem, cloud, and containerised environments.
+o Limited Visibility – IT teams lack real-time insights into dependencies, flows, and risks.
+o Compliance Pressure – Regulations demand segmentation and proof of adequate controls.
+o Slow Incident Response – Breach detection and containment remain time-consuming.
+Guardicore addresses these challenges by combining deep visibility, precise segmentation, and automated defence into one intuitive platform.
+Key Features
+Granular Microsegmentation – Enforce policies down to individual processes and services, independent of network 
+architecture.
+Real-time & Historical Visibility – Automatically map and visualise flows and dependencies.
+Flexible Asset Labelling – Apply rich metadata to workloads for logical grouping and automated enforcement.
+Intuitive Policy Creation – Simplified workflows with AI recommendations and pre-built templates.
+Broad Platform Coverage – Secure modern and legacy systems, containers, IoT/OT, and multi-cloud workloads.
+Threat Detection & Response - Identify lateral movement and malicious activity, with tools for rapid containment.
+AI-Powered Insights – Intelligent suggestions for labelling, segmentation, and vulnerability detection.
+Solution Brief | Akamai Guardicore Segmentation
+
+
+===== PAGE 3 =====
+
+3
+Solution Brief | Akamai Guardicore Segmentation
+Version 1.0 – © 2025 Data Sciences Corporation. All rights reserved.
+ datasciences.co.za/contact-us/
+ info@datasciences.co.za
+About Data Sciences
+Data Sciences Corporation is a 
+Bryanston-based IT solutions provider 
+delivering next-gen infrastructure, 
+intelligent platforms, and data-driven 
+innovation across Africa.
+Simplify your infrastructure and unlock 
+the full value of your data with Data 
+Sciences Corporation—Africa’s trusted 
+partner for next-gen IT solutions.
+Contact Us at: info@datasciences.co.za
+Scan Here to Learn more about our 
+other solutions on our website.
+Relevance to Organisations
+By uniting software-defined segmentation, Zero Trust enforcement, and AI-powered visibility, 
+Akamai Guardicore helps enterprises:
+o Protect critical workloads across diverse environments.
+o Enforce consistent policies at scale.
+o Strengthen their security posture against evolving threats.
+o Streamline compliance with regulatory requirements.
+Why Akamai Guardicore with Data Sciences?
+Proven Expertise in Security – We bring local market knowledge and enterprise-grade delivery 
+across Africa.
+Strategic Partnerships – Our alignment with Akamai ensures best-in-class Zero Trust 
+innovation.
+Certified Teams – Skilled engineers deliver rapid deployment and continuous support.
+Global Standards, Local Presence – Headquartered in Johannesburg, delivering responsiveness with 
+international excellence.

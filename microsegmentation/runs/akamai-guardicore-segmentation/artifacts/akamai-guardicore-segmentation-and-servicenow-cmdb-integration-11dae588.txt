@@ -1,0 +1,48 @@
+===== PAGE 1 =====
+
+AKAMAI SOLUTION BRIEF
+Akamai Guardicore Segmentation  
+and ServiceNow CMDB Integration
+Integrate separate data sources to create a unified labeling scheme  
+across your cloud infrastructure, data centers, and endpoints
+Visibility and microsegmentation
+Akamai Guardicore Segmentation’s integration with ServiceNow allows organizations 
+to leverage data collected from other ITSM processes to ensure consistent security is 
+extended to assets throughout their lifecycle. You can generate application and network 
+dependency maps and assign labels with highly accurate CMDB data, then create the 
+appropriate segmentation policies with this joint solution.
+Akamai Guardicore Segmentation’s no-limit label structure also allows you to take 
+advantage of your ServiceNow CMDB as is — without the need to manipulate labels to 
+ensure you stay under a specific number of used labels. 
+How the integration works
+The integration is provided through an app for ServiceNow CMDB. A dedicated 
+orchestration is then used to create labels in the platform. This approach allows you to 
+maintain a flexible labeling scheme consistent with other systems for use when creating 
+policies or Reveal maps with CMDB data.
+A straightforward configuration process
+Install the app from the ServiceNow Store to use this built-in integration to pull CMDB data.
+Next: 1.  Configure the ServiceNow roles and authorization  
+ 2.  Activate the REST API into Akamai Guardicore Segmentation 
+ 3.  Your CMDB data is now available for use  
+Availability 
+• Akamai Guardicore Segmentation for CMDB from the ServiceNow store
+• Akamai Guardicore Segmentation R32 and above 
+To learn more about this or any other integration, or to request a demo,  
+please contact esg-bd@akamai.com
+Key benefits
+Understanding what assets exist, how they connect, and how their configuration changes over time are at 
+the heart of organizations’ IT service management programs. Bringing this information into your security 
+technology stack by integrating it with a configuration management database can provide your tools with the 
+information they need to improve security processes and reduce risk dramatically.
+• Leverage existing CMDB 
+information for clouds, data 
+centers, IoT, and OT 
+• Integrate natively without the need 
+to change your labeling scheme 
+• Lower security and operational 
+costs by automating workflows 
+using CMDB asset lifecycle 
+management
+• Reduce audit costs through 
+automation and improved 
+information flow on all assets

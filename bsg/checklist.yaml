@@ -1,0 +1,173 @@
+# Canonical Bidirectional Security Gateway (BSG) / Cross Domain Solution evaluation checklist.
+# IDs are stable — never renumber. Add new items with new IDs.
+#
+# verdict_type semantics:
+#   boolean            → supported | partial | not_supported | unknown | not_applicable
+#   numeric_threshold  → same verdicts, but items[].numeric_value + unit MUST be present
+#                        (validator rejects the assessment otherwise)
+#
+# threshold.op:  "<" | "<=" | ">" | ">="   (evaluated against numeric_value + unit)
+#
+# screen: true  → item is part of the quick screening pass (gate items)
+#
+# NOTE on `not_applicable`: BSG.csv mixes two product classes — high-assurance
+# Cross Domain Solutions / protocol-break guards and ruggedized industrial
+# NGFWs. Items 1.1 (protocol break), 1.2 (hardware isolation), 1.5 (internal
+# data stamping), 2.1 (CDR), 2.4 (schema validation), 2.5 (IFC/security
+# labels), and 2.7 (anti-steganography) are the most guard/CDS-specific and
+# are legitimately not_applicable for a plain firewall — that is NOT the same
+# as unknown. Only mark not_applicable when a source explicitly establishes
+# the product's category rules the item out; otherwise unknown.
+
+meta:
+  version: 1
+  source: bsg/checklist.md
+  language: vi
+  updated: 2026-08-07
+
+categories:
+  - id: "1"
+    name: "Architecture & Security"
+  - id: "2"
+    name: "Inspection & CDR Engine"
+  - id: "3"
+    name: "Protocol Support"
+  - id: "4"
+    name: "Performance & High Availability"
+  - id: "5"
+    name: "Management & Compliance"
+
+items:
+  # 1. Architecture & Security
+  - id: "1.1"
+    category: "1"
+    requirement: "Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing."
+    verdict_type: boolean
+    screen: true
+
+  - id: "1.2"
+    category: "1"
+    requirement: "Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly."
+    verdict_type: boolean
+
+  - id: "1.3"
+    category: "1"
+    requirement: "Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list."
+    verdict_type: boolean
+    screen: true
+
+  - id: "1.4"
+    category: "1"
+    requirement: "Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode)."
+    verdict_type: boolean
+
+  - id: "1.5"
+    category: "1"
+    requirement: "Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới."
+    verdict_type: boolean
+
+  # 2. Inspection & CDR Engine
+  - id: "2.1"
+    category: "2"
+    requirement: "Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD."
+    verdict_type: boolean
+    screen: true
+
+  - id: "2.2"
+    category: "2"
+    requirement: "Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file."
+    verdict_type: boolean
+
+  - id: "2.3"
+    category: "2"
+    requirement: "Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô."
+    verdict_type: boolean
+
+  - id: "2.4"
+    category: "2"
+    requirement: "Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema."
+    verdict_type: boolean
+
+  - id: "2.5"
+    category: "2"
+    requirement: "Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin."
+    verdict_type: boolean
+
+  - id: "2.6"
+    category: "2"
+    requirement: "Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến."
+    verdict_type: boolean
+
+  - id: "2.7"
+    category: "2"
+    requirement: "Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP)."
+    verdict_type: boolean
+
+  # 3. Protocol Support
+  - id: "3.1"
+    category: "3"
+    requirement: "Hỗ trợ Giao thức File Transfer: SFTP, FTP/S, HTTPS, SMB/NFS Proxy có làm sạch nội dung."
+    verdict_type: boolean
+
+  - id: "3.2"
+    category: "3"
+    requirement: "Hỗ trợ Giao thức OT/ICS: OPC UA, Modbus TCP, IEC 60870-5-104, DNP3, MQTT Industrial Proxy."
+    verdict_type: boolean
+    screen: true
+
+  - id: "3.3"
+    category: "3"
+    requirement: "Hỗ trợ Giao thức Database: SQL Server, Oracle, PostgreSQL Proxy với khả năng whitelist câu lệnh Query."
+    verdict_type: boolean
+
+  - id: "3.4"
+    category: "3"
+    requirement: "Hỗ trợ Giao thức Realtime Stream: RTSP Video Proxy, Syslog/CEF Unidirectional/Bidirectional Relay."
+    verdict_type: boolean
+
+  # 4. Performance & High Availability
+  - id: "4.1"
+    category: "4"
+    requirement: "Băng thông Xử lý (Throughput): Hỗ trợ băng thông kiểm tra CDR thực tế ≥ 1Gbps (hoặc theo tải dự án)."
+    verdict_type: numeric_threshold
+    threshold: { op: ">=", value: 1000, unit: "Mbps" }
+
+  - id: "4.2"
+    category: "4"
+    requirement: "Độ trễ Xử lý (Processing Latency): Độ trễ xử lý gói tin/giao thức realtime ≤ 10ms."
+    verdict_type: numeric_threshold
+    threshold: { op: "<=", value: 10, unit: "ms" }
+
+  - id: "4.3"
+    category: "4"
+    requirement: "Khả năng Dự phòng (HA Active-Standby): Tự động chuyển mạch khi sự cố trong thời gian ≤ 100ms không mất session."
+    verdict_type: numeric_threshold
+    threshold: { op: "<=", value: 100, unit: "ms" }
+
+  - id: "4.4"
+    category: "4"
+    requirement: "Tự vệ khi Quá tải (Fail-Safe State): Tự động khóa ranh giới (Fail-Close) khi phần cứng bị tấn công từ chối dịch vụ DoS."
+    verdict_type: boolean
+    screen: true
+
+  # 5. Management & Compliance
+  - id: "5.1"
+    category: "5"
+    requirement: "Quản trị Phân quyền (RBAC): Tách biệt vai trò Admin Hệ thống, Admin Policy và Auditor An ninh."
+    verdict_type: boolean
+
+  - id: "5.2"
+    category: "5"
+    requirement: "Tích hợp SIEM/SOAR: Đẩy Log thời gian thực dạng CEF/Syslog qua kênh mã hóa TLS tới SIEM."
+    verdict_type: boolean
+    screen: true
+
+  - id: "5.3"
+    category: "5"
+    requirement: "Báo cáo Tuân thủ (Compliance Report): Có sẵn mẫu báo cáo tuân thủ NIST SP 800-82, IEC 62443, ISO 27001."
+    verdict_type: boolean
+
+  - id: "5.4"
+    category: "5"
+    requirement: "Chứng nhận Quốc tế / Quốc gia: Đạt chứng nhận Common Criteria (EAL4+), FIPS 140-3 hoặc Chứng nhận Cơ yếu."
+    verdict_type: boolean
