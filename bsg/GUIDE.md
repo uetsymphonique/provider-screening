@@ -10,8 +10,10 @@ Domain Solution instead of microsegmentation), and a fully independent
 `checklist.yaml`, evidence stores, and decision buckets. Nothing under `bsg/`
 is shared with `microsegmentation/` except the two top-level helper scripts in
 `scripts/` (`run_batch.py`, `pdf_to_text.py`), both of which take a `--domain`
-flag — **always pass `--domain bsg`** when running them for this project, or
-they silently default to microsegmentation's tree.
+flag — **always pass `--domain bsg`** when running them for this project.
+`run_batch.py` also requires `--mode`. `run_batch.py --domain` and `--mode`
+have no default and fail fast (argparse error) if omitted; `pdf_to_text.py
+--domain` still silently defaults to microsegmentation's tree if you forget it.
 
 ## What overrides what
 
@@ -179,15 +181,24 @@ python bsg/scripts/aggregate_matrix.py --mode deep
 ## Batch runner (`scripts/run_batch.py`)
 
 Runs the mode-specific prompt against a product list, one fresh `claude -p`
-session per product (no context leakage between vendors). Uses
+session per product (no context leakage between vendors). By default uses
 `--permission-mode acceptEdits` + a scoped `--allowedTools` list — no prompts,
-no `--dangerously-skip-permissions`. Full stream-json trace goes to
-`runs/<pid>/claude_run.jsonl`; per-run summary (elapsed, exit code, cost,
+no full bypass. Pass `--dangerously-skip-permissions` to swap that for
+`claude -p --dangerously-skip-permissions` instead — no prompt for ANY tool
+call, in or out of the project tree; off by default, opt in per invocation
+since it removes all guardrails for an unattended batch run. Full stream-json
+trace goes to `runs/<pid>/claude_run.jsonl`; per-run summary (elapsed, exit code, cost,
 validator result) to `runs/<pid>/claude_run.meta.json`. `--skip-done` compares
 the existing `assessment.json`'s `assessment_mode` to the current run, so a
-screen result does NOT block a standard rerun.
+screen result does NOT block a standard rerun. `--domain` and `--mode` are
+required (no default) — the CLI errors out immediately if either is omitted.
+Optional `--max-turns`/`--max-budget-usd` cap agentic turns/spend per product
+(forwarded to `claude -p`); both unset by default — check a real run's
+`claude_run.meta.json` for actual `num_turns`/`total_cost_usd` before picking
+a cap, since a standard-mode pass over 24 checklist items needs meaningfully
+more than a typical single-skill task.
 
-**Always pass `--domain bsg`** — the script defaults to `microsegmentation`.
+**Always pass `--domain bsg`** — required, and there's no default to fall back to.
 
 ```bash
 # --- Screen pass (all 52 vendors from BSG.csv) ---
@@ -271,4 +282,4 @@ For each invocation with `--product`, the script:
 - **Do not** mark `not_supported` because the docs "don't mention it." That is `unknown`. Mark `not_supported` only when a source explicitly states the capability is absent or a documented alternative rules it out.
 - **Do not** mark `not_applicable` without a citation establishing the product's category. That is the whole point of the distinction from `unknown` (see "The two product classes" above).
 - **Do not** fill `numeric_value` with round numbers borrowed from the requirement ("≥ 1000 Mbps → 1000"). If the vendor says "multi-gigabit", verdict is `partial` with `numeric_value: null` and `notes` explaining the imprecision.
-- **Do not** run `scripts/run_batch.py` or `scripts/pdf_to_text.py` without `--domain bsg` — both default to `microsegmentation` and will silently write into the wrong project tree.
+- **Do not** run `scripts/run_batch.py` (also needs `--mode`) or `scripts/pdf_to_text.py` without `--domain bsg`. `run_batch.py` now errors out if `--domain`/`--mode` are omitted; `pdf_to_text.py` still silently defaults to `microsegmentation` and will write into the wrong project tree.

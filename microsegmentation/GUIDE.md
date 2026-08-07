@@ -157,27 +157,37 @@ python microsegmentation/scripts/aggregate_matrix.py --mode deep
 ## Batch runner (`scripts/run_batch.py`)
 
 Runs the mode-specific prompt against a product list, one fresh `claude -p`
-session per product (no context leakage between vendors). Uses
+session per product (no context leakage between vendors). By default uses
 `--permission-mode acceptEdits` + a scoped `--allowedTools` list — no prompts,
-no `--dangerously-skip-permissions`. Full stream-json trace goes to
-`runs/<pid>/claude_run.jsonl`; per-run summary (elapsed, exit code, cost,
+no full bypass. Pass `--dangerously-skip-permissions` to swap that for
+`claude -p --dangerously-skip-permissions` instead — no prompt for ANY tool
+call, in or out of the project tree; off by default, opt in per invocation
+since it removes all guardrails for an unattended batch run. Full stream-json
+trace goes to `runs/<pid>/claude_run.jsonl`; per-run summary (elapsed, exit code, cost,
 validator result) to `runs/<pid>/claude_run.meta.json`. `--skip-done` compares
 the existing `assessment.json`'s `assessment_mode` to the current run, so a
-screen result does NOT block a standard rerun.
+screen result does NOT block a standard rerun. `--domain` and `--mode` are
+required (no default) — the CLI errors out immediately if either is omitted,
+instead of silently running against the wrong project tree or wrong pass.
+Optional `--max-turns`/`--max-budget-usd` cap agentic turns/spend per product
+(forwarded to `claude -p`); both unset by default — check a real run's
+`claude_run.meta.json` for actual `num_turns`/`total_cost_usd` before picking
+a cap, since a standard-mode pass over 30+ checklist items needs meaningfully
+more than a typical single-skill task.
 
 ```bash
 # --- Screen pass (all 50 vendors from Microsegmentation.csv) ---
-venv/Scripts/python.exe scripts/run_batch.py --mode screen --dry-run --skip-done
-venv/Scripts/python.exe scripts/run_batch.py --mode screen --skip-done --limit 3
-venv/Scripts/python.exe scripts/run_batch.py --mode screen --only illumio-core
+venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode screen --dry-run --skip-done
+venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode screen --skip-done --limit 3
+venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode screen --only illumio-core
 
 # --- Standard/deep pass (queue = advance-to-deep bucket from promoter) ---
 venv/Scripts/python.exe microsegmentation/scripts/promote_to_deep.py
-venv/Scripts/python.exe scripts/run_batch.py --mode standard \
+venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode standard \
     --queue-file microsegmentation/decisions/deep_queue.txt --skip-done
 
 # Resume after interruption (either mode)
-venv/Scripts/python.exe scripts/run_batch.py --mode standard \
+venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode standard \
     --queue-file microsegmentation/decisions/deep_queue.txt \
     --start-at cato-sase-cloud --skip-done
 ```

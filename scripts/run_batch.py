@@ -174,11 +174,17 @@ def render_prompt(template: str, product: dict) -> str:
             .replace("{product_id}", product["product_id"]))
 
 
-def parse_stream_cost(log_path: Path) -> float | None:
-    """Scan stream-json log for the final result event; return total_cost_usd."""
+def parse_stream_result(log_path: Path) -> dict | None:
+    """Scan stream-json log for the final `type: "result"` event; return it whole.
+
+    Schema (SDKResultMessage — https://code.claude.com/docs/en/agent-sdk/typescript.md):
+      subtype, is_error, duration_ms, duration_api_ms, num_turns, total_cost_usd,
+      usage.{input_tokens, output_tokens, cache_creation_input_tokens,
+      cache_read_input_tokens}, permission_denials, result, session_id.
+    """
     if not log_path.exists():
         return None
-    cost = None
+    result_event = None
     try:
         with log_path.open(encoding="utf-8") as f:
             for line in f:
@@ -190,12 +196,10 @@ def parse_stream_cost(log_path: Path) -> float | None:
                 except json.JSONDecodeError:
                     continue
                 if isinstance(ev, dict) and ev.get("type") == "result":
-                    c = ev.get("total_cost_usd") or ev.get("cost_usd")
-                    if c is not None:
-                        cost = float(c)
+                    result_event = ev
     except Exception:  # noqa: BLE001
         pass
-    return cost
+    return result_event
 
 
 def run_validator(pid: str) -> dict | None:
@@ -215,7 +219,8 @@ def run_validator(pid: str) -> dict | None:
     }
 
 
-def run_one(product, prompt_text, model, timeout, dry_run) -> dict:
+def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_budget_usd=None,
+            skip_permissions=False) -> dict:
     pid = product["product_id"]
     run_dir = RUNS_ROOT / pid
 
@@ -227,15 +232,27 @@ def run_one(product, prompt_text, model, timeout, dry_run) -> dict:
         claude_bin, "-p",
         "--output-format", "stream-json",
         "--verbose",  # required for stream-json in -p mode
-        "--permission-mode", "acceptEdits",
-        "--allowedTools", ALLOWED_TOOLS,
     ]
+    if skip_permissions:
+        # No prompts for ANY tool call, in or out of the project tree — the
+        # scoped acceptEdits + allowedTools combo below is the safe default;
+        # this is opt-in per invocation via --dangerously-skip-permissions.
+        cmd.append("--dangerously-skip-permissions")
+    else:
+        cmd.extend(["--permission-mode", "acceptEdits", "--allowedTools", ALLOWED_TOOLS])
     if model:
         cmd.extend(["--model", model])
+    if max_turns is not None:
+        cmd.extend(["--max-turns", str(max_turns)])
+    if max_budget_usd is not None:
+        cmd.extend(["--max-budget-usd", str(max_budget_usd)])
     cmd.append(prompt_text)
 
     started_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-    print(f"[{pid}] start {started_iso}  prompt={len(prompt_text)}B  model={model or 'default'}")
+    budget_str = f"${max_budget_usd}" if max_budget_usd is not None else "none"
+    perm_str = "DANGEROUSLY-SKIP-PERMISSIONS" if skip_permissions else "acceptEdits+allowlist"
+    print(f"[{pid}] start {started_iso}  prompt={len(prompt_text)}B  model={model or 'default'}  "
+          f"max_turns={max_turns or 'none'}  max_budget={budget_str}  perm={perm_str}")
 
     if dry_run:
         return {
@@ -268,7 +285,9 @@ def run_one(product, prompt_text, model, timeout, dry_run) -> dict:
         status = "timeout"
     elapsed = round(time.time() - t0, 1)
 
-    cost = parse_stream_cost(log_path)
+    result_event = parse_stream_result(log_path)
+    usage = (result_event or {}).get("usage") or {}
+    cost = (result_event or {}).get("total_cost_usd")
     val = run_validator(pid)
 
     meta = {
@@ -279,22 +298,44 @@ def run_one(product, prompt_text, model, timeout, dry_run) -> dict:
         "elapsed_seconds": elapsed,
         "exit_code": exit_code,
         "status": status,
+        "skip_permissions": skip_permissions,
+        "subtype": (result_event or {}).get("subtype"),
+        "is_error": (result_event or {}).get("is_error"),
+        "num_turns": (result_event or {}).get("num_turns"),
+        "duration_ms": (result_event or {}).get("duration_ms"),
+        "duration_api_ms": (result_event or {}).get("duration_api_ms"),
         "total_cost_usd": cost,
+        "usage": {
+            "input_tokens": usage.get("input_tokens"),
+            "output_tokens": usage.get("output_tokens"),
+            "cache_creation_input_tokens": usage.get("cache_creation_input_tokens"),
+            "cache_read_input_tokens": usage.get("cache_read_input_tokens"),
+        },
+        "permission_denials": len((result_event or {}).get("permission_denials") or []),
+        "session_id": (result_event or {}).get("session_id"),
         "validator": val,
         "log_path": str(log_path.relative_to(REPO_ROOT)),
     }
     meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     v_summary = "n/a" if not val else val.get("exit_code")
-    print(f"[{pid}] {status} in {elapsed}s  cost=${cost or 0:.4f}  validator={v_summary}")
+    print(f"[{pid}] {status} in {elapsed}s  turns={meta['num_turns']}  "
+          f"tokens in={usage.get('input_tokens', 0)} out={usage.get('output_tokens', 0)} "
+          f"cache_read={usage.get('cache_read_input_tokens', 0)} "
+          f"cache_write={usage.get('cache_creation_input_tokens', 0)}  "
+          f"cost=${cost or 0:.4f}  validator={v_summary}")
     return meta
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--domain", choices=list(DOMAINS.keys()), default="microsegmentation",
-                    help="Which project (checklist/prompts/runs tree) to run against.")
-    ap.add_argument("--mode", choices=["screen", "standard"], default="screen",
-                    help="Assessment mode: screen (6 gate items) | standard (all items)")
+    ap.add_argument("--domain", choices=list(DOMAINS.keys()), required=True,
+                    help="Which project (checklist/prompts/runs tree) to run against. Required — "
+                         "no default, so a mistyped command fails fast instead of silently running "
+                         "against the wrong domain.")
+    ap.add_argument("--mode", choices=["screen", "standard"], required=True,
+                    help="Assessment mode: screen (6 gate items) | standard (all items). Required — "
+                         "no default, so a mistyped command fails fast instead of silently running "
+                         "screen mode when you meant standard (or vice versa).")
     ap.add_argument("--csv", type=Path, default=None,
                     help="Defaults to the domain's vendor CSV under providers/.")
     ap.add_argument("--queue-file", type=Path, default=None,
@@ -308,7 +349,23 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--model", help="opus | sonnet | haiku | fable (default: session default)")
     ap.add_argument("--timeout", type=int, default=1800,
-                    help="Per-product timeout in seconds (default 30 min)")
+                    help="Per-product wall-clock timeout in seconds (default 30 min). "
+                         "This kills the subprocess; it does not stop mid-turn like --max-turns/--max-budget-usd.")
+    ap.add_argument("--max-turns", type=int, default=None,
+                    help="Cap on agentic turns per product, forwarded to `claude -p --max-turns`. "
+                         "Unset by default (no cap) — a standard-mode pass over 24-33 checklist items "
+                         "with multi-source research routinely needs more turns than a typical single-skill "
+                         "task, so borrow run-pipeline.py's 70-turn default only after checking actual usage "
+                         "in a real run's claude_run.meta.json.")
+    ap.add_argument("--max-budget-usd", type=float, default=None,
+                    help="Cap on USD spend per product, forwarded to `claude -p --max-budget-usd`. "
+                         "Unset by default (no cap) — check a real run's total_cost_usd before picking a number.")
+    ap.add_argument("--dangerously-skip-permissions", action="store_true",
+                    help="Forward `--dangerously-skip-permissions` to `claude -p` instead of the default "
+                         "--permission-mode acceptEdits + --allowedTools whitelist. No prompt for ANY tool "
+                         "call — any Bash command, any file write, in or out of the project tree. Off by "
+                         "default; pass explicitly per invocation since this removes all guardrails for "
+                         "an unattended batch run.")
     ap.add_argument("--sleep", type=int, default=5,
                     help="Seconds to pause between products (rate-limit hygiene)")
     args = ap.parse_args()
@@ -343,7 +400,9 @@ def main() -> int:
 
         prompt_text = render_prompt(template, prod)
         try:
-            meta = run_one(prod, prompt_text, args.model, args.timeout, args.dry_run)
+            meta = run_one(prod, prompt_text, args.model, args.timeout, args.dry_run,
+                            max_turns=args.max_turns, max_budget_usd=args.max_budget_usd,
+                            skip_permissions=args.dangerously_skip_permissions)
         except Exception as e:  # noqa: BLE001
             print(f"[{pid}] EXCEPTION: {e}", file=sys.stderr)
             meta = {"product_id": pid, "status": f"exception: {e}", "total_cost_usd": None}
@@ -356,30 +415,49 @@ def main() -> int:
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     summary_path = BATCH_DIR / f"summary-{ts}.json"
     total_cost = sum((s.get("total_cost_usd") or 0.0) for s in summary)
+    totals = {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0, "turns": 0}
+    for s in summary:
+        u = s.get("usage") or {}
+        totals["input"] += u.get("input_tokens") or 0
+        totals["output"] += u.get("output_tokens") or 0
+        totals["cache_read"] += u.get("cache_read_input_tokens") or 0
+        totals["cache_write"] += u.get("cache_creation_input_tokens") or 0
+        totals["turns"] += s.get("num_turns") or 0
     payload = {
         "started_at": ts,
         "mode": args.mode,
         "csv": str(args.csv.relative_to(REPO_ROOT)) if args.csv.is_relative_to(REPO_ROOT) else str(args.csv),
         "queue_file": str(args.queue_file) if args.queue_file else None,
         "model": args.model,
+        "max_turns": args.max_turns,
+        "max_budget_usd": args.max_budget_usd,
+        "dangerously_skip_permissions": args.dangerously_skip_permissions,
         "count": len(summary),
         "total_cost_usd": total_cost,
+        "totals": totals,
         "results": summary,
     }
     summary_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
     print()
-    print("=" * 78)
-    print(f"{'product_id':40s} {'status':14s} {'cost':>10s}  val")
-    print("-" * 78)
+    print("=" * 100)
+    print(f"{'product_id':38s} {'status':10s} {'turns':>5s} {'in':>8s} {'out':>7s} "
+          f"{'cache_rd':>9s} {'cache_wr':>9s} {'cost':>9s}  val")
+    print("-" * 100)
     for s in summary:
         cost = s.get("total_cost_usd") or 0.0
+        u = s.get("usage") or {}
         val = s.get("validator")
         val_ec = val.get("exit_code") if isinstance(val, dict) else "-"
-        print(f"{s.get('product_id',''):40s} {s.get('status','?'):14s} "
-              f"${cost:>9.4f}  {val_ec}")
-    print("-" * 78)
-    print(f"TOTAL COST: ${total_cost:.4f}")
+        print(f"{s.get('product_id',''):38s} {s.get('status','?'):10s} "
+              f"{s.get('num_turns') or 0:>5d} "
+              f"{u.get('input_tokens') or 0:>8d} {u.get('output_tokens') or 0:>7d} "
+              f"{u.get('cache_read_input_tokens') or 0:>9d} {u.get('cache_creation_input_tokens') or 0:>9d} "
+              f"${cost:>8.4f}  {val_ec}")
+    print("-" * 100)
+    print(f"TOTAL: turns={totals['turns']}  tokens in={totals['input']} out={totals['output']} "
+          f"cache_read={totals['cache_read']} cache_write={totals['cache_write']}  "
+          f"cost=${total_cost:.4f}")
     print(f"summary saved to {summary_path.relative_to(REPO_ROOT)}")
     return 0
 
