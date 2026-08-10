@@ -5,7 +5,7 @@ Fill in `{VENDOR}`, `{PRODUCT_NAME}`, `{product_id}` (slug from `providers/Micro
 ---
 
 ```
-Use the deep-research skill in QUICK mode to assess ONE product:
+Use the deep-research skill in STANDARD mode to assess ONE product:
 
   Vendor:       {VENDOR}
   Product:      {PRODUCT_NAME}
@@ -39,18 +39,42 @@ skill's default report_template.md.
      product_id       = "{product_id}"
    One entry per screen item; item_ids match the checklist exactly.
 
-4. PDF HANDLING (mandatory when a source is a PDF)
-   WebFetch cannot read PDF binaries. When a relevant source is a PDF:
+4. SOURCE STAGING (mandatory for EVERY cited source — PDF or web page)
+   WebFetch either can't read the content at all (PDF binaries) or fetches
+   AND summarizes through a small model in the same call (web pages) — either
+   way nothing raw survives on disk, which is how fabricated quotes have
+   slipped through before (validate_assessment.py only checks that an
+   evidence_id/source_id exists, never that the quote is real). Before citing
+   ANY source in sources.jsonl / evidence.jsonl, stage it first:
+
+   PDF source:
      d:/vcs/provider-screening/venv/Scripts/python.exe \
        d:/vcs/provider-screening/scripts/pdf_to_text.py <pdf-url> \
-       --product {product_id}
-   This stages the raw PDF into runs/{product_id}/artifacts/<slug>.pdf,
-   writes the extracted text to <slug>.txt, and appends a manifest.jsonl
-   entry with the URL, sha256, page count, and timestamp.
-   Then Read the .txt (last line of the script's stdout is its absolute path).
+       --product {product_id} --domain microsegmentation
+   Web page source:
+     d:/vcs/provider-screening/venv/Scripts/python.exe \
+       d:/vcs/provider-screening/scripts/html_to_text.py <page-url> \
+       --product {product_id} --domain microsegmentation
+
+   Both stage the raw file into runs/{product_id}/artifacts/, write extracted
+   text to <slug>.txt, and append an entry (URL, sha256, timestamp) to the
+   SAME artifacts/manifest.jsonl. Then Read the .txt (last line of the
+   script's stdout is its absolute path) — this is the ONLY text you may
+   quote from. WebFetch is still fine for initial discovery/triage of which
+   pages are worth staging, but the evidence quote itself must come from the
+   staged .txt, never from WebFetch's summary.
    Citation etiquette:
-     - sources.jsonl.raw_url  → the ORIGINAL PDF URL (not the local artifact path)
-     - evidence.jsonl.locator → include the page, e.g. "page 3, 'Kubernetes' section"
+     - sources.jsonl.raw_url  → the ORIGINAL URL (PDF or page), not the local
+                                 artifact path — must match exactly what you
+                                 passed to pdf_to_text.py / html_to_text.py
+     - evidence.jsonl.locator → include the page for PDFs, e.g. "page 3,
+                                 'Kubernetes' section"; a section heading for
+                                 web pages, e.g. "Deployment options section"
+     - evidence.jsonl.quote   → an EXACT substring of the staged .txt, not a
+                                 paraphrase. If quoting two non-adjacent
+                                 sentences, join them with " ... " so the gap
+                                 is visible — never silently stitch text that
+                                 wasn't contiguous in the source.
 
 5. ANTI-FABRICATION (validator enforces these, non-negotiable)
    - `unknown` verdict when no evidence found. Unknown items must have
@@ -77,7 +101,19 @@ skill's default report_template.md.
    If it fails, fix assessment.json in place. NEVER fabricate evidence to
    pass — downgrade verdicts to `unknown` instead and re-run.
 
-   Once it passes, generate report.md:
+   Then run the grounding check (validate_assessment.py does NOT verify a
+   quote is real, only that its IDs exist — this does):
+     d:/vcs/provider-screening/venv/Scripts/python.exe \
+       d:/vcs/provider-screening/scripts/verify_citation_grounding.py \
+       --dir d:/vcs/provider-screening/microsegmentation/runs/{product_id} --strict --require-staged
+   If ANY evidence comes back `fabricated`, that quote is not real — go back
+   to the staged .txt and fix the quote to an exact substring, or downgrade
+   the item's verdict (`partial`/`unknown`) if the claim genuinely isn't
+   supported. Never edit the quote just to force a match without re-reading
+   the .txt. `unverifiable` means a source was cited without being staged
+   per step 4 — go stage it, then re-run.
+
+   Once both pass, generate report.md:
      d:/vcs/provider-screening/venv/Scripts/python.exe \
        d:/vcs/provider-screening/microsegmentation/scripts/render_report.py \
        d:/vcs/provider-screening/microsegmentation/runs/{product_id}/assessment.json
