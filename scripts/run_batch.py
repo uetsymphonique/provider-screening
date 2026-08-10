@@ -28,10 +28,12 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import queue
 import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -202,6 +204,84 @@ def parse_stream_result(log_path: Path) -> dict | None:
     return result_event
 
 
+def _safe_console(s: str) -> str:
+    """Sanitize for print() on a non-UTF-8 console (default cp1252 on Windows).
+
+    Progress lines echo arbitrary file/web content (tool_result text, model
+    text output) which routinely contains characters cp1252 can't encode
+    (Vietnamese diacritics, em-dashes, curly quotes) -- confirmed by testing
+    summarize_event() against a real claude_run.jsonl, which raised
+    UnicodeEncodeError on a plain print(). Replacing unencodable characters
+    here means a batch run degrades to '?' placeholders instead of crashing
+    mid-run on whichever product happens to cite non-ASCII text first.
+    """
+    enc = sys.stdout.encoding or "utf-8"
+    return s.encode(enc, errors="replace").decode(enc, errors="replace")
+
+
+def _truncate(s: str, n: int = 100) -> str:
+    s = " ".join(s.split())
+    return s if len(s) <= n else s[: n - 1] + "…"
+
+
+def _brief_tool_input(name: str, inp: dict) -> str:
+    if name == "Bash":
+        return _truncate(inp.get("command", ""), 90)
+    if name in ("Read", "Edit", "Write"):
+        return inp.get("file_path", "")
+    if name in ("Grep", "Glob"):
+        return _truncate(inp.get("pattern", ""), 60)
+    if name == "WebFetch":
+        return inp.get("url", "")
+    if name == "WebSearch":
+        return _truncate(inp.get("query", ""), 60)
+    if name == "Skill":
+        return inp.get("skill", "") or inp.get("command", "")
+    keys = ", ".join(list(inp.keys())[:3])
+    return f"{{{keys}}}" if keys else ""
+
+
+def summarize_event(ev: dict) -> str | None:
+    """One-line progress summary for a stream-json event, or None to skip it.
+
+    Schema per https://code.claude.com/docs/en/headless.md stream-json output:
+    type in {system, assistant, user, result}; assistant/user carry a
+    message.content list of blocks (text | tool_use | tool_result).
+    """
+    etype = ev.get("type")
+    if etype == "system" and ev.get("subtype") == "init":
+        tools = ev.get("tools") or []
+        return f"session init  model={ev.get('model', '?')}  tools={len(tools)}"
+    if etype == "assistant":
+        for block in (ev.get("message") or {}).get("content") or []:
+            btype = block.get("type")
+            if btype == "tool_use":
+                name = block.get("name", "?")
+                brief = _brief_tool_input(name, block.get("input") or {})
+                return f"tool_use  {name}({brief})" if brief else f"tool_use  {name}"
+            if btype == "text":
+                text = _truncate(block.get("text", ""))
+                if text:
+                    return f"text      {text}"
+        return None
+    if etype == "user":
+        for block in (ev.get("message") or {}).get("content") or []:
+            if block.get("type") == "tool_result":
+                content = block.get("content")
+                text = ""
+                if isinstance(content, list):
+                    text = " ".join(
+                        c.get("text", "") for c in content
+                        if isinstance(c, dict) and c.get("type") == "text"
+                    )
+                elif isinstance(content, str):
+                    text = content
+                tag = "ERROR" if block.get("is_error") else "ok"
+                return f"tool_result[{tag}]  {_truncate(text)}"
+        return None
+    return None
+
+
 def run_validator(pid: str) -> dict | None:
     assessment = RUNS_ROOT / pid / "assessment.json"
     if not assessment.exists():
@@ -220,7 +300,7 @@ def run_validator(pid: str) -> dict | None:
 
 
 def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_budget_usd=None,
-            skip_permissions=False) -> dict:
+            skip_permissions=False, quiet=False) -> dict:
     pid = product["product_id"]
     run_dir = RUNS_ROOT / pid
 
@@ -271,18 +351,57 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
     prompt_path.write_text(prompt_text, encoding="utf-8")
 
     t0 = time.time()
+    exit_code: int | None = None
+    status: str | None = None
     try:
+        proc = subprocess.Popen(
+            cmd, cwd=str(REPO_ROOT),
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, bufsize=1,
+            encoding="utf-8", errors="replace",
+        )
+        # Pump the pipe on a background thread (not select()) so this works
+        # identically on Windows and POSIX, and so the main loop can still
+        # enforce --timeout even while readline() is blocked waiting on the
+        # next stream-json line.
+        line_q: queue.Queue[str | None] = queue.Queue()
+
+        def _pump() -> None:
+            assert proc.stdout is not None
+            for line in iter(proc.stdout.readline, ""):
+                line_q.put(line)
+            line_q.put(None)
+
+        threading.Thread(target=_pump, daemon=True).start()
+
         with log_path.open("w", encoding="utf-8") as logf:
-            proc = subprocess.run(
-                cmd, cwd=str(REPO_ROOT),
-                stdout=logf, stderr=subprocess.STDOUT,
-                timeout=timeout, check=False,
-            )
-        exit_code = proc.returncode
-        status = "ok" if exit_code == 0 else f"exit-{exit_code}"
-    except subprocess.TimeoutExpired:
-        exit_code = -1
-        status = "timeout"
+            while status is None:
+                if timeout is not None and (time.time() - t0) > timeout:
+                    proc.kill()
+                    proc.wait()
+                    exit_code, status = -1, "timeout"
+                    break
+                try:
+                    line = line_q.get(timeout=1.0)
+                except queue.Empty:
+                    continue
+                if line is None:
+                    exit_code = proc.wait()
+                    status = "ok" if exit_code == 0 else f"exit-{exit_code}"
+                    break
+                logf.write(line)
+                logf.flush()
+                if not quiet:
+                    try:
+                        ev = json.loads(line)
+                    except json.JSONDecodeError:
+                        ev = None
+                    summary_line = summarize_event(ev) if isinstance(ev, dict) else None
+                    if summary_line:
+                        print(_safe_console(f"  [{pid}] t+{time.time() - t0:6.1f}s  {summary_line}"),
+                              flush=True)
+    except Exception as e:  # noqa: BLE001
+        exit_code, status = -1, f"error: {e}"
     elapsed = round(time.time() - t0, 1)
 
     result_event = parse_stream_result(log_path)
@@ -368,6 +487,10 @@ def main() -> int:
                          "an unattended batch run.")
     ap.add_argument("--sleep", type=int, default=5,
                     help="Seconds to pause between products (rate-limit hygiene)")
+    ap.add_argument("--quiet", action="store_true",
+                    help="Suppress live per-event progress lines (tool_use/text/tool_result) while "
+                         "a product runs; only the final one-line-per-product summary prints. The "
+                         "full stream-json trace is always written to claude_run.jsonl either way.")
     args = ap.parse_args()
 
     select_domain(args.domain)
@@ -402,7 +525,8 @@ def main() -> int:
         try:
             meta = run_one(prod, prompt_text, args.model, args.timeout, args.dry_run,
                             max_turns=args.max_turns, max_budget_usd=args.max_budget_usd,
-                            skip_permissions=args.dangerously_skip_permissions)
+                            skip_permissions=args.dangerously_skip_permissions,
+                            quiet=args.quiet)
         except Exception as e:  # noqa: BLE001
             print(f"[{pid}] EXCEPTION: {e}", file=sys.stderr)
             meta = {"product_id": pid, "status": f"exception: {e}", "total_cost_usd": None}
