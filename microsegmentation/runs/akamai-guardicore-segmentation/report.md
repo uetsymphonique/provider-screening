@@ -1,18 +1,18 @@
-# Microsegmentation Product Assessment: Akamai Technologies — Akamai Guardicore Segmentation
+# Microsegmentation Product Assessment: Akamai Technologies (Guardicore) - Akamai Guardicore Segmentation
 
 **Product ID:** `akamai-guardicore-segmentation`
-**Version reference:** Akamai product brief published 03/26; Guardicore Platform Agent 7.2.x line
+**Version reference:** Centra/Guardicore Segmentation platform, current product line (v49-v54); staged docs span Centra 5.0 through 2026 product materials
 **Assessment mode:** standard
 **Checklist version:** 1
-**Assessed at:** 2026-08-07T00:00:00Z
-**Total evidence items collected:** 35
-**Total distinct sources:** 20
+**Assessed at:** 2026-08-10T07:42:31Z
+**Total evidence items collected:** 109
+**Total distinct sources:** 23
 
 ---
 
 ## 1. Overview
 
-Akamai Guardicore Segmentation (formerly Guardicore Centra, acquired by Akamai in 2021) is a software-defined microsegmentation platform that combines host-agent enforcement with agentless network-flow collection to control east-west traffic across data centers, cloud, containers, and OT [1, 6]. The vendor positions it as a Zero Trust segmentation platform with continuous, AI-driven discovery, process-level enforcement, and dynamic deception for breach detection [2, 10, 13]. Supported deployment shapes include Windows and Linux servers, macOS endpoints, VMs across AWS/Azure/GCP, Kubernetes via CNI-level enforcement, and BlueField-DPU-based agentless enforcement for OT [3, 6, 14]. The management server is available in both SaaS and on-premises form [6].
+Akamai Guardicore Segmentation (formerly Guardicore Centra) is Akamai's agent-based microsegmentation platform for east-west traffic, positioned around AI-assisted discovery, policy recommendation and enforcement across hybrid cloud, data center, Kubernetes and OT/IoMT environments [1, 2]. The platform decouples policy from the underlying network: assets are grouped by labels (Environment/Application/Role) and enforced by host agents, with agentless coverage via network collectors, VPC flow logs and, most recently, NVIDIA BlueField DPUs for environments that cannot run host software [1, 5, 16, 23]. Deployment is available as SaaS or on-premises, and the product line is in active development (v49-v54-era documentation) [1, 11]. It ships with AI-powered policy workflows, a threat-intelligence firewall, built-in deception (honeypot) capabilities, a full REST API, and documented HA/DR options for the management plane [2, 15, 16, 20]. The 2025-era materials emphasize exposure-aware detection, process-level context and proof-driven policy rollout as differentiators [2, 4].
 
 ---
 
@@ -22,13 +22,13 @@ Akamai Guardicore Segmentation (formerly Guardicore Centra, acquired by Akamai i
 
 | Verdict          | Count | Confidence: high | medium | low |
 |------------------|-------|------------------|--------|-----|
-| supported        | 14    | 10               | 4      | 0   |
-| partial          | 7     | 0                | 7      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 12    | 0                | 0      | 12  |
+| supported        | 22    | 6                | 16     | 0   |
+| partial          | 9     | 0                | 9      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 1     | 0                | 0      | 1   |
 | not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 9 items backed by ≥ 2 source_types; 3 items backed by vendor_doc only (confidence capped at medium per validator rule).
+**Evidence quality:** 22 items backed by ≥ 2 source_types; 12 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -38,134 +38,135 @@ Akamai Guardicore Segmentation (formerly Guardicore Centra, acquired by Akamai i
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Tự động khám phá luồng dữ liệu thời gian thực (Real-time Auto-discovery). | Supported | high | — | Vendor and third-party sources describe continuous, real-time discovery via lightweight sensors and flow telemetry that build a living application dependency map. [2], [6], [8] |
-| 1.2 | Hiển thị sơ đồ kết nối trực quan theo App, Environment, Role, Process. | Supported | high | — | The Reveal map ties each connection to processes and services, giving App / Environment / Role / Process granularity at Layer 7. [2], [6] |
-| 1.3 | Lưu trữ lịch sử luồng kết nối ít nhất 90 ngày để truy vết forensic. | Unknown | low | — | no evidence found (Public sources describe rich historical telemetry export but do not state a specific default flow-history retention in days.) |
-| 1.4 | Hiển thị lỗ hổng phần mềm (Vulnerability/CVE Context) trực tiếp trên map. | Supported | medium | — | The Tenable integration brief describes labelling assets with CVE and risk scores and shows CVE labels on assets in the Reveal map for risk-based segmentation. [14] |
-| 1.5 | Phát hiện các luồng kết nối ẩn, luồng không tiêu chuẩn (Unrecognized Traffic). | Supported | medium | — | AI-analyzed flow telemetry surfaces unmanaged assets and non-standard flows, which the platform then presents in the dependency map. [6] |
+| 1.1 | Tự động khám phá luồng dữ liệu thời gian thực (Real-time Auto-discovery). | Supported | high | — | The product auto-discovers assets and communication flows in real time across on-prem, cloud, Kubernetes and OT workloads; the Akamai product page, the Centra datasheet and the product brief all document continuous discovery, corroborated by PeerSpot user reviews and an independent technical blog. [1], [2], [16], [18], [19] |
+| 1.2 | Hiển thị sơ đồ kết nối trực quan theo App, Environment, Role, Process. | Supported | high | — | A single interactive Reveal map visualizes all assets, flows and dependencies with process-level granularity, and label hierarchies (Environment/Application/Role) render as nested groups; corroborated by the user guide, datasheet and peer reviews. [1], [13], [16], [18] |
+| 1.3 | Lưu trữ lịch sử luồng kết nối ít nhất 90 ngày để truy vết forensic. | Partial | medium | 30 days | Raw connection-flow retention in the management Elasticsearch defaults to 30 days (connections_delete_after_days) while daily grouped connections default to 90 days; both are configurable via CLI (gc-mgmtctl elastic_archive), so the 90-day requirement is met by default only for aggregated data or with custom retention settings. [11] |
+| 1.4 | Hiển thị lỗ hổng phần mềm (Vulnerability/CVE Context) trực tiếp trên map. | Partial | medium | — | Vulnerability data is collected via osquery-based Insight queries and a PeerSpot user describes Tenable integration that surfaces assets with highly exploitable vulnerabilities for policy building, but a dedicated CVE overlay rendered directly on the connectivity map is not explicitly documented in staged sources. [13], [18] |
+| 1.5 | Phát hiện các luồng kết nối ẩn, luồng không tiêu chuẩn (Unrecognized Traffic). | Supported | medium | — | The Network Log surfaces security violations with filters and rule suggestions, the datasheet documents policy-based detection of unsanctioned activity plus reputation analysis of suspicious domains/IPs/hashes, and the product page highlights identification of known, unknown and unmanaged assets. [1], [9], [16] |
 
 ### Category 2 — Policy Management
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Tạo chính sách dựa trên Tag/Label/Identity (không phụ thuộc IP/VLAN). | Supported | high | — | Independent write-ups describe granular policies authored against flexible labels, process, user identity and FQDN, independent of IP/VLAN. [6], [8] |
-| 2.2 | Hỗ trợ gợi ý chính sách tự động bằng AI/Machine Learning (Rule Recommendation). | Supported | high | — | The 2026 AI update to Guardicore automatically generates and explains segmentation policies and simulates impact before enforcement, per Akamai and SiliconAngle coverage. [2], [12] |
-| 2.3 | Chế độ Mô phỏng / Giả lập Chính sách (Policy Simulation / Dry-run). | Supported | medium | — | Guardicore's 'Allow Mode' runs AI-generated policies in simulation showing projected impact before any traffic is blocked. [6] |
-| 2.4 | Khả năng khôi phục chính sách tức thì (Instant 1-Click Rollback). | Unknown | low | — | no evidence found (Public sources reference 'rollback rates' as an operational metric but do not document a documented one-click instant rollback control.) |
-| 2.5 | Hỗ trợ chính sách phân cấp (Inherited & Hierarchical Rules). | Unknown | low | — | no evidence found (No public description of hierarchical / inherited policy structures was located.) |
+| 2.1 | Tạo chính sách dựa trên Tag/Label/Identity (không phụ thuộc IP/VLAN). | Supported | high | — | Policies are built from labels (application/environment/role) and are decoupled from the underlying infrastructure; vendor documentation, the Centra datasheet and peer reviews all describe label-based, IP-independent policy creation. [1], [9], [16], [18] |
+| 2.2 | Hỗ trợ gợi ý chính sách tự động bằng AI/Machine Learning (Rule Recommendation). | Supported | medium | — | Centra's AI-powered engine auto-generates policy rules from templates and observed traffic, and the product page documents machine-learning-based policy recommendations; a PeerSpot reviewer notes that more AI automation for policy creation would still be welcome, so the feature is confirmed by vendor sources only. [1], [9] |
+| 2.3 | Chế độ Mô phỏng / Giả lập Chính sách (Policy Simulation / Dry-run). | Supported | medium | — | The product page states that security teams can simulate the impact of policies before they go live, the product brief documents staged draft/alert/block workflows with readiness measurement, and an independent blog describes Allow Mode simulation before any traffic is blocked. [1], [2], [19], [20] |
+| 2.4 | Khả năng khôi phục chính sách tức thì (Instant 1-Click Rollback). | Supported | medium | — | The user guide documents a Revisions screen that saves every policy change indefinitely and allows reverting to a previous revision at any time, providing one-click rollback of published policies. [13] |
+| 2.5 | Hỗ trợ chính sách phân cấp (Inherited & Hierarchical Rules). | Partial | medium | — | Label keys form a configurable hierarchy (e.g., Environment/Application/Role) that nests assets in the map, and policy rules support priority tiers (implied, override and standard rules), but explicit rule inheritance down a label hierarchy is not documented in staged sources. [13], [14], [16] |
 
 ### Category 3 — Architecture & Support
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 3.1 | Hỗ trợ đa dạng OS: Windows Server (2003-2022), Linux RHEL/CentOS/Ubuntu, AIX, Solaris. | Supported | high | — | Guardicore's 2021 legacy-support release brought coverage for Windows 2000/2003/2008, RHEL 4/5, Solaris SPARC 10/11 and HP-UX 11.23/11.31; current Platform Agent docs list Windows 10-11, Server 2012-2019, RHEL 8+, Debian 11 and Ubuntu 18-22. [5], [11] |
-| 3.2 | Hỗ trợ Container / Kubernetes / OpenShift native isolation. | Partial | medium | — | Kubernetes enforcement is native via CNI controller with DaemonSet+Helm deployment and a third-party review lists OpenShift OVN among supported CNIs, but the Akamai blog itself notes OpenShift and Cilium support was still being expanded at time of writing. [3], [6] |
-| 3.3 | Hỗ trợ cả giải pháp Agent-based và Agentless/Network Integration. | Supported | high | — | Guardicore combines agent-based enforcement with agentless visibility via NetFlow/sFlow/IPFIX network collectors, per independent reviews. [6], [20] |
-| 3.4 | Tương thích môi trường cách ly hoàn toàn không có Internet (Air-gapped Network). | Partial | medium | — | The management server is documented for both on-prem and SaaS; support for fully air-gapped operation is not explicitly certified in public sources. [6] |
-| 3.5 | Khả năng mở rộng (Scalability) lên tới trên 50,000 Workloads tập trung. | Supported | medium | 300000 workloads | Akamai cites a global consulting-firm deployment of 300,000 endpoints secured in two weeks, well above the 50,000-workload threshold; the figure is a vendor-attributed customer case. [1] |
+| 3.1 | Hỗ trợ đa dạng OS: Windows Server (2003-2022), Linux RHEL/CentOS/Ubuntu, AIX, Solaris. | Supported | medium | — | Vendor documentation states agents run on all Windows and Linux operating systems, new and legacy, with OS tables covering Windows Server 2003-2019, RHEL/CentOS/Ubuntu/Debian/SUSE, AIX 6.1/7.1/7.2 and Solaris 10/11; an independent blog corroborates Windows Server 2012+, major Linux distributions and Unix variants including AIX and Solaris. [4], [11], [19] |
+| 3.2 | Hỗ trợ Container / Kubernetes / OpenShift native isolation. | Supported | medium | — | Kubernetes enforcement is native via the Container Network Interface (CNI) controller, OpenShift is listed in the datasheet, and peer reviews describe K8s and OpenShift instrumentation; a couple of reviewers note K8s installation caveats. [1], [3], [16], [18] |
+| 3.3 | Hỗ trợ cả giải pháp Agent-based và Agentless/Network Integration. | Supported | high | — | The product page explicitly states the solution includes both agent-based and agentless options, with agentless ideal for PaaS, IoT and OT; the datasheet describes agent sensors plus network collectors and VPC flow logs, and independent sources document NetFlow/sFlow/IPFIX collection and NVIDIA BlueField DPU agentless enforcement. [1], [5], [16], [19], [23] |
+| 3.4 | Tương thích môi trường cách ly hoàn toàn không có Internet (Air-gapped Network). | Supported | medium | — | The installation guide documents offline-mode Linux agent installation (IS_OFFLINE_PACKAGE=true) and the product page states the platform can be deployed on-premises or in the cloud, supporting air-gapped deployments. [1], [5], [12] |
+| 3.5 | Khả năng mở rộng (Scalability) lên tới trên 50,000 Workloads tập trung. | Supported | medium | 300000 workloads | A vendor customer story documents agent-based deployment across all 300,000 workloads and endpoints of a global consulting firm, and the product page states the AI algorithm learns tens of thousands of applications and millions of flows; peer reviews also praise scalability. [1], [6], [18] |
 
 ### Category 4 — Performance & Impact
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | Unknown | low | — | no evidence found (Public sources describe the agent as 'lightweight' but do not cite a measured CPU percentage under load.) |
-| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | Unknown | low | — | no evidence found (Only macOS memory profile ranges (10 MB soft up to 1000 MB hard limit by host RAM tier) surfaced; that is agent configuration, not measured resident RAM on Windows/Linux at production load.) |
-| 4.3 | Không làm tăng độ trễ mạng (< 0.1ms network latency). | Unknown | low | — | no evidence found (No public benchmark of added network latency (ms) attributable to the agent was located.) |
-| 4.4 | Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng giữ nguyên không bị gián đoạn. | Unknown | low | — | no evidence found (Public documentation and third-party reviews do not describe agent fail-safe behavior when the agent crashes or is stopped (fail-open vs fail-close, traffic continuity).) |
-| 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | Unknown | low | — | no evidence found (Vendor techdocs describe silent install and remote upgrade but do not explicitly state whether a reboot is required.) |
+| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | Partial | medium | n/a (qualitative) | Vendor documentation states agent CPU utilization can reach up to 5% (Windows and AIX), while an implementation partner reports typical usage generally under 1-2%; no source confirms a sustained sub-1% figure, so the <1% requirement is not demonstrated. [11], [20] |
+| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | Partial | medium | n/a (qualitative) | Vendor documentation states agent memory usage up to 400MB (Windows and AIX), while an implementation partner describes a small memory footprint; no staged source documents RAM below 100MB. [11], [20] |
+| 4.3 | Không làm tăng độ trễ mạng (< 0.1ms network latency). | Partial | medium | n/a (qualitative) | The comparison guide documents a latency-optimized engine whose latency is relatively insensitive to policy size, and the product page mentions low-latency enforcement, but no staged source gives a measured latency figure, so the <0.1ms threshold is not demonstrated. [1], [4], [16] |
+| 4.4 | Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng giữ nguyên không bị gián đoạn. | Partial | medium | — | If the enforcement kernel module is missing the agent falls back to polling mode where enforcement is not performed, so traffic continues, and the agent persists and keeps enforcing the last received policy when disconnected; however an explicit fail-open/fail-closed configuration setting is not documented, and a peer reviewer flags kernel-module blue-screen risk. [11], [13], [18] |
+| 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | Supported | medium | — | The installation guide states that after AIX agent installation all processes start automatically with no server reboot required, and agent upgrades are performed in place or via remote agent upgrade from the Centra UI; no staged source documents a reboot requirement for agent install or update. [11], [12] |
 
 ### Category 5 — Integration & Automation
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 5.1 | Full RESTful API hỗ trợ 100% chức năng quản trị. | Partial | medium | — | Guardicore exposes a REST API used by SIEM add-ons and automation recipes; public sources confirm the API's existence but do not verify 100% coverage of admin console functionality. [1], [9] |
-| 5.2 | Tích hợp sẵn với SIEM/SOAR (Splunk, QRadar, Sentinel) qua Syslog/CEF/API. | Supported | high | — | Guardicore telemetry is shipped to Splunk and IBM QRadar via CEF/syslog, with a dedicated Splunkbase add-on that pulls data through the REST API. [6], [9] |
-| 5.3 | Tích hợp CMDB (ServiceNow) để đồng bộ hóa thông tin nhãn (Tags). | Supported | high | — | A ServiceNow-certified Guardicore application in the ServiceNow Store pulls CMDB data via REST to produce labels for Reveal maps and policies. [18], [19] |
-| 5.4 | Tích hợp CI/CD Pipeline (Jenkins, GitLab, Terraform) cho DevSecOps. | Partial | medium | — | Vendor pages mention REST API and automation recipes for DevOps and CI/CD frameworks, but specific Jenkins / GitLab / Terraform module coverage is not detailed in public documents. [1] |
+| 5.1 | Full RESTful API hỗ trợ 100% chức năng quản trị. | Supported | medium | — | Akamai training material states the RESTful API provides programmatic access to all Centra functionality and that every UI action is backed by an API call; the datasheet lists an Open REST API export protocol, and a peer reviewer confirms APIs support building external reports. [15], [16], [18] |
+| 5.2 | Tích hợp sẵn với SIEM/SOAR (Splunk, QRadar, Sentinel) qua Syslog/CEF/API. | Supported | medium | — | The Kubernetes brief documents export of network-log data to SIEM, the datasheet lists STIX/Syslog/CEF exports and automatic IOC exports to SIEM systems, a Fortinet brief documents syslog ingestion of Guardicore data, and the user guide documents TLS-encrypted syslog. [3], [13], [16], [17] |
+| 5.3 | Tích hợp CMDB (ServiceNow) để đồng bộ hóa thông tin nhãn (Tags). | Supported | medium | — | The datasheet documents integration with orchestration systems and configuration management databases, an independent blog describes ServiceNow change-management integration, and an implementation partner describes automated API integration with CMDBs. [16], [19], [20] |
+| 5.4 | Tích hợp CI/CD Pipeline (Jenkins, GitLab, Terraform) cho DevSecOps. | Supported | medium | — | An independent blog documents Ansible and Terraform managing Guardicore policies as code with GitOps-style review and deployment, and a Fortinet brief describes automation that keeps pace with DevOps; the full REST API underpins this programmatic control. [15], [17], [19] |
 
 ### Category 6 — Security & Compliance
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Supported | high | — | Independent reviews describe the enforcement agent as a process-level Layer 7 firewall that ties each connection to the initiating process. [6], [20] |
-| 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Supported | high | — | Guardicore's patented dynamic deception can redirect attackers into a Guardicore-hosted honeypot on anomalous behaviour and records their actions. [10], [13] |
-| 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Akamai publishes a PCI DSS mapping whitepaper (March 2024) and third parties note NIST SP 800-207 alignment; ready-made ISO 27001 and IEC 62443 reports were not confirmed in public sources. [6], [15] |
-| 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Partial | medium | — | Guardicore training material states the agent-to-aggregator connection is encrypted and authenticated on TCP/443 using TLS 1.2; the traffic is authenticated but the checklist's TLS 1.3 requirement is not explicitly met. [7] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Supported | high | — | Policy criteria include process and service attributes, the datasheet documents process-level and user-level enforcement, the Platform Agent documentation describes connection validation with process context, and peer reviews confirm process-level segmentation. [4], [10], [16], [18] |
+| 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Supported | high | — | The datasheet documents a threat-intelligence firewall, reputation analysis and a high-interaction deception engine, the comparison guide describes redirecting blocked sessions to a dynamic deception engine, peer reviews confirm the honeypot model, and an independent blog describes deception-derived IOCs feeding threat feeds and SIEM. [4], [16], [18], [19] |
+| 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | The product page documents support for PCI-DSS, HIPAA and SWIFT audit requirements, an independent blog describes PCI-DSS 1.3 evidence and alignment with NIST SP 800-207, and customer stories describe CJIS and DWI compliance evidence; however ISO 27001 and IEC 62443 report templates were not found in staged sources. [1], [7], [8], [19], [20] |
+| 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Partial | medium | — | The admin guide documents that agent-to-aggregator channels are encrypted and authenticated on TCP/443 using TLS 1.2, and syslog export can be TLS-encrypted; TLS 1.3 is not documented and mutual authentication is described as certificate-based 'authenticated' channels rather than an explicit mTLS mode. [11], [13] |
 
 ### Category 7 — High Availability
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 7.1 | Kiến trúc Cụm Controller hỗ trợ High Availability (Active-Active / Active-Passive). | Unknown | low | — | no evidence found (The Centra installation guide references a Scaling Architecture section but the public excerpts do not describe controller HA cluster (active-active / active-passive) topology.) |
-| 7.2 | Nếu Controller mất kết nối hoàn toàn, Agent trên Host vẫn tiếp tục thực thi Policy (Autonomous Mode). | Unknown | low | — | no evidence found (Publicly available material implies local policy decisions on the agent but does not describe explicit autonomous mode when controller connectivity is lost.) |
-| 7.3 | Hỗ trợ sao lưu và khôi phục thảm họa (Disaster Recovery site sync). | Unknown | low | — | no evidence found (The Centra installation guide explicitly notes disaster-recovery setup is not covered in the guide, and no public DR sync procedure was located.) |
+| 7.1 | Kiến trúc Cụm Controller hỗ trợ High Availability (Active-Active / Active-Passive). | Supported | medium | — | The admin guide documents aggregator clusters with agent-to-aggregator high availability and round-robin load balancing, a three-node MongoDB cluster for automatic failover, and configurable HA within Elasticsearch clusters. [11] |
+| 7.2 | Nếu Controller mất kết nối hoàn toàn, Agent trên Host vẫn tiếp tục thực thi Policy (Autonomous Mode). | Supported | medium | — | The user guide states that when the Enforcement module cannot connect to Centra the agent continues enforcing the latest policy it received, and the admin guide documents persistent local storage of the last policy used after restart until an update is fetched. [11], [13] |
+| 7.3 | Hỗ trợ sao lưu và khôi phục thảm họa (Disaster Recovery site sync). | Supported | medium | — | The admin guide documents a primary/standby management-cluster disaster-recovery scheme with ongoing configuration, inventory and policy sync, plus manual failover/failback procedures. [11] |
 
 ### Category 8 — Standards Certification
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 8.1 | Đạt chứng nhận an ninh quốc tế: FIPS 140-2/140-3, Common Criteria EAL4+. | Unknown | low | — | no evidence found (No entry in NIST CMVP or Common Criteria portals for Guardicore was located from public searches; absence of evidence is not evidence of absence.) |
-| 8.2 | Chứng nhận tương thích phần mềm công nghiệp từ Siemens, Honeywell, ABB (cho OT). | Partial | medium | — | An OT integration with NVIDIA BlueField and Siemens is described as aligning with IEC 62443, which is architectural alignment, not a Siemens/Honeywell/ABB software-compatibility certification for the checklist's target vendors. [16] |
+| 8.1 | Đạt chứng nhận an ninh quốc tế: FIPS 140-2/140-3, Common Criteria EAL4+. | Not Supported | medium | — | The NIST CMVP validated-modules registry (1,168 active certificates listed as of the search) contains no Guardicore or Akamai cryptographic module for FIPS 140-2/140-3, and no vendor document claims a FIPS validation or Common Criteria certification. [22] |
+| 8.2 | Chứng nhận tương thích phần mềm công nghiệp từ Siemens, Honeywell, ABB (cho OT). | Unknown | low | — | no evidence found (No staged source mentions Siemens, Honeywell or ABB compatibility certifications; OT segmentation capability is documented (IoT/OT brief, water-utility customer story) but not vendor-specific ICS certifications.) |
 
 ---
 
 ## 4. Notable Strengths
 
-- **Continuous, process-level visibility (items 1.1, 1.2, 6.1):** Guardicore ties every observed flow to the initiating process and refreshes the map as workloads change, giving Layer-7 application context that IP-based tools miss [2, 6, 11].
-- **Rich integration surface (items 5.2, 5.3, 1.4):** Purpose-built connectors for Splunk, QRadar, ServiceNow CMDB, and Tenable make Guardicore a first-class citizen in existing SecOps stacks [9, 13a, 14].
-- **Dynamic deception for breach containment (item 6.2):** Patented honeypot redirection converts lateral-movement attempts into recorded attacker behaviour and IOCs [10, 13].
-- **Proven scale (item 3.5):** A vendor-cited customer secured 300,000 endpoints in two weeks, comfortably exceeding the 50,000-workload gate [1].
-- **AI-driven policy authoring with simulation (items 2.2, 2.3):** The March 2026 AI update generates and explains policies and validates them in Allow Mode before enforcement [12, 6].
+- **Label-based, IP-independent policy engine (items 2.1, 2.5):** policies are built from a configurable label hierarchy and are completely decoupled from the underlying infrastructure, so rules survive IP and workload changes [1, 9, 13].
+- **Process-level visibility and enforcement (items 6.1, 1.2):** connection telemetry is tied to processes and services, and policy criteria can include process, service, user and FQDN, enabling enforcement below the network layer [4, 10, 16].
+- **Agent-based plus agentless coverage (items 3.3, 3.4):** the platform combines host agents with NetFlow/sFlow/IPFIX collectors, VPC flow logs, IoT/OT fingerprinting and DPU-based agentless enforcement, including offline-mode agent installation for air-gapped sites [1, 5, 6, 16].
+- **Resilient enforcement and management plane (items 7.2, 7.3, 7.1):** agents keep enforcing the last received policy when the controller is unreachable, aggregators and databases cluster for HA, and a primary/standby DR scheme syncs configuration, inventory and policy [11, 13].
+- **Automation surface (items 5.1, 5.4):** the REST API backs every UI action, and policies can be managed as code with Ansible/Terraform in GitOps-style workflows [15, 19].
 
 ## 5. Notable Gaps / Risks
 
-- **Transport encryption below the checklist bar (item 6.4):** Public architecture material describes TLS 1.2, not TLS 1.3, and does not confirm mutual (client-cert) authentication of agents [7].
-- **No quantitative performance evidence (items 4.1, 4.2, 4.3, 4.4):** CPU, RAM, latency, and fail-safe behaviour are all unknown from public sources; a proof-of-value or vendor benchmark request will be needed before procurement.
-- **High-availability internals opaque (items 7.1, 7.2, 7.3):** Controller HA topology, autonomous-mode behaviour on controller loss, and DR sync procedures are not documented in publicly available material.
-- **No public FIPS / Common Criteria certification found (item 8.1):** Absence in NIST CMVP and CC portal searches; needs vendor confirmation for regulated environments.
-- **OpenShift maturity mixed (item 3.2):** Third-party review lists OpenShift OVN as supported CNI, but the Akamai blog still describes it as work-in-progress; needs verification against current release notes.
+- **Agent resource footprint vs. stated thresholds (items 4.1, 4.2):** vendor documentation cites up to 5% CPU and 400MB RAM for the agent, while an implementation partner reports typical usage under 1-2% CPU; neither confirms the checklist's <1% CPU / <100MB RAM targets, and 4.3 has no measured latency figure at all [11, 20].
+- **Flow-history retention below 90 days by default (item 1.3):** raw connection history defaults to 30 days (daily grouped flows default to 90); meeting a 90-day forensic window requires changing the retention policy via CLI [11].
+- **Compliance report coverage is partial (item 6.3):** PCI-DSS, HIPAA, SWIFT, CJIS and DWI evidence are documented, but ISO 27001 and IEC 62443 templates were not found; CVE display directly on the map is also not explicitly documented (item 1.4) [1, 7, 8, 13, 19].
+- **No FIPS 140-2/140-3 or Common Criteria certification found (item 8.1):** the NIST CMVP registry lists no Guardicore/Akamai module; transport security is TLS 1.2 with authenticated channels rather than documented TLS 1.3/mTLS (item 6.4) [11, 22].
+- **No evidence of Siemens/Honeywell/ABB compatibility certifications (item 8.2):** OT segmentation is supported, but vendor-specific industrial certification claims are absent from staged sources.
 
 ## 6. Evidence Quality Notes
 
-Non-unknown verdicts drew on 18 distinct sources including vendor product page and product brief, Akamai TechDocs, three staged Akamai solution briefs (PCI whitepaper, ServiceNow CMDB integration, Tenable integration), an Akamai press release, and independent sources (Security Scientist, PeerSpot, SiliconAngle, CSO Online, Help Net Security, PR Newswire, Industrial Cyber, Splunkbase, and a leaked Guardicore training excerpt on Course Hero). 15 of the 20 non-unknown items cite ≥ 1 independent source; the remainder rely on vendor documentation and are capped at medium confidence per validator rule.
+22 of 33 items were triangulated across two or more source types; 12 items rest on vendor documentation alone (admin/installation/user guides, datasheet, product briefs, training decks) and are capped at medium confidence by the validator rule, even where the underlying behavior is directly documented (e.g., HA, DR, policy revisions, TLS 1.2, offline install). The main official docs on techdocs.akamai.com are SSO-gated, so the Centra 5.0-era guides were staged from Scribd copies and the newest behavior (AI labeling, exposure-aware assurance) comes from 2025-2026 Akamai product materials; there is a version gap between these document sets that the reviewer should keep in mind.
 
-Three tensions surfaced. First, on Kubernetes/OpenShift, a 2022-era Akamai blog says OpenShift support was still being expanded while a 2025 third-party review lists OpenShift OVN as supported — the verdict was set to partial. Second, on TLS, the only concrete number located is TLS 1.2 on TCP/443, which is short of the TLS 1.3 requirement, so 6.4 is partial rather than supported. Third, on IEC 62443, an Industrial Cyber article describes architectural alignment via the NVIDIA BlueField OT integration; that is not the Siemens/Honeywell/ABB software-compatibility certification asked for in item 8.2, so the verdict is partial with an explicit gap note.
-
-Thirteen items are unknown — mostly quantitative (4.1-4.3), operational (4.4, 4.5), HA (7.1-7.3), and certification (8.1) — because no public numeric or certification evidence was located. Per the anti-fabrication contract these are not converted to `not_supported`; a deep pass with vendor SEs or a proof-of-value would be needed to close them.
+Items with independent corroboration include discovery/visibility (1.1-1.2), label-based policy (2.1), K8s support (3.2), agent+agentless (3.3), process-level enforcement (6.1) and deception (6.2), backed by PeerSpot user reviews and independent technical blogs. One explicit contradiction was resolved conservatively: vendor guides document agent CPU/RAM ceilings of 5% / 400MB while a partner reports typical usage under 1-2% CPU, so 4.1/4.2 were left partial with no numeric_value rather than asserting either figure. The FIPS negative (8.1) relies on the NIST CMVP registry search, which is authoritative for FIPS but leaves Common Criteria unverified because the CC portal was inaccessible; 8.2 (OT vendor certifications) is unknown due to total absence of evidence.
 
 ---
 
 ## Bibliography
 
-[1] Akamai Technologies. "Akamai Guardicore Segmentation for Hybrid Cloud". https://www.akamai.com/products/akamai-guardicore-segmentation (Retrieved: 2026-08-07)
-[2] Akamai Technologies. "Akamai Product Brief: Akamai Guardicore Segmentation (Published 03/26)". https://www.akamai.com/site/en/documents/product-brief/akamai-guardicore-segmentation.pdf (Retrieved: 2026-08-07)
-[3] Akamai Technologies. "Feature Spotlight: Kubernetes Enforcement". https://www.akamai.com/blog/security/feature-spotlight-kubernetes-enforcement (Retrieved: 2026-08-07)
-[4] Akamai Technologies. "About Access, Threat Protection, and Segmentation - Guardicore Platform Agent". https://techdocs.akamai.com/guardicore-platform-agent/docs/about-aztc (Retrieved: 2026-08-07)
-[5] Akamai Technologies. "Guardicore Platform Agent - Requirements". https://techdocs.akamai.com/guardicore-platform-agent/docs/requirements (Retrieved: 2026-08-07)
-[6] Security Scientist. "12 Questions and Answers About Akamai Guardicore Segmentation". https://www.securityscientist.net/blog/12-questions-and-answers-about-akamai-guardicore-segmentation-akamai/ (Retrieved: 2026-08-07)
-[7] Guardicore (via Course Hero). "GCSA - Centra Components Architecture (training material excerpt)". https://www.coursehero.com/file/189598805/Day-1-01-GCSA-Centra-Components-Architecture-v42pdf/ (Retrieved: 2026-08-07)
-[8] Data Sciences Corporation. "Solution Brief: Akamai Guardicore Segmentation". https://datasciences.co.za/wp-content/uploads/2025/09/Solution-Brief-Akamai-Guardicore-Segmentation.pdf (Retrieved: 2026-08-07)
-[9] Splunkbase. "Akamai Guardicore Add-on for Splunk". https://splunkbase.splunk.com/app/7426 (Retrieved: 2026-08-07)
-[10] Akamai Technologies. "Guardicore Expands Breach and Threat Detection". https://www.akamai.com/newsroom/press-release/guardicore-expands-threat-detection-and-response-capabilities-to-cover-more-attack-types-aimed-at-data-centers-and-clouds (Retrieved: 2026-08-07)
-[11] Help Net Security. "Guardicore extends microsegmentation and Zero Trust security to legacy infrastructure". https://www.helpnetsecurity.com/2021/04/09/guardicore-microsegmentation-zero-trust/ (Retrieved: 2026-08-07)
-[12] SiliconANGLE. "Akamai updates Guardicore Segmentation with AI to automate zero-trust policy enforcement". https://siliconangle.com/2026/03/24/akamai-updates-guardicore-segmentation-ai-automate-zero-trust-policy-enforcement/ (Retrieved: 2026-08-07)
-[13] CSO Online. "Guardicore Centra provides visibility, protection through advanced micro-segmentation". https://www.csoonline.com/article/563289/guardicore-centra-provides-visibility-protection-through-advanced-micro-segmentation.html (Retrieved: 2026-08-07)
-[14] Akamai Technologies. "Akamai Solution Brief: Tenable Vulnerability Management for Guardicore Segmentation (2023)". https://www.akamai.com/site/en/documents/brief/2023/tenable-vulnerability-management-for-akamai-guardicore-segmentation.pdf (Retrieved: 2026-08-07)
-[15] Akamai Technologies / GRSee Consulting. "Akamai Guardicore Segmentation PCI DSS Whitepaper (March 2024)". https://www.akamai.com/site/en/documents/white-paper/2024/pci-whitepaper-akamai-guardicore-segmentation-revision.pdf (Retrieved: 2026-08-07)
-[16] Industrial Cyber. "NVIDIA partners with Akamai, Forescout, Palo Alto Networks and Siemens for OT threat detection". https://industrialcyber.co/ai/nvidia-partners-with-akamai-forescout-palo-alto-networks-and-siemens-to-target-real-time-ot-threat-detection/ (Retrieved: 2026-08-07)
-[17] PR Newswire. "Guardicore Simplifies Micro-Segmentation To Speed Deployment In Hybrid Data Center Environments". https://www.prnewswire.com/news-releases/guardicore-simplifies-micro-segmentation-to-speed-deployment-in-hybrid-data-center-environments-300805772.html (Retrieved: 2026-08-07)
-[18] PR Newswire. "Guardicore Receives Application Certification from ServiceNow". https://www.prnewswire.com/news-releases/guardicore-receives-application-certification-from-servicenow-301103015.html (Retrieved: 2026-08-07)
-[19] Akamai Technologies. "Akamai Solution Brief: Guardicore Segmentation + ServiceNow CMDB Integration (2023)". https://www.akamai.com/site/en/documents/brief/2023/akamai-guardicore-segmentation-and-servicenow-cmdb-integration.pdf (Retrieved: 2026-08-07)
-[20] PeerSpot. "PeerSpot: Akamai Guardicore Segmentation vs VMware NSX". https://www.peerspot.com/products/comparisons/akamai-guardicore-segmentation_vs_vmware-nsx (Retrieved: 2026-08-07)
+[1] Akamai Technologies. "Akamai Guardicore Segmentation for Hybrid Cloud (product page)". https://www.akamai.com/products/akamai-guardicore-segmentation (Retrieved: 2026-08-10T07:43:20Z)
+[2] Akamai Technologies. "Akamai Guardicore Segmentation Product Brief (PDF)". https://www.akamai.com/content/dam/site/en/documents/brief/akamai-guardicore-segmentation.pdf (Retrieved: 2026-08-10T07:43:20Z)
+[3] Akamai Technologies. "Visualize and Secure Kubernetes with Akamai Guardicore Segmentation (solution brief)". https://www.akamai.com/content/dam/site/en/documents/brief/2025/visualize-and-secure-kubernetes-akamai-segmentation.pdf (Retrieved: 2026-08-10T07:43:20Z)
+[4] Akamai Technologies. "Akamai Guardicore Segmentation vs. Traditional Microsegmentation Solutions (comparison guide)". https://www.akamai.com/content/dam/site/en/documents/brief/2023/akamai-guardicore-segmentation-vs-traditional-microsegmentation-solutions.pdf (Retrieved: 2026-08-10T07:43:20Z)
+[5] Akamai Technologies. "Segmentation for IoT and OT (product brief)". https://www.akamai.com/content/dam/site/en/documents/brief/2024/segmentation-for-iot-and-ot.pdf (Retrieved: 2026-08-10T07:43:20Z)
+[6] Akamai Technologies. "Global Consulting Firm Secured 300,000 Endpoints in Record Time (customer story)". https://www.akamai.com/resources/customer-story/global-consulting-firm (Retrieved: 2026-08-10T07:43:20Z)
+[7] Akamai Technologies. "U.K. Utility Company Protected Vital Water Utilities (customer story)". https://www.akamai.com/resources/customer-story/uk-utility (Retrieved: 2026-08-10T07:43:20Z)
+[8] Akamai Technologies. "North Texas City Secured Critical Infrastructure and CJIS Data (customer story)". https://www.akamai.com/resources/customer-story/north-texas-city (Retrieved: 2026-08-10T07:43:20Z)
+[9] Akamai Technologies. "Create effective segmentation security policies (Zero Trust Security documentation)". https://zero-trust-security.readme.io/docs/segmentation-policies (Retrieved: 2026-08-10T07:43:20Z)
+[10] Akamai Technologies. "About Access, Threat Protection, and Segmentation (Guardicore Platform Agent documentation)". https://guardicore-platform-agent.readme.io/docs/about-aztc (Retrieved: 2026-08-10T07:43:20Z)
+[11] Guardicore / Akamai. "Guardicore Centra 5.0 Administration Guide (Scribd copy)". https://www.scribd.com/document/727768570/Akamai-Guardicore-Segmentation-Admin-User-Guide (Retrieved: 2026-08-10T07:43:20Z)
+[12] Guardicore / Akamai. "Guardicore Centra Installation Guide (Scribd copy)". https://www.scribd.com/document/727768573/Akamai-Guardicore-Segmentation-Installation-Guide (Retrieved: 2026-08-10T07:43:20Z)
+[13] Guardicore / Akamai. "Akamai Guardicore Segmentation User Guide (Scribd copy)". https://www.scribd.com/document/727768579/Akamai-Guardicore-Segmentation-User-Guide (Retrieved: 2026-08-10T07:43:20Z)
+[14] Akamai Technologies. "GCSA Unit 3.01: Policy Rules Structure (training material)". https://www.scribd.com/document/815696882/UNIT-3-01-GCSA-Policy-Rules-Structure (Retrieved: 2026-08-10T07:43:20Z)
+[15] Akamai Technologies. "GCSA Unit 5.08: Useful System Configurations, Auditing and API (training material)". https://www.scribd.com/document/998837701/UNIT-5-08-GCSA-Useful-System-Configurations-Auditing-and-API-v48 (Retrieved: 2026-08-10T07:43:20Z)
+[16] Guardicore / Akamai. "Guardicore Centra Security Platform Data Sheet (v32, partner-hosted)". https://www.infoguard.ch/hubfs/partner/_partner-downloads/Guardicore-Centra-Data-Sheet_English.pdf (Retrieved: 2026-08-10T07:43:20Z)
+[17] Fortinet, Inc.. "Fortinet and Guardicore Security Solution (solution brief)". https://www.fortinet.com/content/dam/fortinet/assets/alliances/sb-fortinet-guardicore-centra-connector-solution.pdf (Retrieved: 2026-08-10T07:43:20Z)
+[18] PeerSpot. "Akamai Guardicore Segmentation Reviews (PeerSpot)". https://www.peerspot.com/products/akamai-guardicore-segmentation-reviews (Retrieved: 2026-08-10T07:43:20Z)
+[19] Security Scientist. "12 Questions and Answers About Akamai Guardicore Segmentation". https://www.securityscientist.net/blog/12-questions-and-answers-about-akamai-guardicore-segmentation-akamai/ (Retrieved: 2026-08-10T07:43:20Z)
+[20] Evolvous. "Akamai Guardicore Segmentation 2026 Guide (Evolvous)". https://evolvous.com/akamai-guardicore-implementation/ (Retrieved: 2026-08-10T07:43:20Z)
+[21] Center for Internet Security. "Akamai Guardicore Segmentation (CIS CyberMarket listing)". https://www.cisecurity.org/services/cis-cybermarket/akamai-guardicore-segmentation (Retrieved: 2026-08-10T07:43:20Z)
+[22] NIST CSRC. "NIST CMVP Validated Modules Search (keyword: guardicore)". https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules/search?SearchMode=Advanced&CertificateStatus=Active&ValidationYear=0&Keyword=guardicore (Retrieved: 2026-08-10T07:43:20Z)
+[23] Enterprise IT World. "Akamai and NVIDIA Deliver Agentless Zero Trust Segmentation". https://www.enterpriseitworld.com/akamai-and-nvidia-deliver-agentless-zero-trust-segmentation-for-critical-infrastructure/ (Retrieved: 2026-08-10T07:43:20Z)
 
 ---
 
 ## Appendix A — Methodology
 
 - **Research mode used:** standard
-- **Queries executed:** n/a (not tracked)
-- **Sources reviewed:** 20 (kept: 20, discarded for low credibility: n/a (not tracked))
-- **Source_types distribution:** third_party_review: 11, vendor_blog: 2, vendor_datasheet: 3, vendor_doc: 4
+- **Queries executed:** 18
+- **Sources reviewed:** 23 (kept: 23, discarded for low credibility: n/a (not tracked))
+- **Source_types distribution:** case_study: 3, certification_registry: 1, community: 1, third_party_review: 5, vendor_datasheet: 1, vendor_doc: 12
 - **Verify script results:** see validate_assessment.py output for this run
 
 ## Appendix B — Machine-readable outputs

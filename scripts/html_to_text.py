@@ -141,13 +141,21 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def download(url: str, dest: Path) -> str:
-    """Download raw HTML to `dest`. Returns the decoded text (str)."""
+def download(url: str, dest: Path, browser_ua: bool = False) -> str:
+    """Download raw HTML to `dest`. Returns the decoded text (str).
+    Set browser_ua=True to use a browser User-Agent for sites that block
+    the default UA (e.g. support.elisity.com returns 403)."""
     dest.parent.mkdir(parents=True, exist_ok=True)
+    ua = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+        if browser_ua
+        else "Mozilla/5.0 (provider-screening html_to_text.py)"
+    )
     req = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "Mozilla/5.0 (provider-screening html_to_text.py)",
+            "User-Agent": ua,
             "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
         },
     )
@@ -212,6 +220,8 @@ def main() -> int:
     ap.add_argument("--out-dir", type=Path, default=None,
                      help="Custom staging dir (no manifest written). Mutually exclusive with --product.")
     ap.add_argument("--slug", default=None)
+    ap.add_argument("--browser-ua", action="store_true",
+                    help="Use browser User-Agent (evades 403 on some support portals).")
     ap.add_argument("--preview", type=int, default=800)
     args = ap.parse_args()
 
@@ -235,7 +245,7 @@ def main() -> int:
     txt_path = staging_dir / f"{slug}.txt"
 
     try:
-        html_text = download(args.url, html_path)
+        html_text = download(args.url, html_path, browser_ua=args.browser_ua)
     except Exception as e:  # noqa: BLE001
         print(f"ERROR fetching {args.url}: {e}", file=sys.stderr)
         return 1

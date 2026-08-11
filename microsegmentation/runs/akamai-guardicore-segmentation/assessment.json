@@ -1,145 +1,349 @@
 {
   "schema_version": 1,
   "product_id": "akamai-guardicore-segmentation",
-  "vendor": "Akamai Technologies",
+  "vendor": "Akamai Technologies (Guardicore)",
   "product_name": "Akamai Guardicore Segmentation",
-  "product_version_reference": "Akamai product brief published 03/26; Guardicore Platform Agent 7.2.x line",
+  "product_version_reference": "Centra/Guardicore Segmentation platform, current product line (v49-v54); staged docs span Centra 5.0 through 2026 product materials",
   "checklist_version": 1,
   "assessment_mode": "standard",
-  "research_run_id": "akamai-guardicore-segmentation-standard-2026-08-07",
-  "assessed_at": "2026-08-07T00:00:00Z",
-  "overall_notes": "Guardicore is well documented on discovery, labeling, K8s, SIEM, ServiceNow and process-level enforcement, but publicly available material is thin on quantitative performance numbers (CPU/RAM/latency), HA/DR internals, and formal cryptographic certifications (FIPS/CC).",
+  "research_run_id": "run-akamai-guardicore-segmentation-standard-20260810",
+  "assessed_at": "2026-08-10T07:42:31Z",
+  "overall_notes": "Akamai Guardicore Segmentation is an agent-based (with agentless options) microsegmentation platform for hybrid cloud, DC, Kubernetes and OT. Core visibility, label-based policy, process-level enforcement, deception, HA/DR and full REST API are well documented; numeric agent-resource and latency thresholds are not met or not quantified in available sources.",
   "items": [
     {
       "item_id": "1.1",
       "verdict": "supported",
       "confidence": "high",
-      "evidence_ids": ["b0b0000000000101", "b0b0000000000102", "b0b0000000000103"],
-      "cited_source_ids": ["a1b2c3d4e5f60002", "a1b2c3d4e5f60006", "a1b2c3d4e5f60008"],
-      "source_types": ["vendor_datasheet", "third_party_review"],
-      "notes": "Vendor and third-party sources describe continuous, real-time discovery via lightweight sensors and flow telemetry that build a living application dependency map."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "078cbadf4ac25af3",
+        "4b20e4f5eef61978",
+        "4b867de07a25c0f4",
+        "bcbefdfe7d2a1320",
+        "d0da504a11044331"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "557832137a7d2040",
+        "7a0405f49fc96f97",
+        "d2fbb7fe2d593a46",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "community",
+        "third_party_review",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "The product auto-discovers assets and communication flows in real time across on-prem, cloud, Kubernetes and OT workloads; the Akamai product page, the Centra datasheet and the product brief all document continuous discovery, corroborated by PeerSpot user reviews and an independent technical blog.",
+      "gaps": null
     },
     {
       "item_id": "1.2",
       "verdict": "supported",
       "confidence": "high",
-      "evidence_ids": ["b0b0000000000120", "b0b0000000000121"],
-      "cited_source_ids": ["a1b2c3d4e5f60002", "a1b2c3d4e5f60006"],
-      "source_types": ["vendor_datasheet", "third_party_review"],
-      "notes": "The Reveal map ties each connection to processes and services, giving App / Environment / Role / Process granularity at Layer 7."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "04dd933d74d891c7",
+        "1fc9f6f930b61fc5",
+        "5a248e468332fec6",
+        "9fcf55c67045947f"
+      ],
+      "cited_source_ids": [
+        "425499d5039f6542",
+        "44c22a65e0af9c25",
+        "d2fbb7fe2d593a46",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "community",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "A single interactive Reveal map visualizes all assets, flows and dependencies with process-level granularity, and label hierarchies (Environment/Application/Role) render as nested groups; corroborated by the user guide, datasheet and peer reviews.",
+      "gaps": null
     },
     {
       "item_id": "1.3",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Public sources describe rich historical telemetry export but do not state a specific default flow-history retention in days."
+      "verdict": "partial",
+      "confidence": "medium",
+      "numeric_value": 30,
+      "unit": "days",
+      "evidence_ids": [
+        "0aa905fadd6a8843",
+        "87e6f9f834c35289",
+        "8ebf880cfc9d0ebc",
+        "e0a3252b1046f0bd"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "Raw connection-flow retention in the management Elasticsearch defaults to 30 days (connections_delete_after_days) while daily grouped connections default to 90 days; both are configurable via CLI (gc-mgmtctl elastic_archive), so the 90-day requirement is met by default only for aggregated data or with custom retention settings.",
+      "gaps": "No staged source states a single default retention period of 90 days or more for raw per-flow history."
     },
     {
       "item_id": "1.4",
-      "verdict": "supported",
+      "verdict": "partial",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000140"],
-      "cited_source_ids": ["a1b2c3d4e5f6000e"],
-      "source_types": ["vendor_datasheet"],
-      "notes": "The Tenable integration brief describes labelling assets with CVE and risk scores and shows CVE labels on assets in the Reveal map for risk-based segmentation."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "124e203b038e30d0",
+        "87214ce9e202115b"
+      ],
+      "cited_source_ids": [
+        "425499d5039f6542",
+        "d2fbb7fe2d593a46"
+      ],
+      "source_types": [
+        "community",
+        "vendor_doc"
+      ],
+      "notes": "Vulnerability data is collected via osquery-based Insight queries and a PeerSpot user describes Tenable integration that surfaces assets with highly exploitable vulnerabilities for policy building, but a dedicated CVE overlay rendered directly on the connectivity map is not explicitly documented in staged sources.",
+      "gaps": null
     },
     {
       "item_id": "1.5",
       "verdict": "supported",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000150"],
-      "cited_source_ids": ["a1b2c3d4e5f60006"],
-      "source_types": ["third_party_review"],
-      "notes": "AI-analyzed flow telemetry surfaces unmanaged assets and non-standard flows, which the platform then presents in the dependency map."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "e7118f805cd9ce66",
+        "f8690a1444391a4e",
+        "fe482223f2429c71"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "792beeaeb4ca23b4",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "The Network Log surfaces security violations with filters and rule suggestions, the datasheet documents policy-based detection of unsanctioned activity plus reputation analysis of suspicious domains/IPs/hashes, and the product page highlights identification of known, unknown and unmanaged assets.",
+      "gaps": null
     },
     {
       "item_id": "2.1",
       "verdict": "supported",
       "confidence": "high",
-      "evidence_ids": ["b0b0000000000201", "b0b0000000000202"],
-      "cited_source_ids": ["a1b2c3d4e5f60006", "a1b2c3d4e5f60008"],
-      "source_types": ["third_party_review"],
-      "notes": "Independent write-ups describe granular policies authored against flexible labels, process, user identity and FQDN, independent of IP/VLAN."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "30a34377c4615b9b",
+        "9f23bb6ab2b87c47",
+        "bd562a8aa99bd575",
+        "e4fbe3c792bf6ad8"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "792beeaeb4ca23b4",
+        "d2fbb7fe2d593a46",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "community",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "Policies are built from labels (application/environment/role) and are decoupled from the underlying infrastructure; vendor documentation, the Centra datasheet and peer reviews all describe label-based, IP-independent policy creation.",
+      "gaps": null
     },
     {
       "item_id": "2.2",
       "verdict": "supported",
-      "confidence": "high",
-      "evidence_ids": ["b0b0000000000220", "b0b0000000000221"],
-      "cited_source_ids": ["a1b2c3d4e5f60002", "a1b2c3d4e5f60012"],
-      "source_types": ["vendor_datasheet", "third_party_review"],
-      "notes": "The 2026 AI update to Guardicore automatically generates and explains segmentation policies and simulates impact before enforcement, per Akamai and SiliconAngle coverage."
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "2cecd16584fd1074",
+        "ac142a72a9c7229f",
+        "bc8dbdff026c1123"
+      ],
+      "cited_source_ids": [
+        "792beeaeb4ca23b4",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "Centra's AI-powered engine auto-generates policy rules from templates and observed traffic, and the product page documents machine-learning-based policy recommendations; a PeerSpot reviewer notes that more AI automation for policy creation would still be welcome, so the feature is confirmed by vendor sources only.",
+      "gaps": null
     },
     {
       "item_id": "2.3",
       "verdict": "supported",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000230"],
-      "cited_source_ids": ["a1b2c3d4e5f60006"],
-      "source_types": ["third_party_review"],
-      "notes": "Guardicore's 'Allow Mode' runs AI-generated policies in simulation showing projected impact before any traffic is blocked."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "16e8ce6afa99b654",
+        "56e4434fe30c103e",
+        "5754bd187d332534",
+        "a9766e397e060f92"
+      ],
+      "cited_source_ids": [
+        "557832137a7d2040",
+        "7a0405f49fc96f97",
+        "995557ab55caa446",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_doc"
+      ],
+      "notes": "The product page states that security teams can simulate the impact of policies before they go live, the product brief documents staged draft/alert/block workflows with readiness measurement, and an independent blog describes Allow Mode simulation before any traffic is blocked.",
+      "gaps": null
     },
     {
       "item_id": "2.4",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Public sources reference 'rollback rates' as an operational metric but do not document a documented one-click instant rollback control."
+      "verdict": "supported",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "071c3a80a19d5c98"
+      ],
+      "cited_source_ids": [
+        "425499d5039f6542"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The user guide documents a Revisions screen that saves every policy change indefinitely and allows reverting to a previous revision at any time, providing one-click rollback of published policies.",
+      "gaps": null
     },
     {
       "item_id": "2.5",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "No public description of hierarchical / inherited policy structures was located."
+      "verdict": "partial",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "097a4e89e09ea6fa",
+        "d17f5112524e2857",
+        "e701487ba9245889",
+        "e7e43da86287ed3a"
+      ],
+      "cited_source_ids": [
+        "2ac67dfe79f3424b",
+        "425499d5039f6542",
+        "44c22a65e0af9c25"
+      ],
+      "source_types": [
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "Label keys form a configurable hierarchy (e.g., Environment/Application/Role) that nests assets in the map, and policy rules support priority tiers (implied, override and standard rules), but explicit rule inheritance down a label hierarchy is not documented in staged sources.",
+      "gaps": null
     },
     {
       "item_id": "3.1",
       "verdict": "supported",
-      "confidence": "high",
-      "evidence_ids": ["b0b0000000000310", "b0b0000000000311"],
-      "cited_source_ids": ["a1b2c3d4e5f6000a", "a1b2c3d4e5f6000b"],
-      "source_types": ["vendor_doc", "third_party_review"],
-      "notes": "Guardicore's 2021 legacy-support release brought coverage for Windows 2000/2003/2008, RHEL 4/5, Solaris SPARC 10/11 and HP-UX 11.23/11.31; current Platform Agent docs list Windows 10-11, Server 2012-2019, RHEL 8+, Debian 11 and Ubuntu 18-22."
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "0c23beeaed60cfac",
+        "14957d615f877c31",
+        "17d7cf97a488bcc4",
+        "5d25a6dc1149aea6"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "557832137a7d2040",
+        "90fdd12b84e1e554"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_doc"
+      ],
+      "notes": "Vendor documentation states agents run on all Windows and Linux operating systems, new and legacy, with OS tables covering Windows Server 2003-2019, RHEL/CentOS/Ubuntu/Debian/SUSE, AIX 6.1/7.1/7.2 and Solaris 10/11; an independent blog corroborates Windows Server 2012+, major Linux distributions and Unix variants including AIX and Solaris.",
+      "gaps": "In the older Centra 5.0 admin guide, enforcement on AIX/Solaris is documented at network (L4) level and HP-UX is Reveal-only."
     },
     {
       "item_id": "3.2",
-      "verdict": "partial",
+      "verdict": "supported",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000301", "b0b0000000000302", "b0b0000000000303"],
-      "cited_source_ids": ["a1b2c3d4e5f60003", "a1b2c3d4e5f60006"],
-      "source_types": ["vendor_blog", "third_party_review"],
-      "notes": "Kubernetes enforcement is native via CNI controller with DaemonSet+Helm deployment and a third-party review lists OpenShift OVN among supported CNIs, but the Akamai blog itself notes OpenShift and Cilium support was still being expanded at time of writing.",
-      "gaps": "No authoritative Akamai doc confirming production-ready OpenShift enforcement parity."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "26a92cb2715d339b",
+        "6ffccd0b22d89077",
+        "c8eb635b5351b278",
+        "c961e583b02ab731"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "af34b1bbb8c8b442",
+        "d2fbb7fe2d593a46",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "community",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "Kubernetes enforcement is native via the Container Network Interface (CNI) controller, OpenShift is listed in the datasheet, and peer reviews describe K8s and OpenShift instrumentation; a couple of reviewers note K8s installation caveats.",
+      "gaps": null
     },
     {
       "item_id": "3.3",
       "verdict": "supported",
       "confidence": "high",
-      "evidence_ids": ["b0b0000000000330", "b0b0000000000331"],
-      "cited_source_ids": ["a1b2c3d4e5f60006", "a1b2c3d4e5f60011"],
-      "source_types": ["third_party_review"],
-      "notes": "Guardicore combines agent-based enforcement with agentless visibility via NetFlow/sFlow/IPFIX network collectors, per independent reviews."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "2d1acb01e1360b96",
+        "2f4b55b64c8188bc",
+        "8db58fe7e88e8d13",
+        "9e805ac8fd17d092",
+        "c0ae20809e11ef6e"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "557832137a7d2040",
+        "71aa9e8554217483",
+        "de872b35f19b3ad1",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "The product page explicitly states the solution includes both agent-based and agentless options, with agentless ideal for PaaS, IoT and OT; the datasheet describes agent sensors plus network collectors and VPC flow logs, and independent sources document NetFlow/sFlow/IPFIX collection and NVIDIA BlueField DPU agentless enforcement.",
+      "gaps": null
     },
     {
       "item_id": "3.4",
-      "verdict": "partial",
+      "verdict": "supported",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000340"],
-      "cited_source_ids": ["a1b2c3d4e5f60006"],
-      "source_types": ["third_party_review"],
-      "notes": "The management server is documented for both on-prem and SaaS; support for fully air-gapped operation is not explicitly certified in public sources.",
-      "gaps": "No vendor doc confirms tested air-gapped deployment mode."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "048de36eef2d73bd",
+        "6ec29e4e870130ee",
+        "775d75f72724346f",
+        "f9bc74992e5be8c0"
+      ],
+      "cited_source_ids": [
+        "3416fdeb1dcc7fbb",
+        "de872b35f19b3ad1",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The installation guide documents offline-mode Linux agent installation (IS_OFFLINE_PACKAGE=true) and the product page states the platform can be deployed on-premises or in the cloud, supporting air-gapped deployments.",
+      "gaps": "Offline management-server installation specifics are not detailed in staged sources."
     },
     {
       "item_id": "3.5",
@@ -147,186 +351,424 @@
       "confidence": "medium",
       "numeric_value": 300000,
       "unit": "workloads",
-      "evidence_ids": ["b0b0000000000350"],
-      "cited_source_ids": ["a1b2c3d4e5f60001"],
-      "source_types": ["vendor_doc"],
-      "notes": "Akamai cites a global consulting-firm deployment of 300,000 endpoints secured in two weeks, well above the 50,000-workload threshold; the figure is a vendor-attributed customer case."
+      "evidence_ids": [
+        "1b01f12de62881c9",
+        "b81a27d3b35dc88d",
+        "b9d20c1b822aecaa"
+      ],
+      "cited_source_ids": [
+        "b0b52d0c68073bb0",
+        "d2fbb7fe2d593a46",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "case_study",
+        "community",
+        "vendor_doc"
+      ],
+      "notes": "A vendor customer story documents agent-based deployment across all 300,000 workloads and endpoints of a global consulting firm, and the product page states the AI algorithm learns tens of thousands of applications and millions of flows; peer reviews also praise scalability.",
+      "gaps": "No staged source states an official per-controller maximum workload count; the 300,000 figure is a production deployment, not a certified capacity."
     },
     {
       "item_id": "4.1",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Public sources describe the agent as 'lightweight' but do not cite a measured CPU percentage under load."
+      "verdict": "partial",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "279740ee4acae94e",
+        "340f80f58f80311e",
+        "4ce2e02c2d5d30a5"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "995557ab55caa446"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_doc"
+      ],
+      "notes": "Vendor documentation states agent CPU utilization can reach up to 5% (Windows and AIX), while an implementation partner reports typical usage generally under 1-2%; no source confirms a sustained sub-1% figure, so the <1% requirement is not demonstrated.",
+      "gaps": null
     },
     {
       "item_id": "4.2",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Only macOS memory profile ranges (10 MB soft up to 1000 MB hard limit by host RAM tier) surfaced; that is agent configuration, not measured resident RAM on Windows/Linux at production load."
+      "verdict": "partial",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "9ea33088252e0e4b",
+        "b681b363e85c3cea"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "995557ab55caa446"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_doc"
+      ],
+      "notes": "Vendor documentation states agent memory usage up to 400MB (Windows and AIX), while an implementation partner describes a small memory footprint; no staged source documents RAM below 100MB.",
+      "gaps": null
     },
     {
       "item_id": "4.3",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "No public benchmark of added network latency (ms) attributable to the agent was located."
+      "verdict": "partial",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "3daf13924d44dfc0",
+        "58d8c17d1233056b",
+        "7f608158271268de"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "90fdd12b84e1e554",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "The comparison guide documents a latency-optimized engine whose latency is relatively insensitive to policy size, and the product page mentions low-latency enforcement, but no staged source gives a measured latency figure, so the <0.1ms threshold is not demonstrated.",
+      "gaps": null
     },
     {
       "item_id": "4.4",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Public documentation and third-party reviews do not describe agent fail-safe behavior when the agent crashes or is stopped (fail-open vs fail-close, traffic continuity)."
+      "verdict": "partial",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "9252e7d90b9d6f84",
+        "e91447debc755eb9",
+        "f70434011af5473c"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "425499d5039f6542",
+        "d2fbb7fe2d593a46"
+      ],
+      "source_types": [
+        "community",
+        "vendor_doc"
+      ],
+      "notes": "If the enforcement kernel module is missing the agent falls back to polling mode where enforcement is not performed, so traffic continues, and the agent persists and keeps enforcing the last received policy when disconnected; however an explicit fail-open/fail-closed configuration setting is not documented, and a peer reviewer flags kernel-module blue-screen risk.",
+      "gaps": null
     },
     {
       "item_id": "4.5",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Vendor techdocs describe silent install and remote upgrade but do not explicitly state whether a reboot is required."
+      "verdict": "supported",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "d56b4f85ff08cfe2",
+        "f58686125d6332fb"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "3416fdeb1dcc7fbb"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The installation guide states that after AIX agent installation all processes start automatically with no server reboot required, and agent upgrades are performed in place or via remote agent upgrade from the Centra UI; no staged source documents a reboot requirement for agent install or update.",
+      "gaps": "Windows-specific install-reboot behavior is not explicitly documented in staged sources."
     },
     {
       "item_id": "5.1",
-      "verdict": "partial",
+      "verdict": "supported",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000501", "b0b0000000000502"],
-      "cited_source_ids": ["a1b2c3d4e5f60001", "a1b2c3d4e5f60009"],
-      "source_types": ["vendor_doc", "third_party_review"],
-      "notes": "Guardicore exposes a REST API used by SIEM add-ons and automation recipes; public sources confirm the API's existence but do not verify 100% coverage of admin console functionality.",
-      "gaps": "No public matrix of REST endpoints versus admin console features."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "11a0ff4d7dcc972a",
+        "6637bee7ea3849d2",
+        "6886d600096b1639",
+        "cf4855cbcd707e6d"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "6595168c041e987c",
+        "d2fbb7fe2d593a46"
+      ],
+      "source_types": [
+        "community",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "Akamai training material states the RESTful API provides programmatic access to all Centra functionality and that every UI action is backed by an API call; the datasheet lists an Open REST API export protocol, and a peer reviewer confirms APIs support building external reports.",
+      "gaps": null
     },
     {
       "item_id": "5.2",
       "verdict": "supported",
-      "confidence": "high",
-      "evidence_ids": ["b0b0000000000501", "b0b0000000000520"],
-      "cited_source_ids": ["a1b2c3d4e5f60006", "a1b2c3d4e5f60009"],
-      "source_types": ["third_party_review"],
-      "notes": "Guardicore telemetry is shipped to Splunk and IBM QRadar via CEF/syslog, with a dedicated Splunkbase add-on that pulls data through the REST API."
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "48e0058c0e389030",
+        "97a8a443e50f3321",
+        "ca85c85497fef804",
+        "ccdfe093307776f2"
+      ],
+      "cited_source_ids": [
+        "425499d5039f6542",
+        "44c22a65e0af9c25",
+        "af34b1bbb8c8b442",
+        "c24efed46ad91f61"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "The Kubernetes brief documents export of network-log data to SIEM, the datasheet lists STIX/Syslog/CEF exports and automatic IOC exports to SIEM systems, a Fortinet brief documents syslog ingestion of Guardicore data, and the user guide documents TLS-encrypted syslog.",
+      "gaps": null
     },
     {
       "item_id": "5.3",
       "verdict": "supported",
-      "confidence": "high",
-      "evidence_ids": ["b0b0000000000530", "b0b0000000000531"],
-      "cited_source_ids": ["a1b2c3d4e5f6000c", "a1b2c3d4e5f6000d"],
-      "source_types": ["vendor_datasheet", "third_party_review"],
-      "notes": "A ServiceNow-certified Guardicore application in the ServiceNow Store pulls CMDB data via REST to produce labels for Reveal maps and policies."
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "07b40b67ceeacbc3",
+        "c4c74b4f28972557",
+        "d5110c215aa9b002"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "557832137a7d2040",
+        "995557ab55caa446"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_datasheet"
+      ],
+      "notes": "The datasheet documents integration with orchestration systems and configuration management databases, an independent blog describes ServiceNow change-management integration, and an implementation partner describes automated API integration with CMDBs.",
+      "gaps": null
     },
     {
       "item_id": "5.4",
-      "verdict": "partial",
+      "verdict": "supported",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000540"],
-      "cited_source_ids": ["a1b2c3d4e5f60001"],
-      "source_types": ["vendor_doc"],
-      "notes": "Vendor pages mention REST API and automation recipes for DevOps and CI/CD frameworks, but specific Jenkins / GitLab / Terraform module coverage is not detailed in public documents.",
-      "gaps": "No public reference implementation for Jenkins/GitLab/Terraform pipelines."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "1d43c106e4f02d51",
+        "52472fa02133c900",
+        "92cf4678babb0e55"
+      ],
+      "cited_source_ids": [
+        "557832137a7d2040",
+        "6595168c041e987c",
+        "c24efed46ad91f61"
+      ],
+      "source_types": [
+        "third_party_review",
+        "vendor_doc"
+      ],
+      "notes": "An independent blog documents Ansible and Terraform managing Guardicore policies as code with GitOps-style review and deployment, and a Fortinet brief describes automation that keeps pace with DevOps; the full REST API underpins this programmatic control.",
+      "gaps": null
     },
     {
       "item_id": "6.1",
       "verdict": "supported",
       "confidence": "high",
-      "evidence_ids": ["b0b0000000000610", "b0b0000000000611"],
-      "cited_source_ids": ["a1b2c3d4e5f60006", "a1b2c3d4e5f60011"],
-      "source_types": ["third_party_review"],
-      "notes": "Independent reviews describe the enforcement agent as a process-level Layer 7 firewall that ties each connection to the initiating process."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "0944a89985b4bc4d",
+        "238142b6d0f4a22c",
+        "348977238731bcf9",
+        "cf0b641656e33ffe"
+      ],
+      "cited_source_ids": [
+        "279c534cbaca4c15",
+        "44c22a65e0af9c25",
+        "90fdd12b84e1e554",
+        "d2fbb7fe2d593a46"
+      ],
+      "source_types": [
+        "community",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "Policy criteria include process and service attributes, the datasheet documents process-level and user-level enforcement, the Platform Agent documentation describes connection validation with process context, and peer reviews confirm process-level segmentation.",
+      "gaps": null
     },
     {
       "item_id": "6.2",
       "verdict": "supported",
       "confidence": "high",
-      "evidence_ids": ["b0b0000000000620", "b0b0000000000621"],
-      "cited_source_ids": ["a1b2c3d4e5f60010", "a1b2c3d4e5f60013"],
-      "source_types": ["vendor_blog", "third_party_review"],
-      "notes": "Guardicore's patented dynamic deception can redirect attackers into a Guardicore-hosted honeypot on anomalous behaviour and records their actions."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "026a9117a3f11a5d",
+        "654b1b8670f69650",
+        "cde5445b38143cd5",
+        "f2b796d4f725f9ec"
+      ],
+      "cited_source_ids": [
+        "44c22a65e0af9c25",
+        "557832137a7d2040",
+        "90fdd12b84e1e554",
+        "d2fbb7fe2d593a46"
+      ],
+      "source_types": [
+        "community",
+        "third_party_review",
+        "vendor_datasheet",
+        "vendor_doc"
+      ],
+      "notes": "The datasheet documents a threat-intelligence firewall, reputation analysis and a high-interaction deception engine, the comparison guide describes redirecting blocked sessions to a dynamic deception engine, peer reviews confirm the honeypot model, and an independent blog describes deception-derived IOCs feeding threat feeds and SIEM.",
+      "gaps": null
     },
     {
       "item_id": "6.3",
       "verdict": "partial",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000630", "b0b0000000000631"],
-      "cited_source_ids": ["a1b2c3d4e5f6000f", "a1b2c3d4e5f60006"],
-      "source_types": ["vendor_doc", "third_party_review"],
-      "notes": "Akamai publishes a PCI DSS mapping whitepaper (March 2024) and third parties note NIST SP 800-207 alignment; ready-made ISO 27001 and IEC 62443 reports were not confirmed in public sources.",
-      "gaps": "No public evidence of built-in ISO 27001 or IEC 62443 compliance report packs."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "19892a71fb3cee58",
+        "1a3c24d27e4fa568",
+        "235209c8a51202bb",
+        "4d57ae3dd88216c5",
+        "543a9fad1dc039f6",
+        "ba318823d7d9c185"
+      ],
+      "cited_source_ids": [
+        "557832137a7d2040",
+        "57e5a05ecb0908fb",
+        "810f6c30430b08b2",
+        "995557ab55caa446",
+        "fe14a292d15d5461"
+      ],
+      "source_types": [
+        "case_study",
+        "third_party_review",
+        "vendor_doc"
+      ],
+      "notes": "The product page documents support for PCI-DSS, HIPAA and SWIFT audit requirements, an independent blog describes PCI-DSS 1.3 evidence and alignment with NIST SP 800-207, and customer stories describe CJIS and DWI compliance evidence; however ISO 27001 and IEC 62443 report templates were not found in staged sources.",
+      "gaps": null
     },
     {
       "item_id": "6.4",
       "verdict": "partial",
       "confidence": "medium",
-      "evidence_ids": ["b0b0000000000601"],
-      "cited_source_ids": ["a1b2c3d4e5f60007"],
-      "source_types": ["third_party_review"],
-      "notes": "Guardicore training material states the agent-to-aggregator connection is encrypted and authenticated on TCP/443 using TLS 1.2; the traffic is authenticated but the checklist's TLS 1.3 requirement is not explicitly met.",
-      "gaps": "No public confirmation of TLS 1.3 support or of mutual (client-certificate) authentication details."
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "9b2dec66afdb3dd9",
+        "a03cfe29bba5c1bd",
+        "e03038e4816e6177"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "425499d5039f6542"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The admin guide documents that agent-to-aggregator channels are encrypted and authenticated on TCP/443 using TLS 1.2, and syslog export can be TLS-encrypted; TLS 1.3 is not documented and mutual authentication is described as certificate-based 'authenticated' channels rather than an explicit mTLS mode.",
+      "gaps": null
     },
     {
       "item_id": "7.1",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "The Centra installation guide references a Scaling Architecture section but the public excerpts do not describe controller HA cluster (active-active / active-passive) topology."
+      "verdict": "supported",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "012e00c984e08983",
+        "063438f235e30231",
+        "404d1a76ed90f06e",
+        "d62acf21be4d0c64"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The admin guide documents aggregator clusters with agent-to-aggregator high availability and round-robin load balancing, a three-node MongoDB cluster for automatic failover, and configurable HA within Elasticsearch clusters.",
+      "gaps": null
     },
     {
       "item_id": "7.2",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "Publicly available material implies local policy decisions on the agent but does not describe explicit autonomous mode when controller connectivity is lost."
+      "verdict": "supported",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "325f1d4c90069c03",
+        "a260a278e81ef312",
+        "a49fbb237154a7ff"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec",
+        "425499d5039f6542"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The user guide states that when the Enforcement module cannot connect to Centra the agent continues enforcing the latest policy it received, and the admin guide documents persistent local storage of the last policy used after restart until an update is fetched.",
+      "gaps": null
     },
     {
       "item_id": "7.3",
-      "verdict": "unknown",
-      "confidence": "low",
-      "evidence_ids": [],
-      "cited_source_ids": [],
-      "source_types": [],
-      "notes": null,
-      "gaps": "The Centra installation guide explicitly notes disaster-recovery setup is not covered in the guide, and no public DR sync procedure was located."
+      "verdict": "supported",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "0b8fe261760923f1",
+        "8da493b200797548",
+        "baac78c665683278"
+      ],
+      "cited_source_ids": [
+        "21ad81ad0bb27fec"
+      ],
+      "source_types": [
+        "vendor_doc"
+      ],
+      "notes": "The admin guide documents a primary/standby management-cluster disaster-recovery scheme with ongoing configuration, inventory and policy sync, plus manual failover/failback procedures.",
+      "gaps": "Reveal flow data and incident data are noted as not synced between the DR clusters."
     },
     {
       "item_id": "8.1",
+      "verdict": "not_supported",
+      "confidence": "medium",
+      "numeric_value": null,
+      "unit": null,
+      "evidence_ids": [
+        "4087895df926ef65"
+      ],
+      "cited_source_ids": [
+        "3341e3ca22597904"
+      ],
+      "source_types": [
+        "certification_registry"
+      ],
+      "notes": "The NIST CMVP validated-modules registry (1,168 active certificates listed as of the search) contains no Guardicore or Akamai cryptographic module for FIPS 140-2/140-3, and no vendor document claims a FIPS validation or Common Criteria certification.",
+      "gaps": "The Common Criteria portal was inaccessible during research, so CC EAL4+ status is unverified rather than confirmed absent."
+    },
+    {
+      "item_id": "8.2",
       "verdict": "unknown",
       "confidence": "low",
+      "numeric_value": null,
+      "unit": null,
       "evidence_ids": [],
       "cited_source_ids": [],
       "source_types": [],
       "notes": null,
-      "gaps": "No entry in NIST CMVP or Common Criteria portals for Guardicore was located from public searches; absence of evidence is not evidence of absence."
-    },
-    {
-      "item_id": "8.2",
-      "verdict": "partial",
-      "confidence": "medium",
-      "evidence_ids": ["b0b0000000000820"],
-      "cited_source_ids": ["a1b2c3d4e5f60014"],
-      "source_types": ["third_party_review"],
-      "notes": "An OT integration with NVIDIA BlueField and Siemens is described as aligning with IEC 62443, which is architectural alignment, not a Siemens/Honeywell/ABB software-compatibility certification for the checklist's target vendors.",
-      "gaps": "No formal Siemens/Honeywell/ABB compatibility certification was located."
+      "gaps": "No staged source mentions Siemens, Honeywell or ABB compatibility certifications; OT segmentation capability is documented (IoT/OT brief, water-utility customer story) but not vendor-specific ICS certifications."
     }
   ]
 }

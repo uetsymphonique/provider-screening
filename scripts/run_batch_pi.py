@@ -1,31 +1,34 @@
-"""Batch-run screen or standard mode assessment across a product list.
+"""Batch-run screen or standard mode assessment across a product list — pi edition.
+
+Same logic as run_batch.py but uses `pi --mode json` instead of `claude -p
+--output-format stream-json`. All file paths, validation, and summary
+collection are identical to run_batch.py.
 
 Modes:
-  --mode screen    (default) → runs microsegmentation/prompts/screen_mode.md;
-                     source is providers/Microsegmentation.csv (all 50 rows).
-  --mode standard  → runs microsegmentation/prompts/standard_mode.md;
-                     source should be --queue-file microsegmentation/decisions/deep_queue.txt
-                     produced by promote_to_deep.py.
+  --mode screen    → runs <domain>/prompts/screen_mode.md
+  --mode standard  → runs <domain>/prompts/standard_mode.md
 
 For each product:
   1. Render the mode-specific prompt template with {VENDOR}, {PRODUCT_NAME},
      {product_id}.
-  2. Spawn a FRESH `claude -p` session (no --continue / --resume) with the
-     project's .claude/skills/deep-research auto-loaded (cwd = repo root).
-  3. Stream the full trace into runs/<pid>/claude_run.jsonl.
+  2. Spawn a FRESH `pi --mode json` session (--no-session) with project skills
+     auto-loaded (cwd = repo root).
+  3. Stream the full trace into runs/<pid>/pi_run.jsonl.
   4. Run validate_assessment.py against the produced assessment.json and
-     record the outcome in runs/<pid>/claude_run.meta.json.
+     record the outcome in runs/<pid>/pi_run.meta.json.
 
 --skip-done skips a product only when its existing assessment.json is in the
-SAME mode as the current run (so a screen result doesn't block a standard rerun).
+SAME mode as the current run.
 
-Requires:  claude CLI on PATH, venv Python for the validator.
-Docs cross-checked: https://code.claude.com/docs/en/headless.md
+--concurrency N runs up to N products in parallel (ThreadPoolExecutor).
+
+Requires: pi CLI on PATH, venv Python for the validator.
 """
 
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import json
 import os
@@ -55,10 +58,7 @@ DOMAINS = {
     },
 }
 
-# Module-level defaults (microsegmentation) — reassigned in main() when
-# --domain selects a different one. Kept as constants so existing call sites
-# (load_prompt_template, already_done_for_mode, run_validator, run_one,
-# BATCH_DIR) don't need a domain parameter threaded through every call.
+# Module-level defaults — reassigned in main() via select_domain().
 CSV_PATH = DOMAINS["microsegmentation"]["csv"]
 PROMPTS_DIR = DOMAINS["microsegmentation"]["dir"] / "prompts"
 PROMPT_FILES = {
@@ -85,10 +85,10 @@ def select_domain(domain: str) -> None:
     VALIDATOR = cfg["dir"] / "scripts" / "validate_assessment.py"
     BATCH_DIR = RUNS_ROOT / "_batch"
 
-# Pre-approve the tools the screen-mode prompt actually needs. Combined with
-# --permission-mode acceptEdits this covers file R/W without blanket approval.
-ALLOWED_TOOLS = "Bash,Read,Edit,Write,Grep,Glob,WebFetch,WebSearch,Skill,TodoWrite"
 
+# ---------------------------------------------------------------------------
+# Prompt template loading (unchanged from run_batch.py)
+# ---------------------------------------------------------------------------
 
 def load_prompt_template(mode: str) -> str:
     prompt_file = PROMPT_FILES[mode]
@@ -121,6 +121,10 @@ def already_done_for_mode(pid: str, mode: str) -> bool:
         return False
     return data.get("assessment_mode") == mode
 
+
+# ---------------------------------------------------------------------------
+# CSV product loading (unchanged)
+# ---------------------------------------------------------------------------
 
 def load_products(csv_path: Path) -> list[dict]:
     with csv_path.open(encoding="utf-8-sig", newline="") as f:
@@ -178,17 +182,32 @@ def render_prompt(template: str, product: dict) -> str:
             .replace("{product_id}", product["product_id"]))
 
 
-def parse_stream_result(log_path: Path) -> dict | None:
-    """Scan stream-json log for the final `type: "result"` event; return it whole.
+# ---------------------------------------------------------------------------
+# pi JSON mode stream parsing
+# ---------------------------------------------------------------------------
 
-    Schema (SDKResultMessage — https://code.claude.com/docs/en/agent-sdk/typescript.md):
-      subtype, is_error, duration_ms, duration_api_ms, num_turns, total_cost_usd,
-      usage.{input_tokens, output_tokens, cache_creation_input_tokens,
-      cache_read_input_tokens}, permission_denials, result, session_id.
+def parse_pi_stream_result(log_path: Path) -> dict | None:
+    """Scan pi --mode json log for session-level cost/usage summary.
+
+    Pi emits per-message usage (on each assistant message_end), not a single
+    'result' event like Claude. We aggregate from all assistant message_end
+    events and also look for the final agent_end + agent_settled.
     """
     if not log_path.exists():
         return None
-    result_event = None
+    total_usage = {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}
+    total_cost = 0.0
+    num_turns = 0
+    session_id = None
+    model_info = {"provider": None, "model": None}
+    stop_reason = None
+    error_message = None
+    duration_ms = None
+    agent_start_ts = None
+    agent_end_ts = None
+    first_event_ts = None   # fallback when agent_start is missing
+    last_event_ts = None    # fallback when agent_end is missing
+
     try:
         with log_path.open(encoding="utf-8") as f:
             for line in f:
@@ -199,24 +218,107 @@ def parse_stream_result(log_path: Path) -> dict | None:
                     ev = json.loads(line)
                 except json.JSONDecodeError:
                     continue
-                if isinstance(ev, dict) and ev.get("type") == "result":
-                    result_event = ev
-    except Exception:  # noqa: BLE001
-        pass
-    return result_event
 
+                etype = ev.get("type")
+                ts = ev.get("timestamp")
+
+                # Fallback timestamps (first & last event in stream)
+                if ts:
+                    if first_event_ts is None:
+                        first_event_ts = ts
+                    last_event_ts = ts
+
+                # Session header
+                if etype == "session":
+                    session_id = ev.get("id")
+
+                # Turn counting
+                elif etype == "turn_start":
+                    num_turns += 1
+
+                # Timing
+                elif etype == "agent_start":
+                    agent_start_ts = ev.get("timestamp")
+
+                elif etype == "agent_end":
+                    agent_end_ts = ev.get("timestamp")
+                    # agent_end carries the final messages array including usage.
+                    # We prefer this over individual message_end events because
+                    # it's the authoritative final state (message_end fires on
+                    # every message, including retries, which would double-count).
+
+                # Per-message usage (assistant) — aggregate from message_end.
+                # This is the reliable way because agent_end may not be emitted
+                # if the process is killed (timeout).
+                elif etype == "message_end":
+                    msg = ev.get("message") or {}
+                    # Extract message timestamp as fallback duration source.
+                    # Pi emits message.timestamp as Unix ms on message_end.
+                    msg_ts = msg.get("timestamp")
+                    if msg_ts:
+                        if first_event_ts is None:
+                            first_event_ts = msg_ts
+                        last_event_ts = msg_ts
+                    if msg.get("role") == "assistant":
+                        # Only count if this is a terminal message (not pending).
+                        # stopReason == "pending" means it's still streaming;
+                        # the final message_end for that turn will have a real stopReason.
+                        if msg.get("stopReason") != "pending":
+                            u = msg.get("usage") or {}
+                            total_usage["input"] += u.get("input", 0)
+                            total_usage["output"] += u.get("output", 0)
+                            total_usage["cacheRead"] += u.get("cacheRead", 0)
+                            total_usage["cacheWrite"] += u.get("cacheWrite", 0)
+                            c = u.get("cost") or {}
+                            total_cost += c.get("total", 0)
+                        model_info["provider"] = msg.get("provider")
+                        model_info["model"] = msg.get("model")
+                        stop_reason = msg.get("stopReason")
+                        if msg.get("errorMessage"):
+                            error_message = msg["errorMessage"]
+
+    except Exception:
+        pass
+
+    # Compute duration — prefer agent_start/agent_end, fall back to
+    # first/last message timestamps (covers runs killed before agent_end).
+    # Pi emits two timestamp formats: ISO 8601 strings (session/agent events)
+    # and Unix milliseconds integers (message.timestamp on message_end).
+    def _parse_ts(ts: str | int | None) -> datetime | None:
+        if ts is None:
+            return None
+        if isinstance(ts, (int, float)):
+            # Unix milliseconds
+            return datetime.fromtimestamp(ts / 1000, tz=timezone.utc)
+        # ISO 8601 string
+        try:
+            return datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
+        except Exception:
+            return None
+
+    start_ts = _parse_ts(agent_start_ts) or _parse_ts(first_event_ts)
+    end_ts = _parse_ts(agent_end_ts) or _parse_ts(last_event_ts)
+    if start_ts and end_ts:
+        duration_ms = int((end_ts - start_ts).total_seconds() * 1000)
+
+    return {
+        "session_id": session_id,
+        "provider": model_info["provider"],
+        "model": model_info["model"],
+        "num_turns": num_turns,
+        "duration_ms": duration_ms,
+        "stop_reason": stop_reason,
+        "error_message": error_message,
+        "usage": total_usage,
+        "total_cost_usd": total_cost,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Progress display helpers (adapted from run_batch.py)
+# ---------------------------------------------------------------------------
 
 def _safe_console(s: str) -> str:
-    """Sanitize for print() on a non-UTF-8 console (default cp1252 on Windows).
-
-    Progress lines echo arbitrary file/web content (tool_result text, model
-    text output) which routinely contains characters cp1252 can't encode
-    (Vietnamese diacritics, em-dashes, curly quotes) -- confirmed by testing
-    summarize_event() against a real claude_run.jsonl, which raised
-    UnicodeEncodeError on a plain print(). Replacing unencodable characters
-    here means a batch run degrades to '?' placeholders instead of crashing
-    mid-run on whichever product happens to cite non-ASCII text first.
-    """
     enc = sys.stdout.encoding or "utf-8"
     return s.encode(enc, errors="replace").decode(enc, errors="replace")
 
@@ -251,7 +353,7 @@ class _LineWindow:
 
     Each push() moves the cursor back up over the previously drawn block and
     rewrites it, so at most N lines of live status are ever on screen. The
-    full stream-json trace is unaffected — it's written to the log file
+    full pi_run.jsonl trace is unaffected — it's written to the log file
     separately, before this is ever called.
     """
 
@@ -273,62 +375,69 @@ class _LineWindow:
 
 
 def _brief_tool_input(name: str, inp: dict) -> str:
-    if name == "Bash":
+    name_lower = name.lower()
+    if name_lower in ("bash",):
         return _truncate(inp.get("command", ""), 90)
-    if name in ("Read", "Edit", "Write"):
-        return inp.get("file_path", "")
-    if name in ("Grep", "Glob"):
-        return _truncate(inp.get("pattern", ""), 60)
-    if name == "WebFetch":
-        return inp.get("url", "")
-    if name == "WebSearch":
-        return _truncate(inp.get("query", ""), 60)
-    if name == "Skill":
-        return inp.get("skill", "") or inp.get("command", "")
+    if name_lower in ("read", "edit", "write"):
+        return inp.get("path", inp.get("file_path", ""))
+    if name_lower in ("grep", "find", "ls"):
+        return _truncate(inp.get("pattern", "") or inp.get("path", ""), 60)
     keys = ", ".join(list(inp.keys())[:3])
     return f"{{{keys}}}" if keys else ""
 
 
 def summarize_event(ev: dict) -> str | None:
-    """One-line progress summary for a stream-json event, or None to skip it.
+    """One-line progress summary for a pi --mode json event.
 
-    Schema per https://code.claude.com/docs/en/headless.md stream-json output:
-    type in {system, assistant, user, result}; assistant/user carry a
-    message.content list of blocks (text | tool_use | tool_result).
+    Pi JSON mode events: session, agent_start, agent_end, agent_settled,
+    turn_start, turn_end, message_start, message_update, message_end,
+    tool_execution_start, tool_execution_update, tool_execution_end,
+    compaction_start, compaction_end, queue_update.
     """
     etype = ev.get("type")
-    if etype == "system" and ev.get("subtype") == "init":
-        tools = ev.get("tools") or []
-        return f"session init  model={ev.get('model', '?')}  tools={len(tools)}"
-    if etype == "assistant":
-        for block in (ev.get("message") or {}).get("content") or []:
-            btype = block.get("type")
-            if btype == "tool_use":
-                name = block.get("name", "?")
-                brief = _brief_tool_input(name, block.get("input") or {})
-                return f"tool_use  {name}({brief})" if brief else f"tool_use  {name}"
-            if btype == "text":
-                text = _truncate(block.get("text", ""))
-                if text:
-                    return f"text      {text}"
+    if etype == "session":
+        return f"session init  id={ev.get('id', '?')}  cwd={ev.get('cwd', '?')}"
+    if etype == "agent_start":
+        return "agent started"
+    if etype == "agent_settled":
+        return "agent settled (done)"
+    if etype == "tool_execution_start":
+        name = ev.get("toolName", "?")
+        args = ev.get("args") or {}
+        brief = _brief_tool_input(name, args)
+        return f"tool_start  {name}({brief})" if brief else f"tool_start  {name}"
+    if etype == "tool_execution_end":
+        name = ev.get("toolName", "?")
+        is_err = ev.get("isError", False)
+        tag = "ERROR" if is_err else "ok"
+        return f"tool_end[{tag}]  {name}"
+    if etype == "message_update":
+        ame = ev.get("assistantMessageEvent") or {}
+        delta_type = ame.get("type")
+        if delta_type == "text_delta":
+            # Return raw delta — caller accumulates to avoid one-line-per-token spam.
+            return ("text", ame.get("delta", ""))
+        elif delta_type == "thinking_delta":
+            return None
+        elif delta_type == "toolcall_end":
+            tc = ame.get("toolCall") or {}
+            name = tc.get("name", "?")
+            args = tc.get("arguments") or {}
+            brief = _brief_tool_input(name, args)
+            return f"toolcall  {name}({brief})" if brief else f"toolcall  {name}"
+        elif delta_type == "toolcall_start":
+            return None
         return None
-    if etype == "user":
-        for block in (ev.get("message") or {}).get("content") or []:
-            if block.get("type") == "tool_result":
-                content = block.get("content")
-                text = ""
-                if isinstance(content, list):
-                    text = " ".join(
-                        c.get("text", "") for c in content
-                        if isinstance(c, dict) and c.get("type") == "text"
-                    )
-                elif isinstance(content, str):
-                    text = content
-                tag = "ERROR" if block.get("is_error") else "ok"
-                return f"tool_result[{tag}]  {_truncate(text)}"
-        return None
+    if etype == "compaction_start":
+        return "compaction started"
+    if etype == "compaction_end":
+        return "compaction ended"
     return None
 
+
+# ---------------------------------------------------------------------------
+# Validator runner (unchanged)
+# ---------------------------------------------------------------------------
 
 def run_validator(pid: str) -> dict | None:
     assessment = RUNS_ROOT / pid / "assessment.json"
@@ -347,40 +456,42 @@ def run_validator(pid: str) -> dict | None:
     }
 
 
-def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_budget_usd=None,
-            skip_permissions=False, quiet=False, overwrite: int | None = None) -> dict:
+# ---------------------------------------------------------------------------
+# Single product runner
+# ---------------------------------------------------------------------------
+
+def run_one(product, prompt_text, model, timeout, dry_run, quiet=False, overwrite: int | None = None) -> dict:
     pid = product["product_id"]
     run_dir = RUNS_ROOT / pid
 
-    claude_bin = shutil.which("claude")
-    if not claude_bin:
-        raise SystemExit("`claude` CLI not on PATH")
+    pi_bin = shutil.which("pi")
+    if not pi_bin:
+        raise SystemExit("`pi` CLI not on PATH")
 
+    # Write prompt to a temp file so we can use pi's @file syntax.
+    # Windows CreateProcess has a 32K command-line limit; long prompts
+    # (9K+) easily exceed it after list2cmdline quoting.  @file avoids
+    # the limit entirely.
+    prompt_file = run_dir / "prompt_pi.txt"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    prompt_file.write_text(prompt_text, encoding="utf-8")
+
+    # pi --mode json outputs streaming events; -nc disables context-file
+    # loading (our prompt already has all instructions embedded).
+    # --no-session avoids polluting ~/.pi/agent/sessions/ with ephemeral runs.
+    # --approve auto-trusts the project so the skill under .pi/skills/ loads.
     cmd = [
-        claude_bin, "-p",
-        "--output-format", "stream-json",
-        "--verbose",  # required for stream-json in -p mode
+        pi_bin, "--mode", "json",
+        "--no-session",
+        "--approve",
+        "-nc",
+        f"@{prompt_file}",
     ]
-    if skip_permissions:
-        # No prompts for ANY tool call, in or out of the project tree — the
-        # scoped acceptEdits + allowedTools combo below is the safe default;
-        # this is opt-in per invocation via --dangerously-skip-permissions.
-        cmd.append("--dangerously-skip-permissions")
-    else:
-        cmd.extend(["--permission-mode", "acceptEdits", "--allowedTools", ALLOWED_TOOLS])
     if model:
         cmd.extend(["--model", model])
-    if max_turns is not None:
-        cmd.extend(["--max-turns", str(max_turns)])
-    if max_budget_usd is not None:
-        cmd.extend(["--max-budget-usd", str(max_budget_usd)])
-    cmd.append(prompt_text)
 
     started_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-    budget_str = f"${max_budget_usd}" if max_budget_usd is not None else "none"
-    perm_str = "DANGEROUSLY-SKIP-PERMISSIONS" if skip_permissions else "acceptEdits+allowlist"
-    print(f"[{pid}] start {started_iso}  prompt={len(prompt_text)}B  model={model or 'default'}  "
-          f"max_turns={max_turns or 'none'}  max_budget={budget_str}  perm={perm_str}")
+    print(f"[{pid}] start {started_iso}  prompt={len(prompt_text)}B  model={model or 'default'}")
 
     if dry_run:
         return {
@@ -390,13 +501,10 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
             "total_cost_usd": None, "validator": None,
         }
 
-    # Only create the run directory + write prompt for real runs, so a dry-run
-    # doesn't pollute runs/ with empty per-product dirs (breaks promote_to_deep).
-    run_dir.mkdir(parents=True, exist_ok=True)
-    prompt_path = run_dir / "prompt.txt"
-    log_path = run_dir / "claude_run.jsonl"
-    meta_path = run_dir / "claude_run.meta.json"
-    prompt_path.write_text(prompt_text, encoding="utf-8")
+    # prompt_pi.txt already written above (before Popen to avoid the
+    # Windows command-line length limit).
+    log_path = run_dir / "pi_run.jsonl"
+    meta_path = run_dir / "pi_run.meta.json"
 
     t0 = time.time()
     exit_code: int | None = None
@@ -408,10 +516,7 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
             text=True, bufsize=1,
             encoding="utf-8", errors="replace",
         )
-        # Pump the pipe on a background thread (not select()) so this works
-        # identically on Windows and POSIX, and so the main loop can still
-        # enforce --timeout even while readline() is blocked waiting on the
-        # next stream-json line.
+        # Pump pipe on background thread
         line_q: queue.Queue[str | None] = queue.Queue()
 
         def _pump() -> None:
@@ -423,6 +528,15 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
         threading.Thread(target=_pump, daemon=True).start()
 
         win = _LineWindow(overwrite) if overwrite else None
+
+        def _emit(text: str) -> None:
+            line_out = _safe_console(text)
+            if win is not None:
+                win.push(line_out)
+            else:
+                print(line_out, flush=True)
+
+        text_buf = ""  # accumulate text_delta chunks for compact progress lines
         with log_path.open("w", encoding="utf-8") as logf:
             while status is None:
                 if timeout is not None and (time.time() - t0) > timeout:
@@ -445,18 +559,27 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
                         ev = json.loads(line)
                     except json.JSONDecodeError:
                         ev = None
-                    summary_line = summarize_event(ev) if isinstance(ev, dict) else None
-                    if summary_line:
-                        line_out = _safe_console(f"  [{pid}] t+{time.time() - t0:6.1f}s  {summary_line}")
-                        if win is not None:
-                            win.push(line_out)
+                    if isinstance(ev, dict):
+                        result = summarize_event(ev)
+                        if isinstance(result, tuple) and result[0] == "text":
+                            # Buffer text deltas; flush on non-text event or when
+                            # buffer fills up (avoid one-line-per-token spam).
+                            text_buf += result[1]
+                            if len(text_buf) >= 140:
+                                _emit(f"  [{pid}] t+{time.time() - t0:6.1f}s  text      {_truncate(text_buf, 140)}")
+                                text_buf = ""
                         else:
-                            print(line_out, flush=True)
-    except Exception as e:  # noqa: BLE001
+                            # Flush any buffered text before printing this event.
+                            if text_buf:
+                                _emit(f"  [{pid}] t+{time.time() - t0:6.1f}s  text      {_truncate(text_buf, 140)}")
+                                text_buf = ""
+                            if result:
+                                _emit(f"  [{pid}] t+{time.time() - t0:6.1f}s  {result}")
+    except Exception as e:
         exit_code, status = -1, f"error: {e}"
     elapsed = round(time.time() - t0, 1)
 
-    result_event = parse_stream_result(log_path)
+    result_event = parse_pi_stream_result(log_path)
     usage = (result_event or {}).get("usage") or {}
     cost = (result_event or {}).get("total_cost_usd")
     val = run_validator(pid)
@@ -469,20 +592,20 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
         "elapsed_seconds": elapsed,
         "exit_code": exit_code,
         "status": status,
-        "skip_permissions": skip_permissions,
-        "subtype": (result_event or {}).get("subtype"),
-        "is_error": (result_event or {}).get("is_error"),
+        "agent": "pi",
+        "provider": (result_event or {}).get("provider"),
+        "model": (result_event or {}).get("model"),
         "num_turns": (result_event or {}).get("num_turns"),
         "duration_ms": (result_event or {}).get("duration_ms"),
-        "duration_api_ms": (result_event or {}).get("duration_api_ms"),
         "total_cost_usd": cost,
+        "stop_reason": (result_event or {}).get("stop_reason"),
+        "error_message": (result_event or {}).get("error_message"),
         "usage": {
-            "input_tokens": usage.get("input_tokens"),
-            "output_tokens": usage.get("output_tokens"),
-            "cache_creation_input_tokens": usage.get("cache_creation_input_tokens"),
-            "cache_read_input_tokens": usage.get("cache_read_input_tokens"),
+            "input_tokens": usage.get("input"),
+            "output_tokens": usage.get("output"),
+            "cache_read_input_tokens": usage.get("cacheRead"),
+            "cache_creation_input_tokens": usage.get("cacheWrite"),
         },
-        "permission_denials": len((result_event or {}).get("permission_denials") or []),
         "session_id": (result_event or {}).get("session_id"),
         "validator": val,
         "log_path": str(log_path.relative_to(REPO_ROOT)),
@@ -490,64 +613,47 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
     meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
     v_summary = "n/a" if not val else val.get("exit_code")
     print(f"[{pid}] {status} in {elapsed}s  turns={meta['num_turns']}  "
-          f"tokens in={usage.get('input_tokens', 0)} out={usage.get('output_tokens', 0)} "
-          f"cache_read={usage.get('cache_read_input_tokens', 0)} "
-          f"cache_write={usage.get('cache_creation_input_tokens', 0)}  "
+          f"tokens in={usage.get('input', 0)} out={usage.get('output', 0)} "
+          f"cache_read={usage.get('cacheRead', 0)} "
+          f"cache_write={usage.get('cacheWrite', 0)}  "
           f"cost=${cost or 0:.4f}  validator={v_summary}")
     return meta
 
 
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--domain", choices=list(DOMAINS.keys()), required=True,
-                    help="Which project (checklist/prompts/runs tree) to run against. Required — "
-                         "no default, so a mistyped command fails fast instead of silently running "
-                         "against the wrong domain.")
+                    help="Which project to run against.")
     ap.add_argument("--mode", choices=["screen", "standard"], required=True,
-                    help="Assessment mode: screen (6 gate items) | standard (all items). Required — "
-                         "no default, so a mistyped command fails fast instead of silently running "
-                         "screen mode when you meant standard (or vice versa).")
+                    help="Assessment mode: screen (gate items) | standard (all items).")
     ap.add_argument("--csv", type=Path, default=None,
                     help="Defaults to the domain's vendor CSV under providers/.")
     ap.add_argument("--queue-file", type=Path, default=None,
-                    help="Text file with one product_id per line (e.g. decisions/deep_queue.txt). "
-                         "Filters CSV rows; queue order is preserved.")
+                    help="Text file with one product_id per line.")
     ap.add_argument("--only", help="Run just one product_id")
-    ap.add_argument("--start-at", help="Start from this product_id (applied after --queue-file)")
+    ap.add_argument("--start-at", help="Start from this product_id")
     ap.add_argument("--limit", type=int, help="Cap number of products")
     ap.add_argument("--skip-done", action="store_true",
                     help="Skip products whose assessment.json is already in the SAME mode.")
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--model", help="opus | sonnet | haiku | fable (default: session default)")
+    ap.add_argument("--model", help="e.g. deepseek/deepseek-v4-pro or anthropic/claude-sonnet-4-5")
     ap.add_argument("--timeout", type=int, default=1800,
-                    help="Per-product wall-clock timeout in seconds (default 30 min). "
-                         "This kills the subprocess; it does not stop mid-turn like --max-turns/--max-budget-usd.")
-    ap.add_argument("--max-turns", type=int, default=None,
-                    help="Cap on agentic turns per product, forwarded to `claude -p --max-turns`. "
-                         "Unset by default (no cap) — a standard-mode pass over 24-33 checklist items "
-                         "with multi-source research routinely needs more turns than a typical single-skill "
-                         "task, so borrow run-pipeline.py's 70-turn default only after checking actual usage "
-                         "in a real run's claude_run.meta.json.")
-    ap.add_argument("--max-budget-usd", type=float, default=None,
-                    help="Cap on USD spend per product, forwarded to `claude -p --max-budget-usd`. "
-                         "Unset by default (no cap) — check a real run's total_cost_usd before picking a number.")
-    ap.add_argument("--dangerously-skip-permissions", action="store_true",
-                    help="Forward `--dangerously-skip-permissions` to `claude -p` instead of the default "
-                         "--permission-mode acceptEdits + --allowedTools whitelist. No prompt for ANY tool "
-                         "call — any Bash command, any file write, in or out of the project tree. Off by "
-                         "default; pass explicitly per invocation since this removes all guardrails for "
-                         "an unattended batch run.")
+                    help="Per-product wall-clock timeout in seconds (default 30 min).")
     ap.add_argument("--sleep", type=int, default=5,
-                    help="Seconds to pause between products (rate-limit hygiene)")
+                    help="Seconds to pause between products.")
     ap.add_argument("--quiet", action="store_true",
-                    help="Suppress live per-event progress lines (tool_use/text/tool_result) while "
-                         "a product runs; only the final one-line-per-product summary prints. The "
-                         "full stream-json trace is always written to claude_run.jsonl either way.")
+                    help="Suppress live per-event progress lines.")
+    ap.add_argument("--concurrency", type=int, default=1, metavar="N",
+                    help="Run up to N products in parallel (default 1 = sequential).")
     ap.add_argument("--overwrite", type=int, nargs="?", const=5, default=None, metavar="N",
                     help="Show a live N-line window of progress (default 5 if flag given with no "
                          "value; pass 1 for a single overwritten line), redrawn in place instead of "
                          "scrolling one line per event. No effect if --quiet is set. The full "
-                         "stream-json trace is still written to claude_run.jsonl either way.")
+                         "stream trace is still written to pi_run.jsonl either way.")
     args = ap.parse_args()
 
     select_domain(args.domain)
@@ -566,37 +672,64 @@ def main() -> int:
 
     print(f"domain={args.domain}  mode={args.mode}  loaded={len(all_products)} products, running={len(products)}")
     if queue_pids is not None:
-        print(f"queue-file={args.queue_file.relative_to(REPO_ROOT) if args.queue_file.is_relative_to(REPO_ROOT) else args.queue_file}  ({len(queue_pids)} pid(s))")
+        qp = args.queue_file
+        rel = qp.relative_to(REPO_ROOT) if qp.is_relative_to(REPO_ROOT) else qp
+        print(f"queue-file={rel}  ({len(queue_pids)} pid(s))")
     print(f"model={args.model or 'default'}  timeout={args.timeout}s  sleep={args.sleep}s")
-    print(f"cwd={REPO_ROOT}")
+    print(f"agent=pi  cwd={REPO_ROOT}")
     print()
 
     summary: list[dict] = []
-    for i, prod in enumerate(products, 1):
+    print_lock = threading.Lock()
+
+    def _run_product(i: int, prod: dict) -> dict:
         pid = prod["product_id"]
-        print(f"--- [{i}/{len(products)}] {pid} ({prod['vendor']}) ---")
+        with print_lock:
+            print(f"--- [{i}/{len(products)}] {pid} ({prod['vendor']}) ---")
         if args.skip_done and already_done_for_mode(pid, args.mode):
-            print(f"[{pid}] skipped (assessment.json already in mode={args.mode})")
-            summary.append({"product_id": pid, "status": "skipped"})
-            continue
+            with print_lock:
+                print(f"[{pid}] skipped (assessment.json already in mode={args.mode})")
+            return {"product_id": pid, "status": "skipped"}
 
         prompt_text = render_prompt(template, prod)
         try:
+            # Concurrent runs always use quiet per-product output to avoid
+            # interleaved progress lines. The final summary is printed per product.
             meta = run_one(prod, prompt_text, args.model, args.timeout, args.dry_run,
-                            max_turns=args.max_turns, max_budget_usd=args.max_budget_usd,
-                            skip_permissions=args.dangerously_skip_permissions,
-                            quiet=args.quiet, overwrite=args.overwrite)
-        except Exception as e:  # noqa: BLE001
-            print(f"[{pid}] EXCEPTION: {e}", file=sys.stderr)
+                           quiet=args.quiet or args.concurrency > 1, overwrite=args.overwrite)
+        except Exception as e:
+            with print_lock:
+                print(f"[{pid}] EXCEPTION: {e}", file=sys.stderr)
             meta = {"product_id": pid, "status": f"exception: {e}", "total_cost_usd": None}
-        summary.append(meta)
 
-        if args.sleep and i < len(products) and not args.dry_run:
-            time.sleep(args.sleep)
+        # Print per-product summary
+        u = meta.get("usage") or {}
+        with print_lock:
+            print(f"[{pid}] {meta.get('status')} in {meta.get('elapsed_seconds', '?')}s  "
+                  f"turns={meta.get('num_turns')}  "
+                  f"cost=${meta.get('total_cost_usd') or 0:.4f}  "
+                  f"val={meta.get('validator', {}).get('exit_code', '-')}")
+        return meta
+
+    if args.concurrency > 1:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as ex:
+            futures = {ex.submit(_run_product, i, prod): i for i, prod in enumerate(products, 1)}
+            for fut in concurrent.futures.as_completed(futures):
+                summary.append(fut.result())
+        # Restore original order
+        summary.sort(key=lambda s: next(
+            (i for i, p in enumerate(products, 1) if p["product_id"] == s.get("product_id")),
+            9999))
+    else:
+        for i, prod in enumerate(products, 1):
+            meta = _run_product(i, prod)
+            summary.append(meta)
+            if args.sleep and i < len(products) and not args.dry_run:
+                time.sleep(args.sleep)
 
     BATCH_DIR.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    summary_path = BATCH_DIR / f"summary-{ts}.json"
+    summary_path = BATCH_DIR / f"summary-pi-{ts}.json"
     total_cost = sum((s.get("total_cost_usd") or 0.0) for s in summary)
     totals = {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0, "turns": 0}
     for s in summary:
@@ -608,13 +741,11 @@ def main() -> int:
         totals["turns"] += s.get("num_turns") or 0
     payload = {
         "started_at": ts,
+        "agent": "pi",
         "mode": args.mode,
         "csv": str(args.csv.relative_to(REPO_ROOT)) if args.csv.is_relative_to(REPO_ROOT) else str(args.csv),
         "queue_file": str(args.queue_file) if args.queue_file else None,
         "model": args.model,
-        "max_turns": args.max_turns,
-        "max_budget_usd": args.max_budget_usd,
-        "dangerously_skip_permissions": args.dangerously_skip_permissions,
         "count": len(summary),
         "total_cost_usd": total_cost,
         "totals": totals,

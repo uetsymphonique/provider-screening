@@ -15,6 +15,13 @@ Follow the project's output contract in
 d:/vcs/provider-screening/bsg/GUIDE.md - it OVERRIDES the
 skill's default report_template.md.
 
+CRITICAL SAFETY RULE - NEVER run a command that kills processes by name,
+especially "taskkill //F //IM python.exe" or "pkill python". You are
+running inside a Python orchestrator process; killing all python.exe
+processes kills your own parent and aborts the entire run. To stop a
+background script you started, use Ctrl-C logic (write a sentinel file
+that the script checks) or kill ONLY the specific PIDs you own.
+
 1. CHECKLIST
    Read d:/vcs/provider-screening/bsg/checklist.yaml.
    For screen mode, only assess items with `screen: true`:

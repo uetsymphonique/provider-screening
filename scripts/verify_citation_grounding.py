@@ -74,11 +74,18 @@ def normalize(text: str) -> str:
 
 
 def normalize_url(url: str) -> str:
-    """Loose match key: scheme+host+path with trailing slash / case ignored."""
+    """Loose match key: scheme+host+path(+query) with trailing slash / case ignored.
+
+    Query strings are kept because two URLs that differ only in query (e.g.
+    support-portal document pages) point at different documents; collapsing
+    them onto one key would route evidence to the wrong staged text.
+    """
     if url.startswith("local:"):
         return url
     p = urllib.parse.urlparse(url.strip())
     path = p.path.rstrip("/")
+    if p.query:
+        return f"{p.netloc.lower()}{path}?{p.query}"
     return f"{p.netloc.lower()}{path}"
 
 

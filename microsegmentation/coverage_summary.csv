@@ -1,0 +1,51 @@
+﻿product_id,vendor,product_name,mode,items_assessed,supported,partial,not_supported,unknown,not_applicable,confidence_high,confidence_medium,confidence_low,vendor_only_items,triangulated_items,weighted_score,max_score,absolute_pct,applicable_pct
+akamai-guardicore-segmentation,Akamai Technologies (Guardicore),Akamai Guardicore Segmentation,standard,33,22,9,1,1,0,6,26,1,12,20,21.38,33,64.8,64.8
+algosec-horizon,AlgoSec,AlgoSec Horizon (Horizon Security Analyzer / FireFlow / AppViz / ACE),standard,33,10,12,1,3,7,1,29,3,24,13,12.25,33,37.1,47.1
+appviewx-avx-one,AppViewX,AppViewX AVX ONE (AVX Platform),standard,33,2,12,3,8,8,1,24,8,14,10,6.25,33,18.9,25.0
+arista-cloudvision-mss,Arista Networks,Arista CloudVision MSS (Multi-Domain Segmentation Service),standard,33,9,13,1,5,5,4,24,5,14,14,12.5,33,37.9,44.6
+armis-centrix,Armis (Armis from ServiceNow),Armis Centrix (Cyber Exposure Management platform),standard,33,14,14,1,4,0,1,28,4,20,13,16.0,33,48.5,48.5
+aruba-dynamic-segmentation-clearpass,HPE Aruba Networking,Aruba Dynamic Segmentation / ClearPass (ClearPass Policy Manager + Aruba Central NetConductor),standard,33,2,13,0,18,0,2,13,18,0,4,6.88,33,20.8,20.8
+blastshield,BlastWave,BlastShield,standard,33,11,12,2,8,0,1,24,8,9,13,13.0,33,39.4,39.4
+cato-sase-cloud,Cato Networks,Cato SASE Cloud,standard,33,10,19,1,3,0,1,28,4,29,11,14.75,33,44.7,44.7
+check-point-quantum-cloudguard,Check Point Software Technologies,Check Point Quantum / CloudGuard,standard,33,8,15,0,6,4,1,26,6,17,12,11.75,33,35.6,40.5
+cisco-secure-workload-tetration,Cisco Systems,Cisco Secure Workload (Tetration),standard,33,16,10,0,7,0,9,17,7,7,16,18.0,33,54.5,54.5
+claroty-xdome-ctd,Claroty,Claroty xDome / Continuous Threat Detection (CTD),standard,33,13,9,1,6,4,8,19,6,11,21,15.12,33,45.8,52.2
+cloudflare-one,Cloudflare,Cloudflare One,standard,33,7,15,2,9,0,1,23,9,19,4,11.12,33,33.7,33.7
+colortokens-xshield,ColorTokens,ColorTokens Xshield,standard,33,17,12,1,3,0,8,22,3,16,21,19.25,33,58.3,58.3
+cyolo-pro,Cyolo,Cyolo PRO (with Cyolo CPS Segmentation),standard,33,11,12,0,10,0,1,21,11,11,10,12.88,33,39.0,39.0
+dragos-platform,"Dragos, Inc.",Dragos Platform,standard,33,8,10,5,9,1,2,22,9,16,8,10.25,33,31.1,32.0
+elisity-digital,Elisity,Elisity Digital,standard,33,11,11,3,3,5,3,27,3,9,23,13.12,33,39.8,46.9
+extreme-fabric-connect,Extreme Networks,Extreme Fabric Connect,standard,33,5,15,0,5,8,1,27,5,25,7,9.62,33,29.2,38.5
+faddom-hybrid-cloud-mapping,Faddom,Faddom Hybrid Cloud Mapping,standard,33,9,14,1,4,5,3,26,4,18,16,12.75,33,38.6,45.5
+firemon-security-manager,FireMon,FireMon Security Manager,standard,33,6,11,0,7,9,0,25,8,21,14,8.5,33,25.8,35.4
+forcepoint-next-gen-firewall-flexedge,Forcepoint,Forcepoint Next-Gen Firewall / FlexEdge (NGFW with Security Management Center; rebranded FlexEdge Secure SD-WAN from v7.1),standard,33,6,20,0,7,0,0,26,7,24,6,12.0,33,36.4,36.4
+fortigate-fortiflex-microsegmentation,Fortinet,FortiGate / FortiFlex Microsegmentation,standard,33,10,20,0,3,0,0,28,5,29,20,14.75,33,44.7,44.7
+hillstone-cloudhive,Hillstone Networks,Hillstone CloudHive (山石云·格),standard,33,5,15,1,9,3,1,21,11,11,8,9.38,33,28.4,31.2
+illumio-zero-trust-segmentation,Illumio,Illumio Zero Trust Segmentation (Illumio Segmentation / Illumio Core),standard,33,27,4,0,2,0,6,25,2,21,12,23.25,33,70.5,70.5
+isocio-ciara,Radiflow,"iSocio (central OT monitoring, now iCEN) + CIARA (OT risk assessment)",standard,33,5,13,0,10,5,2,21,10,15,11,9.12,33,27.7,32.6
+juniper-connected-security-vsrx,Juniper Networks,Juniper Connected Security / vSRX,standard,33,9,15,0,5,4,1,22,10,20,8,11.88,33,36.0,40.9
+kaspersky-industrial-cybersecurity-kics,Kaspersky,Kaspersky Industrial CyberSecurity (KICS),standard,33,6,21,2,4,0,1,28,4,21,6,12.62,33,38.3,38.3
+microsoft-defender-for-iot,Microsoft,Microsoft Defender for IoT,standard,33,7,14,3,3,6,2,28,3,26,9,11.0,33,33.3,40.7
+mission-secure-platform,Mission Secure,Mission Secure Platform,standard,33,5,12,0,16,0,1,14,18,0,9,8.25,33,25.0,25.0
+nanolock-zerotrust-ot-security,NanoLock Security (now OTOPIQ),NanoLock ZeroTrust OT Security,standard,33,3,14,1,15,0,0,18,15,14,4,7.5,33,22.7,22.7
+nozomi-guardian-vantage,Nozomi Networks,Nozomi Guardian / Vantage,standard,33,12,12,6,1,2,2,30,1,15,12,14.0,33,42.4,45.2
+np-view,Network Perception (acquired by Dragos),NP-View,standard,33,4,9,1,9,10,0,24,9,20,8,6.38,33,19.3,27.7
+nutanix-flow-network-security,Nutanix,Nutanix Flow Network Security,standard,33,11,13,1,4,4,7,22,4,19,7,14.88,33,45.1,51.3
+ordr-systems-control-engine-sce,Ordr,Ordr Systems Control Engine (SCE),standard,33,14,8,0,5,6,3,25,5,25,19,14.25,33,43.2,52.8
+otorio-titan,OTORIO,OTORIO Titan (asset-centric IoT-OT-CPS security platform; now Armis Centrix for OT/IoT Security On-Prem),standard,33,6,7,2,10,8,2,20,11,12,9,7.62,33,23.1,30.5
+prisma-cloud-next-gen-firewalls,Palo Alto Networks,Prisma Cloud / Next-Gen Firewalls,standard,33,19,12,0,2,0,3,28,2,26,12,19.5,33,59.1,59.1
+sangfor-hci-next-gen-firewall,Sangfor Technologies,Sangfor HCI / Next-Gen Firewall (Athena NGFW),standard,33,7,10,1,11,4,0,22,11,18,2,9.0,33,27.3,31.0
+skybox-security-posture-management,Skybox Security,Skybox Security Suite (Skybox Security Posture Management Platform),standard,33,3,13,1,7,9,2,24,7,4,8,7.62,33,23.1,31.8
+sonicwall-network-security-cloud-edge,SonicWall,SonicWall Network Security / Cloud Edge (Cloud Secure Edge),standard,33,6,16,0,11,0,0,22,11,21,13,10.5,33,31.8,31.8
+sophos-firewall-synchronized-security,Sophos,"Sophos Firewall / Synchronized Security (SFOS with Sophos Central, Security Heartbeat, Synchronized Application Control, ZTNA)",standard,33,7,18,0,8,0,2,22,9,15,8,12.38,33,37.5,37.5
+tenable-ot-security,Tenable,Tenable OT Security (Tenable One OT Exposure),standard,33,8,17,0,7,1,4,22,7,15,12,13.38,33,40.5,41.8
+trend-vision-one-cloud-one,Trend Micro,Trend Vision One / Cloud One,standard,33,6,15,0,12,0,1,20,12,18,11,10.38,33,31.4,31.4
+truefort-fortress,TrueFort Inc.,TrueFort Fortress (Fortress Platform / Fortress XDR),standard,33,8,10,1,14,0,1,18,14,13,12,10.0,33,30.3,30.3
+tufin-orchestration-suite,Tufin,Tufin Orchestration Suite,standard,33,9,10,0,5,9,1,27,5,15,15,10.75,33,32.6,44.8
+unisys-stealth,Unisys,Unisys Stealth,standard,33,12,13,0,8,0,1,24,8,18,11,14.12,33,42.8,42.8
+versa-secure-sd-wan-sase,Versa Networks,Versa Secure SD-WAN / SASE (VersaONE Universal SASE Platform),standard,33,14,11,0,8,0,1,24,8,23,8,14.88,33,45.1,45.1
+vmware-vdefend-firewall-nsx,VMware (by Broadcom),VMware vDefend Firewall (NSX),standard,33,16,10,0,3,4,1,29,3,27,12,16.0,33,48.5,55.2
+watchguard-firebox,WatchGuard Technologies,WatchGuard Firebox (Fireware OS + WatchGuard Cloud + FireCloud ZTNA),standard,33,4,17,0,11,1,0,22,11,21,6,9.38,33,28.4,29.3
+zentera-coshield,Zentera Systems,Zentera CoShield,standard,33,17,11,0,5,0,3,25,5,12,14,17.62,33,53.4,53.4
+zero-networks-segment,Zero Networks,Zero Networks Segment,standard,33,10,11,1,7,4,3,23,7,16,10,12.38,33,37.5,42.7
+zscaler-zero-trust-exchange,Zscaler,Zscaler Zero Trust Exchange,standard,33,14,16,1,2,0,1,30,2,29,14,16.75,33,50.8,50.8

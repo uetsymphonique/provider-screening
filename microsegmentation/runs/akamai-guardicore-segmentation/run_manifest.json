@@ -1,22 +1,27 @@
 {
-  "run_id": "akamai-guardicore-segmentation-standard-2026-08-07",
-  "product_id": "akamai-guardicore-segmentation",
-  "vendor": "Akamai Technologies",
-  "product_name": "Akamai Guardicore Segmentation",
+  "version": "3.0.0",
+  "query": "Assess Akamai Guardicore Segmentation against the full 33-item microsegmentation checklist (standard mode).",
   "mode": "standard",
-  "assessment_mode": "standard",
-  "checklist_version": 1,
-  "started_at": "2026-08-07T00:00:00Z",
-  "completed_at": "2026-08-07T00:00:00Z",
-  "supersedes": "akamai-guardicore-segmentation-2026-08-07 (screen)",
+  "started_at": "2026-08-10T07:10:00Z",
+  "finished_at": "2026-08-10T08:40:00Z",
   "assumptions": [
-    "Product refers to Akamai Guardicore Segmentation (formerly Guardicore Centra) as marketed in 2025-2026.",
-    "Full 33-item checklist. Screen-mode evidence for items 1.1, 2.1, 3.2, 4.4, 5.1, 6.4 was retained and re-checked against fresh searches.",
-    "Where a checklist requirement is quantitative (numeric_threshold) and no public number was found, verdict is 'unknown' rather than an inferred pass/fail."
+    "Akamai Guardicore Segmentation (formerly Guardicore Centra) is assessed as Akamai's microsegmentation product; official techdocs.akamai.com Guardicore pages are SSO-gated, so official Centra guides were sourced from Scribd copies of the Admin/Installation/User guides plus Akamai marketing/brief PDFs and public ReadMe docs.",
+    "Agent-resource and latency numeric items (4.1/4.2/4.3) use documented vendor figures (up to 5% CPU / 400MB RAM; latency described qualitatively) and are rated partial because no source confirms the checklist thresholds.",
+    "NIST CMVP registry search is treated as authoritative negative evidence for FIPS 140-2/140-3 certification (8.1); Common Criteria portal was inaccessible, so CC status remains unverified.",
+    "Vendor-hosted customer stories (e.g., 300,000-endpoint deployment) are treated as case_study evidence, not independent analyst evidence.",
+    "Scribd copies of Guardicore training materials (GCSA units) are treated as vendor_doc."
   ],
   "provider_config": {
-    "web_search": "enabled",
-    "web_fetch": "enabled",
-    "pdf_helper": "scripts/pdf_to_text.py"
-  }
+    "primary": "direct HTTP fetch (staging helpers) + DuckDuckGo/Bing discovery via reader proxy",
+    "scholarly": null
+  },
+  "report_dir": "D:\\vcs\\provider-screening\\microsegmentation\\runs\\akamai-guardicore-segmentation",
+  "artifact_paths": {
+    "sources": "sources.jsonl",
+    "evidence": "evidence.jsonl",
+    "claims": "claims.jsonl",
+    "report": "report.md"
+  },
+  "queries_executed": 18,
+  "continuation": null
 }
