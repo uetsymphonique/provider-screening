@@ -1,0 +1,32 @@
+{
+  "product_id": "wago-industrial-security-gateway",
+  "vendor": "WAGO",
+  "product_name": "WAGO Industrial Security Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 1289.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 138,
+  "duration_ms": 1273170,
+  "total_cost_usd": 0.0675370752,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 112146,
+    "output_tokens": 71431,
+    "cache_read_input_tokens": 11369984,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-3597-7211-87ce-ee6ff5f5d68b",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\wago-industrial-security-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\wago-industrial-security-gateway\\pi_run.jsonl"
+}

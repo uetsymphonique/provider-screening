@@ -1,0 +1,32 @@
+{
+  "product_id": "bsgw-secure-gateway",
+  "vendor": "Lancs Networks",
+  "product_name": "BSGW Secure Gateway",
+  "started_at": "2026-08-11T08:19:51Z",
+  "elapsed_seconds": 772.6,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 119,
+  "duration_ms": 762504,
+  "total_cost_usd": 0.0685162352,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 118446,
+    "output_tokens": 78242,
+    "cache_read_input_tokens": 10723584,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fefe8-18cc-7490-99d0-420fe45b9dd4",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\bsgw-secure-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\bsgw-secure-gateway\\pi_run.jsonl"
+}

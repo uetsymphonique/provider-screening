@@ -1,0 +1,32 @@
+{
+  "product_id": "flexedge-intelligent-gateway",
+  "vendor": "Red Lion Controls",
+  "product_name": "FlexEdge Intelligent Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 1375.7,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 172,
+  "duration_ms": 1362231,
+  "total_cost_usd": 0.07556082800000002,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 95889,
+    "output_tokens": 80002,
+    "cache_read_input_tokens": 14191360,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-2961-7192-a0ee-b8fa89799f94",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\flexedge-intelligent-gateway\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\flexedge-intelligent-gateway\\pi_run.jsonl"
+}

@@ -1,0 +1,32 @@
+{
+  "product_id": "sophos-red-xgs-gateway",
+  "vendor": "Sophos",
+  "product_name": "Sophos RED / XGS Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 1285.3,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 123,
+  "duration_ms": 1270439,
+  "total_cost_usd": 0.09221827440000001,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 146045,
+    "output_tokens": 96660,
+    "cache_read_input_tokens": 15966848,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-2533-744d-812a-5889109d8f59",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\sophos-red-xgs-gateway\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\sophos-red-xgs-gateway\\pi_run.jsonl"
+}

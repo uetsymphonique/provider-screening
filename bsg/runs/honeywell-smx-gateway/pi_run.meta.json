@@ -1,0 +1,32 @@
+{
+  "product_id": "honeywell-smx-gateway",
+  "vendor": "Honeywell International",
+  "product_name": "Honeywell SMX Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 539.8,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 61,
+  "duration_ms": 523174,
+  "total_cost_usd": 0.036152194400000004,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 70315,
+    "output_tokens": 53969,
+    "cache_read_input_tokens": 3998848,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-3aff-7a46-a868-13df1c17d5f7",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\honeywell-smx-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\honeywell-smx-gateway\\pi_run.jsonl"
+}

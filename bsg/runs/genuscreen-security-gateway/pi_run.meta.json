@@ -1,0 +1,32 @@
+{
+  "product_id": "genuscreen-security-gateway",
+  "vendor": "GENUA GmbH",
+  "product_name": "genuscreen Security Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 1866.1,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 140,
+  "duration_ms": 1850163,
+  "total_cost_usd": 0.089072452,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 144725,
+    "output_tokens": 85587,
+    "cache_read_input_tokens": 16016640,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-2a2f-7f09-9b64-b076c7947452",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\genuscreen-security-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\genuscreen-security-gateway\\pi_run.jsonl"
+}

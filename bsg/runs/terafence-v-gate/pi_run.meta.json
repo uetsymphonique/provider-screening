@@ -1,0 +1,32 @@
+{
+  "product_id": "terafence-v-gate",
+  "vendor": "Terafence",
+  "product_name": "Terafence V-Gate",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 926.9,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 115,
+  "duration_ms": 913485,
+  "total_cost_usd": 0.0621756576,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 108196,
+    "output_tokens": 71748,
+    "cache_read_input_tokens": 9620992,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-2618-79ce-989e-573944efa1b5",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\terafence-v-gate\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\terafence-v-gate\\pi_run.jsonl"
+}

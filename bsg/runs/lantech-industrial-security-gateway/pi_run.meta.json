@@ -1,0 +1,32 @@
+{
+  "product_id": "lantech-industrial-security-gateway",
+  "vendor": "Lantech Communications",
+  "product_name": "Lantech Industrial Security Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 3147.1,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 265,
+  "duration_ms": 3129255,
+  "total_cost_usd": 0.14022780240000002,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 150143,
+    "output_tokens": 122240,
+    "cache_read_input_tokens": 30350208,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-361c-7596-a58f-1331cdde3f9d",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\lantech-industrial-security-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\lantech-industrial-security-gateway\\pi_run.jsonl"
+}

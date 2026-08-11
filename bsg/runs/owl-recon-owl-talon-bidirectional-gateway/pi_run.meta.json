@@ -1,0 +1,32 @@
+{
+  "product_id": "owl-recon-owl-talon-bidirectional-gateway",
+  "vendor": "Owl Cyber Defense",
+  "product_name": "Owl ReCon / Owl Talon Bidirectional Gateway",
+  "started_at": "2026-08-11T08:19:51Z",
+  "elapsed_seconds": 611.5,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 86,
+  "duration_ms": 603107,
+  "total_cost_usd": 0.0564184992,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 113018,
+    "output_tokens": 69993,
+    "cache_read_input_tokens": 7499264,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fefe8-18dc-780b-b2e3-4a2de7cd46fc",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\owl-recon-owl-talon-bidirectional-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\owl-recon-owl-talon-bidirectional-gateway\\pi_run.jsonl"
+}

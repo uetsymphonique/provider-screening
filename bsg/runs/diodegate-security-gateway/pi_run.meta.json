@@ -1,0 +1,32 @@
+{
+  "product_id": "diodegate-security-gateway",
+  "vendor": "DiodeGate",
+  "product_name": "DiodeGate Security Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 891.5,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 100,
+  "duration_ms": 875444,
+  "total_cost_usd": 0.05014224319999999,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 100594,
+    "output_tokens": 57361,
+    "cache_read_input_tokens": 7142144,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-3225-7a0e-aae3-3fdd1020ed08",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\diodegate-security-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\diodegate-security-gateway\\pi_run.jsonl"
+}

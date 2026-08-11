@@ -1,0 +1,32 @@
+{
+  "product_id": "advantech-uno-ecu-series",
+  "vendor": "Advantech",
+  "product_name": "Advantech UNO / ECU Series",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 921.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 92,
+  "duration_ms": 907803,
+  "total_cost_usd": 0.05084628080000001,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 90593,
+    "output_tokens": 60474,
+    "cache_read_input_tokens": 7582336,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-277b-7a93-bafc-1aa7e35013c6",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\advantech-uno-ecu-series\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\advantech-uno-ecu-series\\pi_run.jsonl"
+}

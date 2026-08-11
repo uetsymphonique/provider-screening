@@ -1,0 +1,32 @@
+{
+  "product_id": "everfox-high-assurance-cross-domain-gateway",
+  "vendor": "Everfox",
+  "product_name": "Everfox High Assurance Cross Domain Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 1053.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 151,
+  "duration_ms": 1036909,
+  "total_cost_usd": 0.09335170880000002,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 123686,
+    "output_tokens": 105435,
+    "cache_read_input_tokens": 16612096,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-30ab-7c1c-aec2-16f257723291",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\everfox-high-assurance-cross-domain-gateway\\assessment.json (24 items, mode=standard, gate=-, default=advance-to-deep)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\everfox-high-assurance-cross-domain-gateway\\pi_run.jsonl"
+}

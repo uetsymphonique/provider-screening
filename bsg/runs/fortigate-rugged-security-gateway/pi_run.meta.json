@@ -1,0 +1,32 @@
+{
+  "product_id": "fortigate-rugged-security-gateway",
+  "vendor": "Fortinet",
+  "product_name": "FortiGate Rugged Security Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 1145.1,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 199,
+  "duration_ms": 1128609,
+  "total_cost_usd": 0.12295662959999999,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 138511,
+    "output_tokens": 108923,
+    "cache_read_input_tokens": 26095232,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-312a-7119-a7af-d6ae9ee44f2d",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\fortigate-rugged-security-gateway\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\fortigate-rugged-security-gateway\\pi_run.jsonl"
+}

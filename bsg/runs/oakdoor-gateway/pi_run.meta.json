@@ -1,0 +1,32 @@
+{
+  "product_id": "oakdoor-gateway",
+  "vendor": "Oakdoor (PA Consulting)",
+  "product_name": "Oakdoor Gateway",
+  "started_at": "2026-08-11T08:19:51Z",
+  "elapsed_seconds": 1640.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 136,
+  "duration_ms": 1630185,
+  "total_cost_usd": 0.08362013519999995,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 117269,
+    "output_tokens": 89349,
+    "cache_read_input_tokens": 15065984,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fefe8-193a-7b97-9106-47ca3fc87401",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\oakdoor-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\oakdoor-gateway\\pi_run.jsonl"
+}

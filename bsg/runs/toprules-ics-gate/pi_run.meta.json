@@ -1,0 +1,32 @@
+{
+  "product_id": "toprules-ics-gate",
+  "vendor": "TOPSEC Technologies",
+  "product_name": "TopRules / ICS Gate",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 2059.8,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 184,
+  "duration_ms": 2043804,
+  "total_cost_usd": 0.1081946208,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 121556,
+    "output_tokens": 111984,
+    "cache_read_input_tokens": 21364736,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-329c-7f14-83be-fa3a42b0c43a",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\toprules-ics-gate\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\toprules-ics-gate\\pi_run.jsonl"
+}

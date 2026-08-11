@@ -1,0 +1,32 @@
+{
+  "product_id": "fibersystem-secure-gateway",
+  "vendor": "Fibersystem",
+  "product_name": "Fibersystem Secure Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 676.2,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 86,
+  "duration_ms": 663374,
+  "total_cost_usd": 0.051943662399999986,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 96700,
+    "output_tokens": 71453,
+    "cache_read_input_tokens": 6571008,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-2d20-7c64-bb5d-af9fa0fa1741",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\fibersystem-secure-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\fibersystem-secure-gateway\\pi_run.jsonl"
+}

@@ -1,0 +1,32 @@
+{
+  "product_id": "connexium-security-gateway",
+  "vendor": "Schneider Electric",
+  "product_name": "ConneXium Security Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 2836.2,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 197,
+  "duration_ms": 2821819,
+  "total_cost_usd": 0.11525505599999997,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 142398,
+    "output_tokens": 105335,
+    "cache_read_input_tokens": 23509120,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-2a99-723c-b1f9-85f507163633",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\connexium-security-gateway\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\connexium-security-gateway\\pi_run.jsonl"
+}

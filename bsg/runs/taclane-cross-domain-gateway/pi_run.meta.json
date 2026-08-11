@@ -1,0 +1,32 @@
+{
+  "product_id": "taclane-cross-domain-gateway",
+  "vendor": "General Dynamics Mission Systems",
+  "product_name": "TACLANE Cross Domain Gateway",
+  "started_at": "2026-08-11T08:53:42Z",
+  "elapsed_seconds": 802.7,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 100,
+  "duration_ms": 788230,
+  "total_cost_usd": 0.05317441360000001,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 81691,
+    "output_tokens": 71042,
+    "cache_read_input_tokens": 7802112,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff007-27ea-7667-978c-5be96482f52f",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\taclane-cross-domain-gateway\\assessment.json (24 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\taclane-cross-domain-gateway\\pi_run.jsonl"
+}

@@ -1,0 +1,32 @@
+{
+  "product_id": "sdot-security-gateway-sdot-industry-gateway",
+  "vendor": "infodas GmbH",
+  "product_name": "SDoT Security Gateway / SDoT Industry Gateway",
+  "started_at": "2026-08-11T08:19:51Z",
+  "elapsed_seconds": 880.4,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 126,
+  "duration_ms": 872024,
+  "total_cost_usd": 0.0718669336,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 104935,
+    "output_tokens": 87587,
+    "cache_read_input_tokens": 11661312,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fefe8-1938-7b0a-b421-c5c92344c19f",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\sdot-security-gateway-sdot-industry-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\sdot-security-gateway-sdot-industry-gateway\\pi_run.jsonl"
+}

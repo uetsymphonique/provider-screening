@@ -1,0 +1,32 @@
+{
+  "product_id": "nexor-guardian-nexor-guardiode",
+  "vendor": "Nexor",
+  "product_name": "Nexor Guardian / Nexor GuarDiode",
+  "started_at": "2026-08-11T08:19:51Z",
+  "elapsed_seconds": 734.3,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 110,
+  "duration_ms": 724438,
+  "total_cost_usd": 0.061721794400000016,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 109077,
+    "output_tokens": 72500,
+    "cache_read_input_tokens": 9339648,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fefe8-1900-7a3a-8817-ae3e02aa6669",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\nexor-guardian-nexor-guardiode\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\nexor-guardian-nexor-guardiode\\pi_run.jsonl"
+}
