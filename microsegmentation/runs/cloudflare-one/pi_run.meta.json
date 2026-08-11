@@ -1,0 +1,32 @@
+{
+  "product_id": "cloudflare-one",
+  "vendor": "Cloudflare",
+  "product_name": "Cloudflare One",
+  "started_at": "2026-08-10T13:42:26Z",
+  "elapsed_seconds": 864.1,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 119,
+  "duration_ms": 851050,
+  "total_cost_usd": 0.0824293904,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 156202,
+    "output_tokens": 78010,
+    "cache_read_input_tokens": 13827968,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019febe9-1ad4-7c0f-a581-80ce260fa872",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\cloudflare-one\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\cloudflare-one\\pi_run.jsonl"
+}

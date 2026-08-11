@@ -1,0 +1,32 @@
+{
+  "product_id": "tenable-ot-security",
+  "vendor": "Tenable",
+  "product_name": "Tenable OT Security",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1011.4,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 144,
+  "duration_ms": 998985,
+  "total_cost_usd": 0.08786672159999998,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 139770,
+    "output_tokens": 84246,
+    "cache_read_input_tokens": 15967872,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-93d6-7ec0-9319-a705d458b2dd",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\tenable-ot-security\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\tenable-ot-security\\pi_run.jsonl"
+}

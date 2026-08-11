@@ -1,0 +1,32 @@
+{
+  "product_id": "sangfor-hci-next-gen-firewall",
+  "vendor": "Sangfor Technologies",
+  "product_name": "Sangfor HCI / Next-Gen Firewall",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1987.7,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 184,
+  "duration_ms": 1974460,
+  "total_cost_usd": 0.1072240456,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 133289,
+    "output_tokens": 93343,
+    "cache_read_input_tokens": 22295552,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-93d6-7e9e-97c1-e124b985b117",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\sangfor-hci-next-gen-firewall\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\sangfor-hci-next-gen-firewall\\pi_run.jsonl"
+}

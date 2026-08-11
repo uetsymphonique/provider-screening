@@ -1,0 +1,32 @@
+{
+  "product_id": "faddom-hybrid-cloud-mapping",
+  "vendor": "Faddom",
+  "product_name": "Faddom Hybrid Cloud Mapping",
+  "started_at": "2026-08-10T11:05:49Z",
+  "elapsed_seconds": 857.3,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 109,
+  "duration_ms": 850418,
+  "total_cost_usd": 0.08317946000000001,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 156477,
+    "output_tokens": 85711,
+    "cache_read_input_tokens": 13312000,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019feb59-add2-71d2-b786-fac311b376d2",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\faddom-hybrid-cloud-mapping\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\faddom-hybrid-cloud-mapping\\pi_run.jsonl"
+}

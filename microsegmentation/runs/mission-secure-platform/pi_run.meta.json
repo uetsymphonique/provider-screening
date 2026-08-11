@@ -1,0 +1,32 @@
+{
+  "product_id": "mission-secure-platform",
+  "vendor": "Mission Secure",
+  "product_name": "Mission Secure Platform",
+  "started_at": "2026-08-11T00:15:40Z",
+  "elapsed_seconds": 1911.3,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 110,
+  "duration_ms": 1858677,
+  "total_cost_usd": 0.0660604224,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 107940,
+    "output_tokens": 71258,
+    "cache_read_input_tokens": 11070208,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fee2d-7263-769f-9634-227cbc0d8345",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\mission-secure-platform\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\mission-secure-platform\\pi_run.jsonl"
+}

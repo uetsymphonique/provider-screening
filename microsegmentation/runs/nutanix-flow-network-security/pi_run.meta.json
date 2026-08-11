@@ -1,0 +1,32 @@
+{
+  "product_id": "nutanix-flow-network-security",
+  "vendor": "Nutanix",
+  "product_name": "Nutanix Flow Network Security",
+  "started_at": "2026-08-10T13:42:26Z",
+  "elapsed_seconds": 1104.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 132,
+  "duration_ms": 1088679,
+  "total_cost_usd": 0.08217766480000004,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 121477,
+    "output_tokens": 89429,
+    "cache_read_input_tokens": 14332416,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019febe9-1a01-7ff9-a7a6-0c6ed653c879",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\nutanix-flow-network-security\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\nutanix-flow-network-security\\pi_run.jsonl"
+}

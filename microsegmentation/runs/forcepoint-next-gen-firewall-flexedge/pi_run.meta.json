@@ -1,0 +1,32 @@
+{
+  "product_id": "forcepoint-next-gen-firewall-flexedge",
+  "vendor": "Forcepoint",
+  "product_name": "Forcepoint Next-Gen Firewall / FlexEdge",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1232.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 159,
+  "duration_ms": 1220236,
+  "total_cost_usd": 0.108790416,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 178748,
+    "output_tokens": 85032,
+    "cache_read_input_tokens": 21413120,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-93dd-708d-a636-da80bdcd358c",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\forcepoint-next-gen-firewall-flexedge\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\forcepoint-next-gen-firewall-flexedge\\pi_run.jsonl"
+}

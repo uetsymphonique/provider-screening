@@ -1,0 +1,32 @@
+{
+  "product_id": "appviewx-avx-one",
+  "vendor": "AppViewX",
+  "product_name": "AppViewX AVX ONE",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 824.7,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 103,
+  "duration_ms": 812336,
+  "total_cost_usd": 0.0657139504,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 106822,
+    "output_tokens": 85722,
+    "cache_read_input_tokens": 9555968,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-9409-700f-9e2f-0f6e0013f306",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\appviewx-avx-one\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\appviewx-avx-one\\pi_run.jsonl"
+}

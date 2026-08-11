@@ -1,0 +1,32 @@
+{
+  "product_id": "zentera-coshield",
+  "vendor": "Zentera Systems",
+  "product_name": "Zentera CoShield",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1592.7,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 176,
+  "duration_ms": 1577643,
+  "total_cost_usd": 0.09491357680000001,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 151197,
+    "output_tokens": 87472,
+    "cache_read_input_tokens": 17590656,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-9474-73e3-8fb1-6d1bd798a3a0",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\zentera-coshield\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\zentera-coshield\\pi_run.jsonl"
+}

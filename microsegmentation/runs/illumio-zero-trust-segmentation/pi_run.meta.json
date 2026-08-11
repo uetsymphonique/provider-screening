@@ -1,0 +1,32 @@
+{
+  "product_id": "illumio-zero-trust-segmentation",
+  "vendor": "Illumio",
+  "product_name": "Illumio Zero Trust Segmentation",
+  "started_at": "2026-08-10T08:24:44Z",
+  "elapsed_seconds": 1702.8,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 274,
+  "duration_ms": 1694288,
+  "total_cost_usd": 0.1854761832,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 204501,
+    "output_tokens": 135623,
+    "cache_read_input_tokens": 42454144,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019feac6-32a7-7ec1-bbf9-de523b56a951",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\illumio-zero-trust-segmentation\\assessment.json (33 items, mode=standard, gate=-, default=advance-to-deep)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\illumio-zero-trust-segmentation\\pi_run.jsonl"
+}

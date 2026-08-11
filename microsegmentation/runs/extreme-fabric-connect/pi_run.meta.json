@@ -1,0 +1,32 @@
+{
+  "product_id": "extreme-fabric-connect",
+  "vendor": "Extreme Networks",
+  "product_name": "Extreme Fabric Connect",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1746.2,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 209,
+  "duration_ms": 1732136,
+  "total_cost_usd": 0.13451991280000003,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 181541,
+    "output_tokens": 108900,
+    "cache_read_input_tokens": 28075776,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-9452-7cd2-8f67-9ac5fc2526ca",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\extreme-fabric-connect\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\extreme-fabric-connect\\pi_run.jsonl"
+}

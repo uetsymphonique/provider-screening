@@ -1,0 +1,32 @@
+{
+  "product_id": "cyolo-pro",
+  "vendor": "Cyolo",
+  "product_name": "Cyolo PRO",
+  "started_at": "2026-08-10T13:42:26Z",
+  "elapsed_seconds": 695.9,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 109,
+  "duration_ms": 683660,
+  "total_cost_usd": 0.057438712799999986,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 98807,
+    "output_tokens": 64321,
+    "cache_read_input_tokens": 9141376,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019febe9-1a8c-779d-9c71-f51cb9f6a557",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\cyolo-pro\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\cyolo-pro\\pi_run.jsonl"
+}

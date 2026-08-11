@@ -1,0 +1,32 @@
+{
+  "product_id": "firemon-security-manager",
+  "vendor": "FireMon",
+  "product_name": "FireMon Security Manager",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1504.7,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 192,
+  "duration_ms": 1489386,
+  "total_cost_usd": 0.11061582560000001,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 150682,
+    "output_tokens": 85944,
+    "cache_read_input_tokens": 23377152,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-9438-745a-a287-a0b7a489404c",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\firemon-security-manager\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\firemon-security-manager\\pi_run.jsonl"
+}

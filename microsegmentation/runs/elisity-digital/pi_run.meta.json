@@ -1,0 +1,28 @@
+{
+  "product_id": "elisity-digital",
+  "vendor": "Elisity",
+  "product_name": "Elisity Digital",
+  "status": "ok (rescued - assessment complete, pi killed before agent_end)",
+  "agent": "pi",
+  "session_id": "019fea9c-16bb-7086-9171-1be4cd13a6f1",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 152,
+  "stop_reason": "stop (rescued)",
+  "usage": {
+    "input_tokens": 310198,
+    "output_tokens": 101808,
+    "cache_read_input_tokens": 21396096,
+    "cache_creation_input_tokens": 0
+  },
+  "total_cost_usd": 0.13184302879999998,
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK (33 items, mode=standard)"
+    ]
+  },
+  "log_path": "microsegmentation/runs/elisity-digital/pi_run.jsonl",
+  "duration_ms": 1214604,
+  "error_message": null
+}

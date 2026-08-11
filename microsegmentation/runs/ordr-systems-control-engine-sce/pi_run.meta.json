@@ -1,0 +1,32 @@
+{
+  "product_id": "ordr-systems-control-engine-sce",
+  "vendor": "Ordr",
+  "product_name": "Ordr Systems Control Engine (SCE)",
+  "started_at": "2026-08-10T13:42:26Z",
+  "elapsed_seconds": 1078.0,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 143,
+  "duration_ms": 1066285,
+  "total_cost_usd": 0.09490093760000004,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 157986,
+    "output_tokens": 87505,
+    "cache_read_input_tokens": 17243392,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019febe9-1aae-73ad-b6b0-52d80b113f9e",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\ordr-systems-control-engine-sce\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\ordr-systems-control-engine-sce\\pi_run.jsonl"
+}

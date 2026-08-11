@@ -1,0 +1,32 @@
+{
+  "product_id": "colortokens-xshield",
+  "vendor": "ColorTokens",
+  "product_name": "ColorTokens Xshield",
+  "started_at": "2026-08-10T08:24:33Z",
+  "elapsed_seconds": 1479.1,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 170,
+  "duration_ms": 1468056,
+  "total_cost_usd": 0.1168178312,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 164739,
+    "output_tokens": 112222,
+    "cache_read_input_tokens": 22261504,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019feac6-0c56-7570-b3d6-1b80907549ae",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\colortokens-xshield\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\colortokens-xshield\\pi_run.jsonl"
+}

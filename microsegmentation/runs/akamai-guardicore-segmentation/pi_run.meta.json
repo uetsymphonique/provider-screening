@@ -1,0 +1,32 @@
+{
+  "product_id": "akamai-guardicore-segmentation",
+  "vendor": "Akamai Technologies (Guardicore)",
+  "product_name": "Akamai Guardicore Segmentation",
+  "started_at": "2026-08-10T07:12:31Z",
+  "elapsed_seconds": 1875.9,
+  "exit_code": 0,
+  "status": "ok (restored from batch summary)",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 233,
+  "duration_ms": 234,
+  "total_cost_usd": 0.15999816000000003,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 226664,
+    "output_tokens": 122410,
+    "cache_read_input_tokens": 33568000,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fea84-132d-7810-a3c9-ef06e62d71a3",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\akamai-guardicore-segmentation\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\runs\\akamai-guardicore-segmentation\\pi_run.jsonl"
+}

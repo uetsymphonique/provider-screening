@@ -1,0 +1,32 @@
+{
+  "product_id": "kaspersky-industrial-cybersecurity-kics",
+  "vendor": "Kaspersky",
+  "product_name": "Kaspersky Industrial CyberSecurity (KICS)",
+  "started_at": "2026-08-10T16:40:58Z",
+  "elapsed_seconds": 1311.5,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 185,
+  "duration_ms": 1297246,
+  "total_cost_usd": 0.10180881199999996,
+  "stop_reason": "stop",
+  "error_message": "502 <html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n</body>\r\n</html>\r\n",
+  "usage": {
+    "input_tokens": 138507,
+    "output_tokens": 92327,
+    "cache_read_input_tokens": 20202240,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019fec8c-93f0-7bd0-9926-ae0f8b44929a",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\kaspersky-industrial-cybersecurity-kics\\assessment.json (33 items, mode=standard, gate=-, default=drop)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\kaspersky-industrial-cybersecurity-kics\\pi_run.jsonl"
+}

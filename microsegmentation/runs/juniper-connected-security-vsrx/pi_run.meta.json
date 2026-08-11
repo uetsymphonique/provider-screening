@@ -1,0 +1,32 @@
+{
+  "product_id": "juniper-connected-security-vsrx",
+  "vendor": "Juniper Networks",
+  "product_name": "Juniper Connected Security / vSRX",
+  "started_at": "2026-08-10T13:42:26Z",
+  "elapsed_seconds": 2130.1,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 191,
+  "duration_ms": 2119139,
+  "total_cost_usd": 0.1115997568,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 134610,
+    "output_tokens": 109951,
+    "cache_read_input_tokens": 22131456,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019febe9-1a4e-799b-a4e2-ab95e90a8e3e",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\microsegmentation\\runs\\juniper-connected-security-vsrx\\assessment.json (33 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "microsegmentation\\runs\\juniper-connected-security-vsrx\\pi_run.jsonl"
+}
