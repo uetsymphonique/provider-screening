@@ -24,20 +24,11 @@ The ConneXium Security Gateway is Schneider Electric's industrial (OT) network s
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 5     | 0                | 5      | 0   |
-| not_supported    | 2     | 0                | 2      | 0   |
-| unknown          | 9     | 0                | 0      | 9   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 3     | 0                | 3      | 0   |
+| unknown          | 15    | 0                | 0      | 15  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 8 items backed by ≥ 2 source_types; 14 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Schneider positions the ConneXium firewall as an Ethernet TCP/IP firewall whose function is to restrict access to automation networks to authorized devices and services, and the manual describes it as a Security Device with VPN function; no protocol-break (TCP/IP session termination) architecture is documented.
-- **1.2:** The device is documented as a compact 2-port 10/100BASE-TX DIN-rail firewall; no dual processing board or FPGA/shared-memory hardware-isolation design is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is documented as a firewall with VPN function rather than a guard with data-stamping control core.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is an Ethernet TCP/IP firewall rather than a CDS guard with a CDR engine.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall/router rather than a guard with a content validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is a firewall/router rather than a classified-data guard.
-- **2.7:** No anti-steganography detection/removal capability for image files is documented; the product is a firewall/router rather than a CDS guard.
+**Evidence quality:** 6 items backed by ≥ 2 source_types; 8 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The ConneXium Security Gateway is Schneider Electric's industrial (OT) network s
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Schneider positions the ConneXium firewall as an Ethernet TCP/IP firewall whose function is to restrict access to automation networks to authorized devices and services, and the manual describes it as a Security Device with VPN function; no protocol-break (TCP/IP session termination) architecture is documented. [2], [4], [7] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The device is documented as a compact 2-port 10/100BASE-TX DIN-rail firewall; no dual processing board or FPGA/shared-memory hardware-isolation design is described. [4], [5] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The reference manual documents Stateful Packet Inspection (the firewall transmits data packets from external to internal network only when requested by an internal subscriber) and the product page documents switchover between bridge mode and route mode -- packet-forwarding architectures, not a protocol-break design that terminates and re-originates sessions. [2], [6] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual-processing-board hardware isolation design (FPGA or isolated shared memory) is documented.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The stateful packet inspection firewall transmits unsolicited inbound traffic only for connections requested from inside and drops other data packets, with an explicit drop-everything rule on the external interface; firewall rules can be applied per packet or per frame. [2], [3], [6] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (No hardened-OS / microkernel / SELinux-strict-mode claim for the device OS was found in the reviewed sources.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is documented as a firewall with VPN function rather than a guard with data-stamping control core. [2], [4] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic stamping of cleaned data prior to session re-initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is an Ethernet TCP/IP firewall rather than a CDS guard with a CDR engine. [4], [7] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No file CDR (Office/PDF/Image/CAD reconstruction) capability is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-content inspection, macro/script removal or embedded-object sanitization is documented for this packet-level firewall.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of payload is documented.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall/router rather than a guard with a content validation engine. [4], [7] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is a firewall/router rather than a classified-data guard. [4], [7] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema-validation engine is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No keyword/regex-based data-leakage detection on traffic content is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal capability for image files is documented; the product is a firewall/router rather than a CDS guard. [4], [7] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -113,7 +104,7 @@ The ConneXium Security Gateway is Schneider Electric's industrial (OT) network s
 
 All 24 items were assessed from 8 distinct sources, every one vendor-documented: three Schneider catalogs/manuals (ConneXium Connecting Ethernet Devices catalog 2018, TCSEFEC Web-based Interface Reference Manual 2012, Modicon Networking catalog 2026), two Schneider product datasheets (one mirrored by the RMS Online reseller), two se.com pages (product and range) and one Schneider Community thread. Only item 3.2 draws on a non-documentation source (community), and no item is backed by an independent analyst/lab source, so confidence is capped at medium throughout and no verdict is high-confidence. No independent source was locatable: all public search engines, archive.org and the major distributor sites rate-limited or blocked this environment during the run, and the exact "Security Gateway 2xxx" SKU is de-indexed, so the assessment anchors to the documented ConneXium firewall family with the identity caveat recorded in the overview and run manifest.
 
-The sources were mutually consistent — catalog, manual and datasheets agree on product category (Ethernet TCP/IP firewall), 2x 10/100 ports, security features and certifications — so no contradictions required adjudication. The main judgment calls were: treating the family as a firewall/router by category (hence not_applicable on the CDS-specific items 1.1, 1.2, 1.5, 2.1, 2.4, 2.5, 2.7, per the documented category), and rating the numeric-threshold items from the documented numbers (4.1 not_supported at 100 Mbps because the ports are 10/100; 4.3 partial because router redundancy is documented but no switchover time is published).
+The sources were mutually consistent — catalog, manual and datasheets agree on product category (Ethernet TCP/IP firewall), 2x 10/100 ports, security features and certifications — so no contradictions required adjudication. The main judgment calls were: item 1.1 is rated not_supported on the documented Stateful Packet Inspection / bridge-or-route-mode packet-forwarding architecture, which is incompatible with a protocol-break design; items 1.2, 1.5, 2.1, 2.4, 2.5 and 2.7 have no documented fact either confirming or excluding the capability and are rated unknown rather than not_applicable; and the numeric-threshold items were rated from the documented numbers (4.1 not_supported at 100 Mbps because the ports are 10/100; 4.3 partial because router redundancy is documented but no switchover time is published).
 
 ---
 

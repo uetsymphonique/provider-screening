@@ -24,9 +24,9 @@ Arista CloudVision MSS (Multi-Domain Segmentation Service, formerly Macro-Segmen
 |------------------|-------|------------------|--------|-----|
 | supported        | 9     | 3                | 6      | 0   |
 | partial          | 13    | 1                | 12     | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
+| not_supported    | 0     | 0                | 0      | 0   |
 | unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 5     | 0                | 5      | 0   |
+| not_applicable   | 6     | 0                | 6      | 0   |
 
 **Evidence quality:** 20 items backed by ≥ 2 source_types; 14 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
@@ -35,6 +35,7 @@ Arista CloudVision MSS (Multi-Domain Segmentation Service, formerly Macro-Segmen
 - **4.2:** MSS does not deploy endpoint software, so an agent RAM footprint does not apply.
 - **4.4:** No endpoint agent exists in MSS - the network switch creates the microperimeters - so an agent crash fail-open/fail-closed consideration does not apply.
 - **4.5:** MSS installs no host agents (agentless switches orchestrated by CloudVision), so reboot-free agent install/update requirements do not apply.
+- **6.1:** Enforcement is documented as stateless, wire-speed, in-network via EOS switches with no endpoint software, so process-level enforcement is ruled out by the documented architecture.
 - **6.4:** There is no endpoint agent communicating with a controller in MSS (network-enforced, no endpoint software), so the agent-to-controller TLS/mutual-auth requirement does not apply.
 
 ---
@@ -94,7 +95,7 @@ Arista CloudVision MSS (Multi-Domain Segmentation Service, formerly Macro-Segmen
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | Enforcement is documented as stateless, wire-speed, in-network via EOS switches with no endpoint software, so process-level enforcement is ruled out by the documented architecture. [7], [21] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | Enforcement is documented as stateless, wire-speed, in-network via EOS switches with no endpoint software, so process-level enforcement is ruled out by the documented architecture. [7], [21] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | AVA queries threat-intelligence sources and open-source intelligence, Zscaler brings attacker-infrastructure intelligence into Arista NDR, and NDR risk scores feed segmentation decisions; deception/honeypot capabilities are not documented. [1], [3], [22] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Automated compliance reporting and zero-trust alignment with NIST 800-207 (CISA Zero Trust Maturity Model) are documented; PCI-DSS, ISO 27001 or IEC 62443 report templates are not documented. [4], [13], [21] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | N/A | medium | — | There is no endpoint agent communicating with a controller in MSS (network-enforced, no endpoint software), so the agent-to-controller TLS/mutual-auth requirement does not apply. [7], [10] |

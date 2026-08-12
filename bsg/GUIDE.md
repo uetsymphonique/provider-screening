@@ -1,341 +1,101 @@
 # BSG (Bidirectional Security Gateway) Screening — Research Guide
 
-This project uses the [`deep-research`](../.claude/skills/deep-research/) skill for
-per-product investigation but **replaces its default report contract** with a
-structured, comparable one so 52 vendors can be aggregated into a single matrix.
+Shared machinery lives in the
+[`provider-assessment`](../.claude/skills/provider-assessment/GUIDE.md) skill:
+verdict contract (rules 1–8), workflow, batch runner, source-type taxonomy,
+staging/citation etiquette, grounding check, and pitfalls all live there and
+apply to this domain verbatim. **This file only covers what is BSG-specific.**
 
-This is the sibling of [`microsegmentation/`](../microsegmentation/GUIDE.md) —
-same machinery, different domain (Bidirectional Security Gateway / Cross
-Domain Solution instead of microsegmentation), and a fully independent
-`checklist.yaml`, evidence stores, and decision buckets. Nothing under `bsg/`
-is shared with `microsegmentation/` except the top-level helper scripts in
-`scripts/` (`run_batch.py`, `pdf_to_text.py`, `html_to_text.py`,
-`verify_citation_grounding.py`), all of which take a `--domain` flag (except
-`verify_citation_grounding.py`, which takes `--dir` instead since the run
-directory already encodes the domain) — **always pass `--domain bsg`** when
-running them for this project. `run_batch.py` also requires `--mode`.
-`run_batch.py --domain` and `--mode` have no default and fail fast (argparse
-error) if omitted; `pdf_to_text.py`/`html_to_text.py --domain` still silently
-default to microsegmentation's tree if you forget it.
+The project uses the [`deep-research`](../.claude/skills/deep-research/) skill
+for per-product investigation but **replaces its default report contract** with
+a structured, comparable one so 52 vendors can be aggregated into a single
+matrix.
 
-## What overrides what
+## Domain specifics
 
-| Concern | Default in deep-research | Project override |
-|---|---|---|
-| Report template | `templates/report_template.md` (prose Findings) | [`templates/product_report.md`](./templates/product_report.md) (per-item verdicts) |
-| Output "truth" | Markdown report | `assessment.json` (schema: [`schemas/assessment.schema.json`](./schemas/assessment.schema.json)) — Markdown derived from it |
-| Verify scripts | `validate_report.py`, `verify_citations.py`, `verify_claim_support.py` | Add: `scripts/validate_assessment.py` (structural — evidence_id/source_id referential integrity); `scripts/verify_citation_grounding.py` (quote-vs-fetched-text — catches fabricated quotes structural validation can't see); render `report.md`'s mechanical sections with `scripts/render_report.py`; then aggregate with `scripts/aggregate_matrix.py` |
-| Evidence store | Shared `sources.jsonl` / `evidence.jsonl` per run | **Per-product**: each vendor gets its own directory under `runs/<product_id>/` |
+- **Provider list:** `providers/BSG.csv` (52 vendors).
+- **Checklist:** 24 items across 5 categories; version pinned in
+  `checklist.yaml` → `meta.version`. Machine-readable source of truth is
+  `checklist.yaml`; `checklist.md` is the human-readable wording source.
+- **Output:** `<this folder>/comparison_matrix.xlsx` (multi-sheet) produced by
+  the shared `aggregate_matrix.py`.
+- **Product classes:** see below — knowing them helps you know WHERE TO LOOK
+  for evidence, never what verdict to give.
 
-The evidence/claims/source registries from deep-research are **kept as-is** — that's the anti-fabrication core. This project only adds a downstream contract that consumes them.
-
-## Directory layout
-
-```
-bsg/
-├── checklist.md               # human-readable requirements (source of truth for wording)
-├── checklist.yaml             # machine-readable with stable IDs, verdict_type, thresholds, screen flag
-├── GUIDE.md                   # this file
-├── schemas/
-│   └── assessment.schema.json
-├── templates/
-│   ├── product_report.md      # deep/standard mode
-│   └── screening_report.md    # screen mode
-├── scripts/
-│   ├── validate_assessment.py
-│   ├── render_report.py       # regenerates report.md's mechanical sections from assessment.json
-│   ├── aggregate_matrix.py
-│   └── promote_to_deep.py
-├── runs/                      # ONE SUBDIR PER PRODUCT
-│   ├── _pdf_cache/            # scripts/pdf_to_text.py --domain bsg default when no --product (shared, no manifest)
-│   ├── _html_cache/           # scripts/html_to_text.py --domain bsg default when no --product (shared, no manifest)
-│   └── <product_id>/
-│       ├── assessment.json    # canonical (validated)
-│       ├── report.md          # derived from assessment.json + template
-│       ├── sources.jsonl      # produced by deep-research skill
-│       ├── evidence.jsonl     # produced by deep-research skill
-│       ├── claims.jsonl       # produced by deep-research skill
-│       ├── run_manifest.json  # produced by deep-research skill
-│       └── artifacts/         # raw fetched material staged for audit -- EVERY
-│           │                  # cited source must land here (PDF or web page),
-│           │                  # not just PDFs; it's the ground truth
-│           │                  # scripts/verify_citation_grounding.py checks
-│           │                  # evidence.jsonl quotes against.
-│           ├── <slug>.pdf     # staged raw PDF (kept)
-│           ├── <slug>.html    # staged raw HTML (kept)
-│           ├── <slug>.txt     # extracted text (PDF: ===== PAGE N ===== delimiters)
-│           └── manifest.jsonl # append-only ledger: url, sha256, captured_at, kind (pdf|html), size
-├── decisions/                 # generated by scripts/promote_to_deep.py
-├── comparison_matrix.csv      # generated by scripts/aggregate_matrix.py
-└── coverage_summary.csv       # generated by scripts/aggregate_matrix.py
-```
-
-## Two modes
-
-**Screen mode** — quick gate on the 6 items marked `screen: true` in `checklist.yaml`.
-- Use for: cutting the list of 52 down to a shortlist before spending token budget on deep passes.
-- Deep-research invocation: `standard`.
-- Output: `assessment.json` with `assessment_mode: "screen"` + `report.md` from `templates/screening_report.md`.
-- Recommendation field: `advance-to-deep | drop | needs-more-info`.
-
-**Standard / Deep mode** — full checklist (24 items).
-- Use for: shortlisted vendors after screening.
-- Deep-research invocation: `standard` (default) or `deep` for load-bearing procurement decisions.
-- Output: `assessment.json` with `assessment_mode: "standard"` or `"deep"` + `report.md` from `templates/product_report.md`.
-
-The user (or you) picks the mode at run time. The validator enforces coverage per mode: `screen` requires all items with `screen: true`; `standard`/`deep` require every item.
-
-## The two product classes on this list — and `not_applicable`
+## The two product classes on this list
 
 `providers/BSG.csv` mixes two genuinely different product classes:
 
 - **High-assurance Cross Domain Solutions (CDS) / protocol-break guards** — infodas, Owl Cyber Defense, Advenica, Waterfall, Nexor, OPSWAT, Everfox, BAE Systems, General Dynamics, Lockheed Martin, GENUA, Rohde & Schwarz, Thales, etc. These are purpose-built to enforce a protocol break, content disarm & reconstruction, and classification-based filtering between security domains.
 - **Ruggedized industrial NGFWs / OT gateways** — Siemens SCALANCE, Moxa, Phoenix Contact, Hirschmann, Fortinet Rugged, Palo Alto PA-220R/400R, Cisco Catalyst Industrial, Rockwell, ABB, Schneider, etc. These control bidirectional traffic between IT and OT zones with standard firewall/NGFW mechanisms, not protocol-break architecture.
 
-Checklist items 1.1 (protocol break), 1.2 (hardware isolation), 1.5 (internal data stamping), 2.1 (CDR), 2.4 (schema validation), 2.5 (IFC/security labels), and 2.7 (anti-steganography) are the most guard/CDS-specific capabilities. For a product that is legitimately a firewall/router by category, the correct verdict on those items is `not_applicable` — **not** `not_supported` (which implies the capability was evaluated and found lacking) and **not** `unknown` (which implies absence of evidence, not absence of relevance). Use `not_applicable` only when a source explicitly establishes the product's category; never as a default.
+**This is research context, not a scoring rule.** Knowing a product's class tells you where to look for evidence and how to read its datasheet. It must never decide a verdict.
 
-This distinction matters mechanically: `promote_to_deep.py`'s rule engine counts `not_supported` and `unknown` but ignores `not_applicable`. A rugged NGFW correctly scoped with `not_applicable` on CDS-only items can still legitimately reach `advance-to-deep` on its actual merits (throughput, fail-secure behavior, HA, certifications). One mis-scoped as `not_supported` gets auto-dropped for lacking a capability it was never meant to have.
+In particular: a product's class is **never** grounds for `not_applicable` on an item its class tends not to implement. Every item on the checklist asks whether the product delivers a capability this procurement is buying. A product that does not deliver it **falls short** — it is not exempt. Exempting it removes the item from `applicable_pct`'s denominator and scores the product as if the requirement had never been asked, which is how a general-purpose product ends up outranking a purpose-built one on a specialist checklist.
 
-## Verdicts and the anti-fabrication contract
+Deliberately not listed here: *which* items are most often mis-exempted this way. A list of item IDs becomes a lookup table that gets applied instead of the test, which is the failure mode rules 7–8 exist to prevent. Classify the item you are scoring from its own wording.
 
-Verdict enum: `supported | partial | not_supported | unknown | not_applicable`.
+The test that actually governs `not_applicable` is rule 7 in the shared GUIDE; the `not_supported` / `unknown` split these items usually land in instead is rule 8.
 
-Hard rules — enforced by `validate_assessment.py`, not just convention:
+## Per-domain files
 
-1. **`unknown` is first-class.** If no evidence was found, verdict MUST be `unknown` with empty `evidence_ids` / `cited_source_ids`. Never fabricate `not_supported` from silence.
-2. **Every non-unknown verdict needs evidence.** `evidence_ids`, `cited_source_ids`, `source_types` all non-empty — this includes `not_applicable`: cite the source that establishes the product's category.
-3. **Numeric thresholds need actual numbers — except qualified `partial`.** Items with `verdict_type: numeric_threshold` (throughput Mbps, latency ms, retention days, channels, sessions) MUST include `numeric_value` + matching `unit` when verdict is `supported`/`not_supported`. "High throughput" is not evidence; "1.2 Gbps sustained per vendor datasheet [2]" is. `verdict: partial` may leave `numeric_value: null` only when `notes` explains the qualitative/imprecise source (e.g. vendor says "multi-gigabit") — see the pitfall below.
-4. **Vendor-only sources cap confidence at `medium`.** If `source_types` contains only `vendor_doc` / `vendor_datasheet` / `vendor_blog`, `confidence: "high"` is rejected. High confidence requires at least one third-party or independent source.
-5. **Notes are paraphrase-only, ≤ 2 sentences.** No cross-product comparison in per-item notes — that belongs in the aggregation layer, not per-product prose.
-6. **Checklist version pin.** `assessment.checklist_version` must equal `checklist.yaml` → `meta.version`. Bumping the checklist invalidates old assessments (as it should).
-
-## Gate decision (screen mode) — rule + override
-
-Screen-mode assessments must fill `gate_decision` in `assessment.json`. The validator
-computes a rule-based default from the item verdicts and requires the model to
-justify any divergence:
-
-| Rule (priority order) | Default |
-|---|---|
-| ANY `item.verdict == "not_supported"` | `drop` |
-| `unknown_count >= 3` | `needs-more-info` |
-| otherwise | `advance-to-deep` |
-
-Contract on the JSON block:
-
-```json
-"gate_decision": {
-  "recommendation": "advance-to-deep",           // one of drop | needs-more-info | advance-to-deep
-  "rationale": "≤3 sentences citing item IDs.",
-  "default_recommendation": null,                // leave null; validator computes
-  "override_reason": null                        // REQUIRED (non-empty) iff recommendation != default
-}
+```
+bsg/
+├── checklist.md            # human-readable wording (source of truth)
+├── checklist.yaml          # machine-readable IDs, verdict_type, thresholds
+├── GUIDE.md                # this file
+├── runs/                   # one subdir per product (see shared GUIDE)
+└── comparison_matrix.xlsx  # generated by aggregate_matrix.py --domain bsg
 ```
 
-Validator behavior:
-- Missing `gate_decision` in screen mode → fail.
-- `recommendation != default_recommendation` without a non-empty `override_reason` → fail.
-- Hand-setting `default_recommendation` to something the rule engine disagrees with → fail (prevents gaming the check).
-- Passing runs print e.g. `gate=drop (OVERRIDE), default=needs-more-info` for audit.
+Everything else — `schemas/`, `templates/`, `prompts/`, `scripts/` — is
+shared in `.claude/skills/provider-assessment/` and selected with `--domain`.
+The aggregation entry point lives at
+`.claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py`.
 
-Downstream (`scripts/promote_to_deep.py`) reads `gate_decision.recommendation`
-directly — no markdown parsing:
+## Workflow (this domain)
 
 ```bash
-venv/Scripts/python.exe bsg/scripts/promote_to_deep.py [--dry-run]
-```
+# 1. Kick off deep-research skill per product, writing to bsg/runs/<product_id>/
 
-Emits into `bsg/decisions/`:
-- `deep_queue.txt` — one product_id per line (bucket = advance-to-deep)
-- `needs_more_info.txt` / `dropped.txt` — same shape for the other buckets
-- `summary.md` — audit table (bucket, override flag, default vs recommendation, rationale)
-
-Products without an `assessment.json`, or with a non-screen mode, or without
-`gate_decision`, land in an `errors` list — the script never guesses on their
-behalf.
-
-## Workflow per product
-
-```bash
-# 1. Kick off deep-research skill scoped to one product; instruct it to
-#    - write outputs to bsg/runs/<product_id>/
-#    - write assessment.json per this GUIDE.md's schema/rules
-#    - in standard/deep mode, write ONLY report.md's 4 narrative sections by
-#      hand (1. Overview, 4. Notable Strengths, 5. Notable Gaps / Risks,
-#      6. Evidence Quality Notes) — everything else in report.md is generated
-#      by step 3 below and will be overwritten if hand-written
-#    - in screen mode, report.md is fully generated by step 3 — nothing to
-#      hand-write
-#
 # 2. Validate
-python bsg/scripts/validate_assessment.py \
+python .claude/skills/provider-assessment/scripts/validate_assessment.py \
+    --domain bsg \
     bsg/runs/<product_id>/assessment.json \
     --evidence-store bsg/runs/<product_id>
 
-# 3. Render report.md's mechanical sections from the validated assessment.json
-#    (safe to re-run any time assessment.json changes — narrative sections
-#    written in step 1 are preserved verbatim, see render_report.py docstring)
-python bsg/scripts/render_report.py \
+# 3. Render report.md's mechanical sections (narrative preserved on re-run)
+python .claude/skills/provider-assessment/scripts/render_report.py \
+    --domain bsg \
     bsg/runs/<product_id>/assessment.json
 
-# 4. Once ≥ 1 product is validated, aggregate
-python bsg/scripts/aggregate_matrix.py
-#   -> bsg/comparison_matrix.csv
-#   -> bsg/coverage_summary.csv
+# 4. Aggregate all validated products
+python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py --domain bsg
 
-# 5. Filter to just deep-mode results if desired
-python bsg/scripts/aggregate_matrix.py --mode deep
+# 5. Filter to deep-mode results if desired
+python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py --domain bsg --mode deep
 ```
 
-## Batch runner (`scripts/run_batch.py`)
-
-Runs the mode-specific prompt against a product list, one fresh `claude -p`
-session per product (no context leakage between vendors). By default uses
-`--permission-mode acceptEdits` + a scoped `--allowedTools` list — no prompts,
-no full bypass. Pass `--dangerously-skip-permissions` to swap that for
-`claude -p --dangerously-skip-permissions` instead — no prompt for ANY tool
-call, in or out of the project tree; off by default, opt in per invocation
-since it removes all guardrails for an unattended batch run. Full stream-json
-trace goes to `runs/<pid>/claude_run.jsonl`; per-run summary (elapsed, exit code, cost,
-validator result) to `runs/<pid>/claude_run.meta.json`. `--skip-done` compares
-the existing `assessment.json`'s `assessment_mode` to the current run, so a
-screen result does NOT block a standard rerun. `--domain` and `--mode` are
-required (no default) — the CLI errors out immediately if either is omitted.
-Optional `--max-turns`/`--max-budget-usd` cap agentic turns/spend per product
-(forwarded to `claude -p`); both unset by default — check a real run's
-`claude_run.meta.json` for actual `num_turns`/`total_cost_usd` before picking
-a cap, since a standard-mode pass over 24 checklist items needs meaningfully
-more than a typical single-skill task.
+## Batch runner (this domain)
 
 **Always pass `--domain bsg`** — required, and there's no default to fall back to.
 
 ```bash
-# --- Screen pass (all 52 vendors from BSG.csv) ---
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode screen --dry-run --skip-done
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode screen --skip-done --limit 3
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode screen --only zoneguard
+# --- Standard pass ---
+venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard --dry-run --skip-done
+venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard --skip-done --limit 3
+venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard --only zoneguard
 
-# --- Standard/deep pass (queue = advance-to-deep bucket from promoter) ---
-venv/Scripts/python.exe bsg/scripts/promote_to_deep.py
+# Resume after interruption
 venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard \
-    --queue-file bsg/decisions/deep_queue.txt --skip-done
-
-# Resume after interruption (either mode)
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard \
-    --queue-file bsg/decisions/deep_queue.txt \
     --start-at waterfall-bidirectional-security-gateway --skip-done
 ```
 
-Global summary + total cost dumped to `bsg/runs/_batch/summary-<ts>.json`
-(mode + queue_file recorded so the batch is reproducible).
+Global summary + total cost dumped to `bsg/runs/_batch/summary-<ts>.json`.
 
-Docs cross-checked: <https://code.claude.com/docs/en/headless.md>,
-<https://code.claude.com/docs/en/permission-modes.md>.
+`--domain` and `--mode` are required for `run_batch.py` (argparse error if
+omitted). `pdf_to_text.py`/`html_to_text.py --domain` silently default to
+`microsegmentation`'s tree if you forget it — always pass `--domain bsg` for
+this project.
 
-## Source type taxonomy
-
-Use the narrowest applicable tag on each item's `source_types` array:
-
-| Tag | Meaning |
-|---|---|
-| `vendor_doc` | Official product documentation, admin guides, KB articles |
-| `vendor_datasheet` | Marketing datasheet / one-pager |
-| `vendor_blog` | Vendor-authored blog post |
-| `analyst_report` | Gartner / Forrester / IDC / etc. |
-| `third_party_review` | Independent lab test, comparison, technical blog by non-vendor |
-| `peer_reviewed` | Academic paper |
-| `regulatory_filing` | SEC / regulator filing |
-| `certification_registry` | NCDSMO Baseline registry, Common Criteria portal, BSI Germany, ANSSI France, NIST CMVP/FIPS validation entry |
-| `community` | Reddit, Stack Overflow, user forum |
-| `case_study` | Named customer case study (may be vendor-hosted; still tag as case_study, and add vendor_doc if hosted) |
-| `conference_talk` | RSA, Black Hat, DEF CON, vendor conference recording |
-| `product_release_notes` | Public release/changelog |
-
-## Handling PDF and web-page sources
-
-WebFetch either can't read the content at all (raw binary for `application/pdf`
-— you'll see "binary content saved to …" in the tool output) or fetches AND
-summarizes a web page through a small model in the same call, so nothing raw
-survives to check later. **Every source cited in `sources.jsonl` /
-`evidence.jsonl` — PDF or web page — must be staged first** with the matching
-helper, so a persisted, hash-anchored `.txt` exists for
-`scripts/verify_citation_grounding.py` to check quotes against.
-
-```bash
-# PDF — stage into bsg/runs/<product>/artifacts/ + append manifest.jsonl
-python scripts/pdf_to_text.py https://example.com/datasheet.pdf \
-    --product <product_id> --domain bsg
-
-# Web page — same staging contract, HTML instead of PDF
-python scripts/html_to_text.py https://example.com/product-page/ \
-    --product <product_id> --domain bsg
-
-# Local file (e.g. re-processing a WebFetch-cached PDF the harness saved) —
-# the file is COPIED into artifacts/, the original is not touched.
-python scripts/pdf_to_text.py C:/path/to/webfetch-cached.pdf \
-    --product <product_id> --domain bsg --slug some-readable-name
-
-# Ad-hoc / shared cache (no product context, no manifest)
-python scripts/pdf_to_text.py https://example.com/datasheet.pdf --domain bsg
-python scripts/html_to_text.py https://example.com/product-page/ --domain bsg
-```
-
-`--domain` defaults to `microsegmentation` for both scripts — omitting it for
-a BSG product stages the file into the wrong project's `runs/` tree with no
-error. Always pass `--domain bsg` explicitly here.
-
-For each invocation with `--product`, the scripts:
-- Download (or copy, for local input) the raw file into `runs/<product_id>/artifacts/<slug>.{pdf,html}`.
-- Extract text into `<slug>.txt` — `pdf_to_text.py` page-by-page via `pypdf`, delimited by `===== PAGE N =====` headers; `html_to_text.py` via a stdlib tag-stripper (nav/header/footer/aside/script/style dropped entirely; table cells separated with `" | "` so adjacent cells don't run together).
-- Append one line to the SAME `runs/<product_id>/artifacts/manifest.jsonl` — url/local path of origin, sha256, byte size, capture timestamp, and `"kind": "pdf"` or `"html"` — everything needed to prove which version of the source was actually read.
-- Print the `.txt` absolute path as the last stdout line so you can pipe it into a `Read` call.
-
-WebFetch is still fine for initial discovery — deciding which pages are worth
-staging — but the evidence quote itself must come from the staged `.txt`,
-never from WebFetch's own summary.
-
-**Citation etiquette for staged evidence:**
-- `source.raw_url` in `sources.jsonl` must point at the **original URL** (PDF or page), not the local artifact path — and must match exactly what was passed to `pdf_to_text.py`/`html_to_text.py`, since `verify_citation_grounding.py` matches on it.
-- `evidence.jsonl.locator` should identify the page for PDFs (e.g. `"page 3, 'throughput' section"`) or a section heading for web pages, so a reader can jump straight to the quote in the staged file.
-- `evidence.jsonl.quote` must be an **exact substring** of the staged `.txt`, not a paraphrase. If quoting two non-adjacent sentences, join them with `" ... "` so the elision is visible — never silently stitch text that wasn't contiguous in the source.
-- The `artifacts/manifest.jsonl` sha256 is the integrity anchor — if the vendor rewrites the page/PDF, the hash mismatch is your signal that evidence needs re-validation.
-
-## Citation grounding check
-
-`validate_assessment.py` only checks REFERENTIAL integrity — that an
-`evidence_id`/`source_id` exists somewhere in `evidence.jsonl`/`sources.jsonl`.
-It never checks whether a quote is real, which is exactly how fabricated
-evidence has slipped through: a model can invent a plausible-sounding quote
-and attribute it to a real `source_id`, and the validator still passes. This
-was confirmed empirically on a real run (`bsg/runs/zoneguard`) — ~15 of 27
-evidence entries cited text (SIEM/SNMP integration, a "four-eyes" governance
-claim, database-proxy support, etc.) that does not appear anywhere on the
-cited page, across items whose verdict rested entirely on that evidence.
-
-Run this after `validate_assessment.py` passes, once every cited source has
-been staged per the section above:
-
-```bash
-python scripts/verify_citation_grounding.py --dir bsg/runs/<product_id> --strict --require-staged
-```
-
-Each evidence entry comes back as one of:
-- `grounded` — every quote fragment (split on `" ... "`) found verbatim, normalized, in the staged text for its source
-- `fabricated` — the source WAS staged, but the quote (or part of it) is absent from it. This is not real evidence — go back to the `.txt`, fix the quote to an exact substring, or downgrade the item's verdict
-- `unverifiable` — `source_id` has no staged artifact to check against, meaning a source was cited without going through `pdf_to_text.py`/`html_to_text.py` first — go stage it, then re-run
-
-`--strict` fails the run on any `fabricated` evidence; `--require-staged` also
-fails on `unverifiable`. Note: quote-vs-text matching is exact-substring, not
-semantic — a quote that's a real paraphrase (true fact, reworded) will also
-report `fabricated`, since the anti-fabrication contract requires the quote
-itself to be verbatim, not just accurate in substance.
-
-## Common pitfalls to avoid
-
-- **Do not** turn "vendor claims X" into "product does X" in the `notes` field. Paraphrase with attribution.
-- **Do not** aggregate across products in per-item `notes` ("better than Waterfall at..."). The matrix does that.
-- **Do not** mark `not_supported` because the docs "don't mention it." That is `unknown`. Mark `not_supported` only when a source explicitly states the capability is absent or a documented alternative rules it out.
-- **Do not** mark `not_applicable` without a citation establishing the product's category. That is the whole point of the distinction from `unknown` (see "The two product classes" above).
-- **Do not** fill `numeric_value` with round numbers borrowed from the requirement ("≥ 1000 Mbps → 1000"). If the vendor says "multi-gigabit", verdict is `partial` with `numeric_value: null` and `notes` explaining the imprecision.
-- **Do not** run `scripts/run_batch.py` (also needs `--mode`) or `scripts/pdf_to_text.py`/`scripts/html_to_text.py` without `--domain bsg`. `run_batch.py` now errors out if `--domain`/`--mode` are omitted; `pdf_to_text.py`/`html_to_text.py` still silently default to `microsegmentation` and will write into the wrong project tree.
-- **Do not** cite a source in `evidence.jsonl` before staging it with `pdf_to_text.py`/`html_to_text.py`, and **do not** write a quote from memory or from WebFetch's summary. `verify_citation_grounding.py` will report it `fabricated` or `unverifiable` and fail the run.
+See the shared GUIDE for staging, citation grounding, and pitfalls.

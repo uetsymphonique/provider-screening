@@ -8,7 +8,28 @@
 #
 # threshold.op:  "<" | "<=" | ">" | ">="   (evaluated against numeric_value + unit)
 #
-# screen: true  → item is part of the quick screening pass (gate items)
+# not_applicable_class — classifies the REQUIREMENT SENTENCE, not any vendor
+# (see GUIDE.md "Verdicts" rule 7 for the full test). Set once when an item
+# is authored/revised; never re-derived per product. Only items that can
+# legitimately receive verdict: not_applicable carry this field.
+#   mechanism → sentence names a specific component and asks about A
+#               PROPERTY OF IT (resource use, failure behavior, install/
+#               update behavior, channel encryption). Test: does an
+#               instance of that component exist anywhere in the
+#               documented architecture, for any purpose?
+#               Absent -> not_applicable (no referent to measure).
+#               Present -> evaluate the property normally.
+#   outcome   → sentence asks whether the product CAN PRODUCE A RESULT,
+#               optionally at a stated depth/scope. Test: (1) does the
+#               product produce it via ANY means? none + explicit absence
+#               -> not_supported (never inferred from silence -> unknown).
+#               (2) if produced only at narrower scope, is that scope
+#               ruled out BY DEFINITION by the mechanism already used
+#               (-> not_applicable), or just not built out yet on the
+#               same mechanism (-> partial)?
+# na_test_scope (mechanism class only): "broad" = any instance of the
+#   component counts, whatever its purpose. "narrow" = only an instance
+#   positioned as the sentence requires (e.g. in the traffic path) counts.
 
 meta:
   version: 1
@@ -40,7 +61,6 @@ items:
     category: "1"
     requirement: "Tự động khám phá luồng dữ liệu thời gian thực (Real-time Auto-discovery)."
     verdict_type: boolean
-    screen: true
 
   - id: "1.2"
     category: "1"
@@ -68,7 +88,6 @@ items:
     category: "2"
     requirement: "Tạo chính sách dựa trên Tag/Label/Identity (không phụ thuộc IP/VLAN)."
     verdict_type: boolean
-    screen: true
 
   - id: "2.2"
     category: "2"
@@ -95,12 +114,14 @@ items:
     category: "3"
     requirement: "Hỗ trợ đa dạng OS: Windows Server (2003-2022), Linux RHEL/CentOS/Ubuntu, AIX, Solaris."
     verdict_type: boolean
+    not_applicable_class: mechanism
+    na_test_scope: broad
 
   - id: "3.2"
     category: "3"
     requirement: "Hỗ trợ Container / Kubernetes / OpenShift native isolation."
     verdict_type: boolean
-    screen: true
+    not_applicable_class: outcome
 
   - id: "3.3"
     category: "3"
@@ -124,36 +145,44 @@ items:
     requirement: "Mức độ tiêu tốn tài nguyên Agent: CPU < 1%."
     verdict_type: numeric_threshold
     threshold: { op: "<", value: 1, unit: "cpu_percent" }
+    not_applicable_class: mechanism
+    na_test_scope: broad
 
   - id: "4.2"
     category: "4"
     requirement: "Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB."
     verdict_type: numeric_threshold
     threshold: { op: "<", value: 100, unit: "MB" }
+    not_applicable_class: mechanism
+    na_test_scope: broad
 
   - id: "4.3"
     category: "4"
     requirement: "Không làm tăng độ trễ mạng (< 0.1ms network latency)."
     verdict_type: numeric_threshold
     threshold: { op: "<", value: 0.1, unit: "ms" }
+    not_applicable_class: mechanism
+    na_test_scope: narrow
 
   - id: "4.4"
     category: "4"
     requirement: "Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng giữ nguyên không bị gián đoạn."
     verdict_type: boolean
-    screen: true
+    not_applicable_class: mechanism
+    na_test_scope: narrow
 
   - id: "4.5"
     category: "4"
     requirement: "Cài đặt và cập nhật Agent không yêu cầu Reboot Server."
     verdict_type: boolean
+    not_applicable_class: mechanism
+    na_test_scope: broad
 
   # 5. Integration & Automation
   - id: "5.1"
     category: "5"
     requirement: "Full RESTful API hỗ trợ 100% chức năng quản trị."
     verdict_type: boolean
-    screen: true
 
   - id: "5.2"
     category: "5"
@@ -175,6 +204,7 @@ items:
     category: "6"
     requirement: "Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement)."
     verdict_type: boolean
+    not_applicable_class: outcome
 
   - id: "6.2"
     category: "6"
@@ -190,7 +220,8 @@ items:
     category: "6"
     requirement: "Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth)."
     verdict_type: boolean
-    screen: true
+    not_applicable_class: mechanism
+    na_test_scope: broad
 
   # 7. High Availability
   - id: "7.1"
@@ -202,6 +233,8 @@ items:
     category: "7"
     requirement: "Nếu Controller mất kết nối hoàn toàn, Agent trên Host vẫn tiếp tục thực thi Policy (Autonomous Mode)."
     verdict_type: boolean
+    not_applicable_class: mechanism
+    na_test_scope: narrow
 
   - id: "7.3"
     category: "7"

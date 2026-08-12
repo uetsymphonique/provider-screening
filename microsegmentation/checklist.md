@@ -36,8 +36,8 @@ Internet (Air-gapped Network).
 Workloads tập trung.
 
 ### 4. Performance & Impact
-+ Mức độ tiêu tốn tài nguyên Agent: CPU < 1%, RAM <
-100MB.
++ Mức độ tiêu tốn tài nguyên Agent: CPU < 1%.
++ Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB.
 + Không làm tăng độ trễ mạng (< 0.1ms network latency).
 + Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng
 giữ nguyên không bị gián đoạn.
@@ -55,7 +55,7 @@ DevSecOps.
 ### 6. Security & Compliance
 + Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level
 enforcement).
-+ Tích hợp Threat Intelligence & Mánh dối (Honeypot/
++ Tích hợp Threat Intelligence & Đánh lừa (Honeypot/
 Deception detection).
 + Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST
 800-207, ISO 27001, IEC 62443.
@@ -63,7 +63,8 @@ Deception detection).
 Mutual Auth).
 
 ### 7. High Availability
-+ Kiến trúc Cụm Controller hỗ trợ High Availability (ActiveActive / Active-Passive).
++ Kiến trúc Cụm Controller hỗ trợ High Availability (Active-
+Active / Active-Passive).
 + Nếu Controller mất kết nối hoàn toàn, Agent trên Host vẫn
 tiếp tục thực thi Policy (Autonomous Mode).
 + Hỗ trợ sao lưu và khôi phục thảm họa (Disaster Recovery

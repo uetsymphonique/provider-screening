@@ -24,9 +24,9 @@ Nutanix Flow Network Security (FNS) is the microsegmentation capability of the N
 |------------------|-------|------------------|--------|-----|
 | supported        | 11    | 7                | 4      | 0   |
 | partial          | 13    | 0                | 13     | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
+| not_supported    | 0     | 0                | 0      | 0   |
 | unknown          | 4     | 0                | 0      | 4   |
-| not_applicable   | 4     | 0                | 4      | 0   |
+| not_applicable   | 5     | 0                | 5      | 0   |
 
 **Evidence quality:** 10 items backed by ≥ 2 source_types; 19 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
@@ -35,6 +35,7 @@ Nutanix Flow Network Security (FNS) is the microsegmentation capability of the N
 - **4.2:** No guest agent runs on workloads, so there is no agent RAM footprint to measure.
 - **4.4:** No guest enforcement agent exists whose failure could interrupt workload traffic; enforcement runs in the AHV hypervisor.
 - **4.5:** No agent installation/update cycle exists in the agentless architecture, so reboot requirements do not apply.
+- **6.1:** Vendor docs explicitly state FNS is a stateful layer-4 microsegmentation platform filtering on packet/frame headers, with no process-level inspection; Layer 7 requires partner service insertion.
 
 ---
 
@@ -93,7 +94,7 @@ Nutanix Flow Network Security (FNS) is the microsegmentation capability of the N
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | Vendor docs explicitly state FNS is a stateful layer-4 microsegmentation platform filtering on packet/frame headers, with no process-level inspection; Layer 7 requires partner service insertion. [3], [6] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | Vendor docs explicitly state FNS is a stateful layer-4 microsegmentation platform filtering on packet/frame headers, with no process-level inspection; Layer 7 requires partner service insertion. [3], [6] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | Vendor docs list traffic monitoring and threat detection as functions and describe service insertion for third-party L7 firewalls, IDS/IPS and threat-detection platforms; no native honeypot/deception capability is documented. [1], [3] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Vendor docs state FNS aligns with NIST SP 800-207 and PCI-DSS (plus HIPAA/SOX) with out-of-box audit and reporting; ISO 27001 and IEC 62443 are not mentioned in staged sources. [1], [3] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Unknown | low | — | no evidence found (No staged source documents TLS version or mutual authentication for Flow Network Security control channels (the product has no guest agents).) |

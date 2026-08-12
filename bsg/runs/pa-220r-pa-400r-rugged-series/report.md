@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-Palo Alto Networks markets the PA-220R and PA-400R Series as ruggedized, ML-powered next-generation firewalls (NGFWs) that bring next-generation capabilities to industrial applications in harsh environments, such as utility substations, power plants, manufacturing plants, oil and gas facilities, building management systems and healthcare networks [1], [2]. Both families run PAN-OS, the same software that runs all Palo Alto Networks NGFWs, and are positioned for industrial/defense deployments with extended temperature range, fanless passive cooling, DIN-rail/rack/wall mounting, dual DC power and IEC 61850-3 / IEEE 1613 environmental certifications [1], [2]. The PA-400R Series is the current line (PA-410R, PA-450R, PA-455R-5G with optional integrated 5G), rated from 1.4 Gbps to 3.2 Gbps firewall throughput on PAN-OS 12.1, while the older PA-220R is rated 575/540 Mbps on PAN-OS 10.0 [1], [2]. Because the product is a stateful NGFW rather than a protocol-break cross domain guard, the guard/CDS-specific checklist items (1.1, 1.2, 1.5, 2.1, 2.2, 2.4, 2.5, 2.7) are marked not_applicable on the basis of the documented product category [1], [2], [20].
+Palo Alto Networks markets the PA-220R and PA-400R Series as ruggedized, ML-powered next-generation firewalls (NGFWs) that bring next-generation capabilities to industrial applications in harsh environments, such as utility substations, power plants, manufacturing plants, oil and gas facilities, building management systems and healthcare networks [1], [2]. Both families run PAN-OS, the same software that runs all Palo Alto Networks NGFWs, and are positioned for industrial/defense deployments with extended temperature range, fanless passive cooling, DIN-rail/rack/wall mounting, dual DC power and IEC 61850-3 / IEEE 1613 environmental certifications [1], [2]. The PA-400R Series is the current line (PA-410R, PA-450R, PA-455R-5G with optional integrated 5G), rated from 1.4 Gbps to 3.2 Gbps firewall throughput on PAN-OS 12.1, while the older PA-220R is rated 575/540 Mbps on PAN-OS 10.0 [1], [2]. Because the product is a stateful NGFW rather than a protocol-break cross domain guard, the guard/CDS-specific checklist items (1.1, 1.2, 1.5, 2.1, 2.2, 2.4, 2.5, 2.7) are assessed as unknown: the datasheets and reseller listing do not document these capabilities and no specific documented fact excludes them [1], [2], [20].
 
 ---
 
@@ -25,20 +25,10 @@ Palo Alto Networks markets the PA-220R and PA-400R Series as ruggedized, ML-powe
 | supported        | 8     | 1                | 7      | 0   |
 | partial          | 7     | 0                | 7      | 0   |
 | not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 0     | 0                | 0      | 0   |
-| not_applicable   | 8     | 0                | 8      | 0   |
+| unknown          | 8     | 0                | 0      | 8   |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 11 items backed by ≥ 2 source_types; 18 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Palo Alto markets the PA-220R and PA-400R as ruggedized ML-powered next-generation firewalls (NGFWs) that bring next-generation capabilities to industrial applications in harsh environments; no protocol-break (TCP/IP session termination) architecture is described.
-- **1.2:** The devices are documented as single ruggedized appliances with TPM-based secure boot; no dual processing board or FPGA/shared-memory hardware isolation architecture is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is a stateful NGFW rather than a guard with inner/outer data envelopes.
-- **2.1:** No content disarm and reconstruction of Office/PDF/image/CAD files is documented; the product is an NGFW without a CDR engine.
-- **2.2:** No file disassembly or macro/script/embedded-object removal engine is documented; file handling is limited to blocking/quarantining, which is outside the CDR definition this item targets.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation capability is documented; the product is an NGFW, not a guard with a content validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is an NGFW, not a classified-data guard.
-- **2.7:** No anti-steganography detection or removal capability for image files is documented; the product is an NGFW rather than a CDS guard.
+**Evidence quality:** 7 items backed by ≥ 2 source_types; 14 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -48,23 +38,23 @@ Palo Alto Networks markets the PA-220R and PA-400R Series as ruggedized, ML-powe
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Palo Alto markets the PA-220R and PA-400R as ruggedized ML-powered next-generation firewalls (NGFWs) that bring next-generation capabilities to industrial applications in harsh environments; no protocol-break (TCP/IP session termination) architecture is described. [1], [2], [20] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The devices are documented as single ruggedized appliances with TPM-based secure boot; no dual processing board or FPGA/shared-memory hardware isolation architecture is described. [2], [20] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found (Product documentation describes the devices as ruggedized ML-powered NGFWs but does not document TCP/IP session-termination (protocol-break) architecture either way.) |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (Hardware specs document TPM-based secure boot on a single ruggedized appliance, but no documentation describes a dual processing-board design connected via FPGA or isolated shared memory.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | PAN-OS documentation states the default rules deny all interzone traffic while allowing intrazone traffic, i.e. cross-zone forwarding is whitelist-based, and security policy decisions are made on the application rather than the port. [1], [6] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Supported | medium | — | An independent migration write-up describes PAN-OS as a hardened, closed security-focused operating system; the vendor additionally documents FIPS-CC operational mode, TPM-based secure boot with a hardware root of trust, and PAN-OS Shield management-plane exploit protection. [2], [13], [21], [23] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is a stateful NGFW rather than a guard with inner/outer data envelopes. [1], [2] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No documentation describes an internal control core that cryptographically stamps clean data before re-initiating sessions.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm and reconstruction of Office/PDF/image/CAD files is documented; the product is an NGFW without a CDR engine. [1], [2], [20] |
-| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | N/A | medium | — | No file disassembly or macro/script/embedded-object removal engine is documented; file handling is limited to blocking/quarantining, which is outside the CDR definition this item targets. [1], [2] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No documentation describes content disarm and reconstruction (CDR) of Office, PDF, image or CAD files.) |
+| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No documentation describes removal of VBA macros, JavaScript, DDE links or embedded objects from files.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | Threat Prevention combines antivirus, anti-spyware, IPS and WildFire inline-ML/cloud analysis in a single pass, but the vendor does not document two or more independent antivirus engines scanning raw payload in parallel. [1], [2] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation capability is documented; the product is an NGFW, not a guard with a content validation engine. [1], [2] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is an NGFW, not a classified-data guard. [1], [2] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No documentation describes schema validation of XML, JSON, FIXM or AIXM structures.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No documentation describes information-flow control based on security labels attached to files.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Supported | medium | — | Data Filtering profiles with predefined patterns for credit card and social security numbers plus custom regular-expression patterns are documented, and the datasheet describes identification of payload data patterns to thwart data exfiltration. [1], [7] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection or removal capability for image files is documented; the product is an NGFW rather than a CDS guard. [1], [2], [20] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No documentation describes detection or removal of hidden data in image files (PNG, JPEG, BMP).) |
 
 ### Category 3 — Protocol Support
 
@@ -114,7 +104,7 @@ Palo Alto Networks markets the PA-220R and PA-400R Series as ruggedized, ML-powe
 
 ## 6. Evidence Quality Notes
 
-The assessment draws on 23 staged sources and 46 grounded evidence entries. Item 5.4 is backed by independent registries (NIST CMVP certificates #5333/#5326 and the NIAP Common Criteria validation report VID 11284) plus vendor docs, giving it the run's only high-confidence verdict [13], [17], [18], [19]. Item 1.4 is triangulated between an independent migration write-up describing PAN-OS as a hardened closed OS and vendor documentation of FIPS-CC mode, TPM secure boot and PAN-OS Shield [2], [13], [21], [23]. The category-establishing evidence for the not_applicable items combines two vendor datasheets with a third-party reseller listing [1], [2], [20]. The remaining items rest primarily on vendor documentation (datasheets and PAN-OS TechDocs), so their confidence is capped at medium per the project's vendor-only rule; this is the expected posture for a product whose authoritative specification and behavior documentation is vendor-published.
+The assessment draws on 23 staged sources and 46 grounded evidence entries. Item 5.4 is backed by independent registries (NIST CMVP certificates #5333/#5326 and the NIAP Common Criteria validation report VID 11284) plus vendor docs, giving it the run's only high-confidence verdict [13], [17], [18], [19]. Item 1.4 is triangulated between an independent migration write-up describing PAN-OS as a hardened closed OS and vendor documentation of FIPS-CC mode, TPM secure boot and PAN-OS Shield [2], [13], [21], [23]. The category-establishing evidence for the guard/CDS-specific items (1.1, 1.2, 1.5, 2.1, 2.2, 2.4, 2.5, 2.7), assessed as unknown, combines two vendor datasheets with a third-party reseller listing [1], [2], [20]. The remaining items rest primarily on vendor documentation (datasheets and PAN-OS TechDocs), so their confidence is capped at medium per the project's vendor-only rule; this is the expected posture for a product whose authoritative specification and behavior documentation is vendor-published.
 
 No direct contradictions between sources surfaced. The main judgment calls were: item 4.1 is anchored on the entry PA-400R model (1.4 Gbps) so the ≥1000 Mbps verdict is conservative, with the PA-220R's 575/540 Mbps rating disclosed in the notes rather than conflated; item 4.3 derives a ~3000 ms failover detection time arithmetically from the documented 1000 ms heartbeat interval and three-loss rule, since the vendor does not publish a switchover-time figure; and items 3.1/3.3/3.4 are partial because PAN-OS provides ALG/App-ID handling for FTP, MySQL/Oracle and RTSP but no content-cleaning proxies, query whitelisting or syslog relay gateway.
 

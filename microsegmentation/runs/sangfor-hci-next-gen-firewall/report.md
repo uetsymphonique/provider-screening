@@ -24,9 +24,9 @@ Sangfor Technologies positions its microsegmentation capability inside the virtu
 |------------------|-------|------------------|--------|-----|
 | supported        | 7     | 0                | 7      | 0   |
 | partial          | 10    | 0                | 10     | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
+| not_supported    | 0     | 0                | 0      | 0   |
 | unknown          | 11    | 0                | 0      | 11  |
-| not_applicable   | 4     | 0                | 4      | 0   |
+| not_applicable   | 5     | 0                | 5      | 0   |
 
 **Evidence quality:** 7 items backed by ≥ 2 source_types; 18 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
@@ -35,6 +35,7 @@ Sangfor Technologies positions its microsegmentation capability inside the virtu
 - **4.2:** No endpoint agent exists in the virtualization-native architecture, so the agent RAM-footprint metric does not apply.
 - **4.4:** Because enforcement is hypervisor-native rather than via an endpoint agent, the agent-crash fail-safe scenario does not apply to this architecture.
 - **4.5:** No endpoint agent is installed (hypervisor-native DFW), so agent install/update reboot requirements do not apply.
+- **6.1:** The distributed firewall is documented as providing Layer 3-4 protection for east-west traffic, which rules out process-level (L7) enforcement.
 
 ---
 
@@ -93,7 +94,7 @@ Sangfor Technologies positions its microsegmentation capability inside the virtu
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | The distributed firewall is documented as providing Layer 3-4 protection for east-west traffic, which rules out process-level (L7) enforcement. [4] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | The distributed firewall is documented as providing Layer 3-4 protection for east-west traffic, which rules out process-level (L7) enforcement. [4] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | Neural-X cloud threat intelligence (IOC feeds from 20,000+ gateways) is documented as connectable to Sangfor security products including Athena NGFW; honeypot/deception detection is not evidenced. [2], [9] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Unknown | low | — | no evidence found (No staged source documents built-in compliance reports (PCI-DSS / NIST 800-207 / ISO 27001 / IEC 62443).) |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Unknown | low | — | no evidence found (No staged source documents TLS/mutual-auth specifics for a control channel; the architecture has no endpoint agent-controller pair.) |

@@ -24,9 +24,9 @@ Elisity Digital is a SaaS-delivered, agentless microsegmentation platform that e
 |------------------|-------|------------------|--------|-----|
 | supported        | 11    | 3                | 8      | 0   |
 | partial          | 11    | 0                | 11     | 0   |
-| not_supported    | 3     | 0                | 3      | 0   |
+| not_supported    | 2     | 0                | 2      | 0   |
 | unknown          | 3     | 0                | 0      | 3   |
-| not_applicable   | 5     | 0                | 5      | 0   |
+| not_applicable   | 6     | 0                | 6      | 0   |
 
 **Evidence quality:** 25 items backed by ≥ 2 source_types; 9 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
@@ -36,6 +36,7 @@ Elisity Digital is a SaaS-delivered, agentless microsegmentation platform that e
 - **4.2:** No host agent is deployed on workloads; the Virtual Edge appliance is a separate VM/container, so no workload agent RAM footprint exists to measure.
 - **4.4:** There is no host agent whose crash could interrupt workload traffic; switch-native enforcement with Virtual Edge Group failover is documented to maintain uninterrupted policy enforcement.
 - **4.5:** No software is installed on hosts (agentless), and the vendor describes non-disruptive onboarding with 'No downtime, no reboots', so reboot requirements do not apply.
+- **6.1:** No host agent exists (agentless architecture, per 3.1/4.1/4.2); enforcement is switch-native at L3/L4 (protocol/port level), and the vendor-commissioned Omdia survey notes agentless identity-based approaches structurally cannot see process-level information, so process-level enforcement does not apply.
 
 ---
 
@@ -94,7 +95,7 @@ Elisity Digital is a SaaS-delivered, agentless microsegmentation platform that e
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | Enforcement is switch-native at L3/L4 (protocol/port level) with no host process-level control; the vendor-commissioned Omdia survey notes agentless identity-based approaches cannot see process-level information. [20], [29], [38] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | No host agent exists (agentless architecture, per 3.1/4.1/4.2); enforcement is switch-native at L3/L4 (protocol/port level), and the vendor-commissioned Omdia survey notes agentless identity-based approaches structurally cannot see process-level information, so process-level enforcement does not apply. [20], [29], [38] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | Risk, posture and threat context from EDR, OT and vulnerability sources (CrowdStrike, SentinelOne, Dragos, Nozomi, Tenable) enriches policy, and Elisity Intelligence identifies vulnerabilities and threats; no honeypot/deception detection is documented. [1], [19], [32] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | PCI DSS 4.0 alignment documentation and exportable audit logs are provided, and the platform claims alignment with NIST, PCI, HIPAA, HHS 405(d) and IEC 62443; no ISO 27001-specific reporting or dedicated NIST 800-207 document was found. [1], [22], [39] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Supported | medium | — | There is no host agent, but the Virtual Edge-to-Cloud Control Center control plane uses DTLS 1.3 with mutual certificate exchange, and policy distribution runs over a secure TLS control channel per the KB. [18], [23] |

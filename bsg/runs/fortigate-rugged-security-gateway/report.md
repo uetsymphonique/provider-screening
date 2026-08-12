@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-Fortinet's FortiGate Rugged Security Gateway (Rugged Series models FGR-50G-5G/60F/60G/70F/70G) is a ruggedized industrial next-generation firewall (NGFW) family, not a protocol-break cross-domain guard [1]. The vendor positions it for operational-technology networks: DIN-rail or desktop form factors, redundant 12-125 V DC power, -40 to 75 °C operating range, IP40/IP20 ratings, optional 3G/4G/5G cellular WAN, and IEC 61850-3/IEEE 1613 plus EN 50155 (rolling stock) certification [1][2]. It runs FortiOS, the same OS as the rest of the FortiGate line, with FortiGuard security services (IPS, antivirus, DLP, OT Security Service) and Secure SD-WAN [1][2]. Deployment shapes span IT/OT segmentation per the Purdue model, remote/field sites with cellular WAN, and converged security-fabric topologies with FortiSwitch Rugged [1][2]. All checklist items are assessed against this NGFW class; guard/CDS-only capabilities (protocol break, dual-board isolation, data stamping, schema validation, anti-steganography) are marked not_applicable where a source establishes the product category [1].
+Fortinet's FortiGate Rugged Security Gateway (Rugged Series models FGR-50G-5G/60F/60G/70F/70G) is a ruggedized industrial next-generation firewall (NGFW) family, not a protocol-break cross-domain guard [1]. The vendor positions it for operational-technology networks: DIN-rail or desktop form factors, redundant 12-125 V DC power, -40 to 75 °C operating range, IP40/IP20 ratings, optional 3G/4G/5G cellular WAN, and IEC 61850-3/IEEE 1613 plus EN 50155 (rolling stock) certification [1][2]. It runs FortiOS, the same OS as the rest of the FortiGate line, with FortiGuard security services (IPS, antivirus, DLP, OT Security Service) and Secure SD-WAN [1][2]. Deployment shapes span IT/OT segmentation per the Purdue model, remote/field sites with cellular WAN, and converged security-fabric topologies with FortiSwitch Rugged [1][2]. All checklist items are assessed against this NGFW class; no staged source documents a protocol break, dual-board hardware isolation, internal data stamping, W3C schema validation, or anti-steganography capability, so those items score unknown or not_supported rather than being exempted (per the checklist's outcome-item rule, product class alone is not grounds for not_applicable) [1].
 
 ---
 
@@ -25,17 +25,10 @@ Fortinet's FortiGate Rugged Security Gateway (Rugged Series models FGR-50G-5G/60
 | supported        | 10    | 1                | 9      | 0   |
 | partial          | 8     | 0                | 8      | 0   |
 | not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 0     | 0                | 0      | 0   |
-| not_applicable   | 5     | 0                | 5      | 0   |
+| unknown          | 5     | 0                | 0      | 5   |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 9 items backed by ≥ 2 source_types; 23 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Vendor markets the FortiGate Rugged as a next-generation firewall that segments IT/OT zones and acts as a conduit between them rather than terminating TCP/IP sessions at a boundary; no protocol-break/CDS architecture is part of this product class.
-- **1.2:** The product is a single-chassis ruggedized NGFW appliance (per the datasheet's platform, SPU and TPM design); a dual-processing-board isolated architecture is not part of its design.
-- **1.5:** No internal data-stamping/signing of clean data before internal session re-initiation exists in this NGFW-class product; that mechanism belongs to guard/CDS architectures.
-- **2.4:** No XML/JSON/FIXM/AIXM W3C-schema validation engine exists in this firewall-class product; the capability is specific to guard/CDS appliances.
-- **2.7:** No anti-steganography engine (detection/removal of hidden data in PNG/JPEG/BMP) exists in this firewall-class product.
+**Evidence quality:** 7 items backed by ≥ 2 source_types; 18 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -45,11 +38,11 @@ Fortinet's FortiGate Rugged Security Gateway (Rugged Series models FGR-50G-5G/60
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Vendor markets the FortiGate Rugged as a next-generation firewall that segments IT/OT zones and acts as a conduit between them rather than terminating TCP/IP sessions at a boundary; no protocol-break/CDS architecture is part of this product class. [1], [2] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The product is a single-chassis ruggedized NGFW appliance (per the datasheet's platform, SPU and TPM design); a dual-processing-board isolated architecture is not part of its design. [1], [2] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | FortiOS firewall policies are evaluated against traffic parameters and any traffic that does not match a configured policy is denied (implicit default-deny). [8] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Supported | medium | — | FortiOS is a purpose-built security OS whose firmware, AV and IPS engine files are dually-signed by Fortinet and a third-party CA, and whose executables are protected by real-time file system integrity checking that blocks unauthorized kernel module loading. [20], [21] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal data-stamping/signing of clean data before internal session re-initiation exists in this NGFW-class product; that mechanism belongs to guard/CDS architectures. [1] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found |
 
 ### Category 2 — Inspection & CDR Engine
 
@@ -58,10 +51,10 @@ Fortinet's FortiGate Rugged Security Gateway (Rugged Series models FGR-50G-5G/60
 | 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Partial | medium | — | FortiOS (proxy-mode antivirus) and the FortiGuard CDR service strip active content from Office, PDF and RTF files in real time to produce sanitized files; coverage of Image/CAD formats and 100% reconstruction is not documented for the Rugged series. [1], [18], [19] |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Supported | medium | — | FortiOS CDR strips macros from Microsoft Office documents by default (configurable via the office-macro option), and the FortiGuard CDR service removes all active content including scripts and embedded objects. [18], [19] |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | Inline malware protection uses the single FortiGuard AV engine with AI heuristic detection and FortiGate Cloud sandboxing; two or more independent AV engines scanning raw payloads in parallel are not documented. [1], [10] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM W3C-schema validation engine exists in this firewall-class product; the capability is specific to guard/CDS appliances. [1] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found |
 | 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Partial | medium | — | FortiOS DLP profiles can match Microsoft Information Protection (MIP) security labels attached to files and enforce block actions; this is data-loss-prevention label matching rather than domain-to-domain information flow control per security classification. [6] |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Supported | medium | — | FortiOS DLP supports credit-card, SSN, keyword, hex and regex data types with block actions, FortiGuard DLP ships 500+ predefined patterns, and the datasheet confirms DLP-based exfiltration blocking. [1], [6], [17] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography engine (detection/removal of hidden data in PNG/JPEG/BMP) exists in this firewall-class product. [1] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found |
 
 ### Category 3 — Protocol Support
 
@@ -110,7 +103,7 @@ Fortinet's FortiGate Rugged Security Gateway (Rugged Series models FGR-50G-5G/60
 
 ## 6. Evidence Quality Notes
 
-Evidence was staged from 25 sources (22 vendor_doc, 1 vendor_datasheet, 2 certification registries) and 54 grounded quotes; every quote in evidence.jsonl is an exact substring of a persisted artifact. Nine items (1.1, 1.2, 2.1, 2.3, 2.6, 3.1, 3.2, 4.1, 5.4) draw on ≥2 source_types. Only item 5.4 reaches high confidence, backed by independent NIST CMVP and Common Criteria Portal registries plus the vendor datasheet [1][22][23]; all other items are vendor-documented and capped at medium by the validator rule.
+Evidence was staged from 25 sources (22 vendor_doc, 1 vendor_datasheet, 2 certification registries) and 54 grounded quotes; every quote in evidence.jsonl is an exact substring of a persisted artifact. Seven items (2.1, 2.3, 2.6, 3.1, 3.2, 4.1, 5.4) draw on ≥2 source_types. Only item 5.4 reaches high confidence, backed by independent NIST CMVP and Common Criteria Portal registries plus the vendor datasheet [1][22][23]; all other items are vendor-documented and capped at medium by the validator rule.
 
 The main evidence-quality limitation is the absence of independent (non-vendor) sources for feature claims: FortiOS 7.4.5 administration guide pages are authoritative for firewall behavior but vendor-authored, so feature-level verdicts (default-deny, RBAC, DLP, DoS) rest on single-vendor documentation. No source contradictions were found; the closest to tension is CDR availability (FortiOS native vs FortiGuard cloud, model-dependent per datasheet footnote), which is why item 2.1 is partial rather than supported. Items 3.3 and 5.2 were downgraded rather than forced: 3.3 to not_supported based on the vendor's own exhaustive protocol enumeration [11], and 5.2 to partial because TLS-encrypted syslog is not documented anywhere in the staged material [9].
 

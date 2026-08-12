@@ -24,21 +24,11 @@ The NSFOCUS Industrial Security Gateway (NSFOCUS ISG) is a next-generation indus
 |------------------|-------|------------------|--------|-----|
 | supported        | 2     | 1                | 1      | 0   |
 | partial          | 4     | 0                | 4      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 10    | 0                | 0      | 10  |
-| not_applicable   | 8     | 0                | 8      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 17    | 0                | 0      | 17  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 10 items backed by ≥ 2 source_types; 4 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** NSFOCUS markets the ISG as a next-generation industrial firewall and border-protection product, and documents IP routing (static/policy), SNAT/DNAT and IPSec VPN, so the protocol-break guard architecture is not part of this product class.
-- **1.2:** The vendor positions the ISG as an industrial firewall/border-protection appliance rather than a guard with two isolated processing boards linked by FPGA or isolated shared memory; the hardware-isolation item is not applicable to this product class.
-- **1.5:** Internal data stamping of clean data before new sessions is a guard-architecture control; the ISG is documented as an industrial firewall, so the item is not applicable to this product class.
-- **2.1:** The ISG performs single-pass deep parsing of industrial protocols with virus filtering, intrusion prevention and access control; it is documented as an industrial firewall, so CDR disarm-and-reconstruct of Office/PDF/image/CAD files is not part of this product class.
-- **2.2:** Macro/script removal (VBA, JavaScript, DDE links, embedded objects) is a CDR sub-capability; the ISG is documented as an industrial firewall, so the item is not applicable to this product class.
-- **2.4:** XML/JSON/FIXM/AIXM schema validation is a CDS-specific capability; the ISG is documented as an industrial firewall, so the item is not applicable to this product class.
-- **2.5:** Filtering on file security labels is a CDS-specific information-flow control; the ISG is documented as an industrial firewall, so the item is not applicable to this product class.
-- **2.7:** Steganography detection/removal in image files is a CDS-specific capability; the ISG is documented as an industrial firewall, so the item is not applicable to this product class.
+**Evidence quality:** 2 items backed by ≥ 2 source_types; 5 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -48,23 +38,23 @@ The NSFOCUS Industrial Security Gateway (NSFOCUS ISG) is a next-generation indus
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | NSFOCUS markets the ISG as a next-generation industrial firewall and border-protection product, and documents IP routing (static/policy), SNAT/DNAT and IPSec VPN, so the protocol-break guard architecture is not part of this product class. [1], [2] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The vendor positions the ISG as an industrial firewall/border-protection appliance rather than a guard with two isolated processing boards linked by FPGA or isolated shared memory; the hardware-isolation item is not applicable to this product class. [1], [2] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The vendor documents static/policy routing, SNAT/DNAT and IPSec VPN on the ISG, so the datapath forwards IP between interfaces rather than terminating every session at the boundary. Protocol-break session termination is therefore absent. [1] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No public documentation describes a dual processing-board design connected via FPGA or isolated shared memory.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The ISG supports a self-learning industrial-protocol whitelist used as its security policy, with five-tuple filtering and IP-MAC binding. [1] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (No public documentation of the underlying OS hardening approach (hardened OS, microkernel or SELinux strict mode).) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Internal data stamping of clean data before new sessions is a guard-architecture control; the ISG is documented as an industrial firewall, so the item is not applicable to this product class. [1], [2] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No public documentation describes an internal control core that cryptographically stamps clean data before re-initiating sessions.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | The ISG performs single-pass deep parsing of industrial protocols with virus filtering, intrusion prevention and access control; it is documented as an industrial firewall, so CDR disarm-and-reconstruct of Office/PDF/image/CAD files is not part of this product class. [1], [2] |
-| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | N/A | medium | — | Macro/script removal (VBA, JavaScript, DDE links, embedded objects) is a CDR sub-capability; the ISG is documented as an industrial firewall, so the item is not applicable to this product class. [1], [2] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No public documentation describes content disarm and reconstruction (CDR) of Office, PDF, image or CAD files.) |
+| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No public documentation describes removal of VBA macros, JavaScript, DDE links or embedded objects from files.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | The ISG documents built-in industrial virus scanning/filtering with 9 million-plus virus signatures, and the registry description confirms virus detection, intrusion prevention and content filtering; the number of independent antivirus engines scanning raw payloads is not specified. [1], [2] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | XML/JSON/FIXM/AIXM schema validation is a CDS-specific capability; the ISG is documented as an industrial firewall, so the item is not applicable to this product class. [1], [2] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Filtering on file security labels is a CDS-specific information-flow control; the ISG is documented as an industrial firewall, so the item is not applicable to this product class. [1], [2] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No public documentation describes schema validation of XML, JSON, FIXM or AIXM structures.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No public documentation describes information-flow control based on security labels attached to files.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (Only generic content filtering is documented; keyword/regex DLP for secrets, ID numbers or accounts is not specified.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | Steganography detection/removal in image files is a CDS-specific capability; the ISG is documented as an industrial firewall, so the item is not applicable to this product class. [1], [2] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No public documentation describes detection or removal of hidden data in image files (PNG, JPEG, BMP).) |
 
 ### Category 3 — Protocol Support
 
@@ -113,7 +103,7 @@ The NSFOCUS Industrial Security Gateway (NSFOCUS ISG) is a next-generation indus
 
 ## 6. Evidence Quality Notes
 
-Four sources were staged: two vendor pages (the ISG product page [1] and the SIES product page [4]) and two independent IPv6 Ready Logo registry artifacts (the ISG's logo entry 02-C-002610 [2] and the vendor-wide approved-list search [3]). Ten items are triangulated across at least two source types (vendor_doc + certification_registry), while items 1.3, 4.1, 4.3 and 4.4 rest on vendor documentation alone, so confidence is capped at medium for them; only item 3.2 reaches high confidence because the independent registry directly corroborates the 20-plus protocol claim [1, 2]. The registry entry independently confirms the exact product name ("NSFOCUS Industrial Security Gateway"), version V2.0, the approval date (2023-05-03) and the product's category, and no contradiction between the vendor page and the registry surfaced. The assessment likely understates items 1.4, 4.2, 5.1, 5.2, 5.3 and 5.4, where the vendor's admin guide or datasheet (not publicly accessible: bbs.nsfocus.com requires SSO login and nsfocusglobal.com is Cloudflare-protected, with the Wayback Machine rate-limiting this environment) would contain the relevant figures. All 30 evidence quotes were verified verbatim against the staged artifact texts (30/30 grounded).
+Four sources were staged: two vendor pages (the ISG product page [1] and the SIES product page [4]) and two independent IPv6 Ready Logo registry artifacts (the ISG's logo entry 02-C-002610 [2] and the vendor-wide approved-list search [3]). Items 2.3 and 3.2 are triangulated across at least two source types (vendor_doc + certification_registry), while items 1.1, 1.3, 4.1, 4.3 and 4.4 rest on vendor documentation alone, so confidence is capped at medium for them; only item 3.2 reaches high confidence because the independent registry directly corroborates the 20-plus protocol claim [1, 2]. The registry entry independently confirms the exact product name ("NSFOCUS Industrial Security Gateway"), version V2.0, the approval date (2023-05-03) and the product's category, and no contradiction between the vendor page and the registry surfaced. The assessment likely understates items 1.4, 4.2, 5.1, 5.2, 5.3 and 5.4, where the vendor's admin guide or datasheet (not publicly accessible: bbs.nsfocus.com requires SSO login and nsfocusglobal.com is Cloudflare-protected, with the Wayback Machine rate-limiting this environment) would contain the relevant figures. All 30 evidence quotes were verified verbatim against the staged artifact texts (30/30 grounded).
 
 ---
 

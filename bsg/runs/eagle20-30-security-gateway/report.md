@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-The Hirschmann EAGLE20/30 Security Gateway (EAGLE20-0400 and EAGLE30-0402) is a ruggedized multiport industrial firewall from Belden's Hirschmann line, running the Hirschmann Security Operating System (HiSecOS) [1, 2]. Belden positions it as an "Industrial Firewall, Router, Transparent (Bridging)" device: a stateful inspection firewall with NAT, static and OSPF routing, IPSec VPN, and deep packet inspection for OPC Classic and Modbus traffic, deployed as a DIN-rail appliance with up to eight ports (Fast Ethernet, Gigabit Ethernet SFP, and SHDSL) [2, 4]. It is a standard firewall-class product for segmenting industrial networks at IT/OT boundaries, not a Cross Domain Solution or protocol-break guard; the guard-specific checklist items are therefore marked not applicable on the documented product category [2, 4]. Target applications include automobile and machine building, process automation, transportation, water/wastewater, and oil and gas networks [2].
+The Hirschmann EAGLE20/30 Security Gateway (EAGLE20-0400 and EAGLE30-0402) is a ruggedized multiport industrial firewall from Belden's Hirschmann line, running the Hirschmann Security Operating System (HiSecOS) [1, 2]. Belden positions it as an "Industrial Firewall, Router, Transparent (Bridging)" device: a stateful inspection firewall with NAT, static and OSPF routing, IPSec VPN, and deep packet inspection for OPC Classic and Modbus traffic, deployed as a DIN-rail appliance with up to eight ports (Fast Ethernet, Gigabit Ethernet SFP, and SHDSL) [2, 4]. It is a standard firewall-class product for segmenting industrial networks at IT/OT boundaries: its documented "Router" categorization and NAT/routing feature set contradict a protocol-break architecture (item 1.1), and no evidence confirms or excludes the other guard-specific checklist items, which are rated unknown [2, 4]. Target applications include automobile and machine building, process automation, transportation, water/wastewater, and oil and gas networks [2].
 
 ---
 
@@ -24,20 +24,11 @@ The Hirschmann EAGLE20/30 Security Gateway (EAGLE20-0400 and EAGLE30-0402) is a 
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 6     | 0                | 6      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 10    | 0                | 0      | 10  |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 16    | 0                | 0      | 16  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 10 items backed by ≥ 2 source_types; 13 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** The vendor documents the EAGLE20/30 as an industrial firewall, router and transparent bridging device with full IP routing and NAT, so the protocol-break architecture (session termination with IP routing removed) is not part of this product class.
-- **1.2:** The vendor documents a single convection-cooled metal DIN-rail firewall appliance; the dual processing-board design linked via FPGA or isolated shared memory is a CDS concept that does not apply to this firewall class.
-- **1.5:** Internal data stamping of clean data before a boundary funnel initiates a new session is a guard/CDS mechanism; the EAGLE20/30 is documented as a firewall/router class product to which this concept does not apply.
-- **2.1:** The vendor documents packet-level inspection (deep packet inspection for OPC and Modbus) rather than file-level content disarm and reconstruction; as a firewall the CDR requirement does not apply to this product class.
-- **2.4:** W3C-schema validation of XML/JSON/FIXM/AIXM documents is a guard/CDS content-checking mechanism; the EAGLE20/30 is documented as a packet-filtering firewall/router class product.
-- **2.5:** Information-flow control by security labels attached to files is a guard/CDS mechanism; the EAGLE20/30 is documented as a firewall/router class product without any file-labelling scheme.
-- **2.7:** Steganography detection/removal in image files is a guard/CDS content-checking capability; the EAGLE20/30 is documented as a firewall/router class product without file-content inspection.
+**Evidence quality:** 4 items backed by ≥ 2 source_types; 7 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The Hirschmann EAGLE20/30 Security Gateway (EAGLE20-0400 and EAGLE30-0402) is a 
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | The vendor documents the EAGLE20/30 as an industrial firewall, router and transparent bridging device with full IP routing and NAT, so the protocol-break architecture (session termination with IP routing removed) is not part of this product class. [2], [4] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The vendor documents a single convection-cooled metal DIN-rail firewall appliance; the dual processing-board design linked via FPGA or isolated shared memory is a CDS concept that does not apply to this firewall class. [2], [4] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Hirschmann datasheets categorize the EAGLE20/30 as "Industrial Firewall, Router, Transparent (Bridging)" and document IP masquerading, 1:1 NAT, Double-NAT and Destination NAT -- an IP-routing/NAT architecture that forwards traffic rather than terminating sessions and removing IP routing. [2], [4] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual-processing-board hardware isolation design (FPGA or isolated shared memory) is documented.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | Vendor documents rule-based forwarding in which packets are evaluated against configured firewall rules and only safe packets continue while unwanted packets are discarded, supported by Firewall Learning Mode and ACL filtering. [1], [2] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | Vendor documents IEEE 1686-compliant configuration with security audit trails and password-policy user management, but no hardened-OS/microkernel/SELinux-strict approach; NVD records HiSecOS vulnerabilities affecting EAGLE20/30 (CVE-2020-6994 buffer overflow, CVE-2018-25236 management authentication bypass). [2], [6], [7] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Internal data stamping of clean data before a boundary funnel initiates a new session is a guard/CDS mechanism; the EAGLE20/30 is documented as a firewall/router class product to which this concept does not apply. [2], [4] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic stamping of cleaned data prior to session re-initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | The vendor documents packet-level inspection (deep packet inspection for OPC and Modbus) rather than file-level content disarm and reconstruction; as a firewall the CDR requirement does not apply to this product class. [2], [4] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (The documented Deep Packet Inspection covers OPC and Modbus protocol traffic; no file-level CDR (Office/PDF/Image/CAD reconstruction) capability is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No public documentation of VBA macro / JavaScript / DDE link / embedded object removal from Office or PDF files.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No public documentation of multi-engine antivirus scanning of raw payloads.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | W3C-schema validation of XML/JSON/FIXM/AIXM documents is a guard/CDS content-checking mechanism; the EAGLE20/30 is documented as a packet-filtering firewall/router class product. [2], [4] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Information-flow control by security labels attached to files is a guard/CDS mechanism; the EAGLE20/30 is documented as a firewall/router class product without any file-labelling scheme. [2], [4] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema-validation engine is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No public documentation of keyword/regex-based DLP rules for secrets, ID numbers or accounts.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | Steganography detection/removal in image files is a guard/CDS content-checking capability; the EAGLE20/30 is documented as a firewall/router class product without file-content inspection. [2], [4] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -114,7 +105,7 @@ The Hirschmann EAGLE20/30 Security Gateway (EAGLE20-0400 and EAGLE30-0402) is a 
 
 All 24 items were assessed, with 14 non-unknown verdicts grounded in 34 evidence entries drawn from 7 sources. No item reached three independent source types: vendor documentation (product page [1], product bulletin [2], flyer [3], category listing [4]) backs every non-unknown verdict, and the only non-vendor sources secured were the two NVD vulnerability records [6, 7] and the ISASecure certification registry [5]. All public search engines, the Common Criteria portal, CISA.gov and the Wayback Machine were blocked or unreachable from the research environment, so no independent lab review or analyst report could be located; confidence is capped at medium for all non-unknown items per the vendor-only rule.
 
-The product-class determination (firewall/router rather than CDS guard) rests on two independent vendor statements — the product bulletin describes the device as "Industrial Firewall, Router, Transparent (Bridging)" with full NAT and routing [2], and the firewalls category page lists it identically [4] — which justifies the seven not_applicable verdicts on guard-specific items. The only evidence tension is on item 1.4: vendor documentation emphasises IEEE 1686-compliant security configuration and audit [2], while NVD documents HiSecOS vulnerabilities affecting the EAGLE20/30 [6, 7]; because no hardened-OS/microkernel/SELinux claim exists to reconcile with that vulnerability history, the item is rated partial rather than supported.
+The product-class determination (firewall/router rather than CDS guard) rests on two independent vendor statements — the product bulletin describes the device as "Industrial Firewall, Router, Transparent (Bridging)" with full NAT and routing [2], and the firewalls category page lists it identically [4] — which grounds the not_supported verdict on item 1.1 (IP-routing architecture contradicts protocol break); the remaining guard-specific items (1.2, 1.5, 2.1, 2.4, 2.5, 2.7) have no documented fact either way and are rated unknown rather than not_applicable. The only evidence tension is on item 1.4: vendor documentation emphasises IEEE 1686-compliant security configuration and audit [2], while NVD documents HiSecOS vulnerabilities affecting the EAGLE20/30 [6, 7]; because no hardened-OS/microkernel/SELinux claim exists to reconcile with that vulnerability history, the item is rated partial rather than supported.
 
 ---
 

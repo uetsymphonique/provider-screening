@@ -24,11 +24,14 @@ Armis Centrix is the cyber exposure management platform of Armis, now part of Se
 |------------------|-------|------------------|--------|-----|
 | supported        | 14    | 1                | 13     | 0   |
 | partial          | 14    | 0                | 14     | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
+| not_supported    | 0     | 0                | 0      | 0   |
 | unknown          | 4     | 0                | 0      | 4   |
-| not_applicable   | 0     | 0                | 0      | 0   |
+| not_applicable   | 1     | 0                | 1      | 0   |
 
 **Evidence quality:** 20 items backed by ≥ 2 source_types; 20 items backed by vendor_doc only (confidence capped at medium per validator rule).
+
+**Not-applicable items:**
+- **6.1:** Documented enforcement is entirely network-layer (NAC, firewall, WLC, switch, ACL; partner Elisity enforces at the network access layer); no host-based process-level enforcement is offered.
 
 ---
 
@@ -87,7 +90,7 @@ Armis Centrix is the cyber exposure management platform of Armis, now part of Se
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | Documented enforcement is entirely network-layer (NAC, firewall, WLC, switch, ACL; partner Elisity enforces at the network access layer); no host-based process-level enforcement is offered. [2], [24] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | Documented enforcement is entirely network-layer (NAC, firewall, WLC, switch, ACL; partner Elisity enforces at the network access layer); no host-based process-level enforcement is offered. [2], [24] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Supported | medium | — | The threat-intelligence module deploys honeypots and deception lures and combines dark-web intelligence with HUMINT for early-warning detection. [5], [7] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Out-of-the-box compliance dashboards and reporting are documented for NIST, CIS, HIPAA, GDPR and IEC 62443 alignment (whitepaper maps IEC 62443 3-2/3-3/4-2); explicit PCI-DSS and ISO 27001 report templates are not evidenced. [7], [17], [19], [31] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Partial | medium | — | Collector-to-cloud transport is encrypted with tenant-specific keys managed via FIPS 140-2 validated AWS KMS; TLS version (1.3) and mutual-authentication specifics are not published. [22], [26] |

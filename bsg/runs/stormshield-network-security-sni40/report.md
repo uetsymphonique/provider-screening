@@ -24,20 +24,11 @@ The SNi40 is a ruggedized industrial firewall appliance of the Stormshield Netwo
 |------------------|-------|------------------|--------|-----|
 | supported        | 6     | 1                | 5      | 0   |
 | partial          | 9     | 0                | 9      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 2     | 0                | 0      | 2   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 8     | 0                | 0      | 8   |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 11 items backed by ≥ 2 source_types; 12 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Stormshield markets the SNi40 as an industrial firewall specially designed to protect PLCs, and independent press describes it as a 'pare-feu industriel'; no protocol-break (TCP/IP session termination) architecture is documented.
-- **1.2:** The SNi40 is documented as a compact DIN-rail industrial firewall appliance; no dual processing board or FPGA/shared-memory isolation design is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is marketed as an industrial firewall rather than a guard with a data-stamping core.
-- **2.1:** No content disarm and reconstruction of Office/PDF/image/CAD files is documented; the product is an industrial firewall rather than a CDS guard with a CDR engine.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is an industrial firewall rather than a guard with a content-validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is an industrial firewall rather than a classified-data guard.
-- **2.7:** No anti-steganography detection/removal for image files is documented; the product is an industrial firewall rather than a CDS guard.
+**Evidence quality:** 4 items backed by ≥ 2 source_types; 13 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The SNi40 is a ruggedized industrial firewall appliance of the Stormshield Netwo
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Stormshield markets the SNi40 as an industrial firewall specially designed to protect PLCs, and independent press describes it as a 'pare-feu industriel'; no protocol-break (TCP/IP session termination) architecture is documented. [2], [16], [17] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The SNi40 is documented as a compact DIN-rail industrial firewall appliance; no dual processing board or FPGA/shared-memory isolation design is described. [2], [16] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The SNS configuration manual documents bridge/routed interface modes with packet rewriting for NAT (SIP/FTP/NAT), an IP-routing firewall architecture that logically excludes a protocol-break design terminating every session with no IP routing. [2], [3] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual-board FPGA or shared-memory hardware isolation architecture is documented; only generic industrial-firewall appliance positioning is described.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The user manual documents ten predefined filter policies from strictest to most permissive, with 'Block all' enabled by default at factory settings so that only firewall management ports (1300/TCP and 443/TCP) remain open and all other connections are blocked. [3] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | The SNS range page describes general hardening of the on-board firmware against attacks that attempt to exploit the firewall itself, and the manual documents TPM and Secure Boot protections; no microkernel or SELinux-strict-mode architecture statement is published. [3], [11], [18] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is marketed as an industrial firewall rather than a guard with a data-stamping core. [2], [16] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic data-stamping/signing control of sanitized content prior to new-session initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm and reconstruction of Office/PDF/image/CAD files is documented; the product is an industrial firewall rather than a CDS guard with a CDR engine. [2], [16], [17] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No 100% content-disarm-and-reconstruction capability for Office/PDF/image/CAD formats is documented; only deep packet inspection on industrial protocols is described.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Partial | medium | — | The user manual documents rewriting of packets by application analyses for SMTP, HTTP and web2.0 (content sanitisation of web traffic); removal of VBA macros, DDE links or embedded objects inside Office/PDF files is not documented. [3] |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | The SNS manual documents a ClamAV-based antivirus engine in the proxies plus an optional 'advanced antivirus engine' with sandboxing; parallel multi-engine scanning of the raw payload is not documented. [3] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is an industrial firewall rather than a guard with a content-validation engine. [2], [16], [17] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is an industrial firewall rather than a classified-data guard. [2], [16] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No W3C-schema structural validation of XML/JSON/FIXM/AIXM documents is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control / file filtering is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No DLP feature (keyword / national-ID / account-number / custom regex blocking) surfaced in the datasheet, user manual or technical notes reviewed.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal for image files is documented; the product is an industrial firewall rather than a CDS guard. [2], [16], [17] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection or removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -112,7 +103,7 @@ The SNi40 is a ruggedized industrial firewall appliance of the Stormshield Netwo
 
 ## 6. Evidence Quality Notes
 
-The assessment draws on 20 staged sources and 59 grounded evidence quotes. Item 5.4 was triangulated across the official ANSSI certified/qualified-products catalog (certification registry), the French IT security press (Global Security Mag), and multiple vendor pages, which is why it is the only item at high confidence. Items 4.1 and 4.2 combine vendor specifications with an independent integrator spec sheet. The remaining non-applicable and partial/supported items rest primarily on vendor documentation (datasheet, user manual, technical notes, product pages), so their confidence is capped at medium per the validator rule; 12 of 24 items use vendor-only sources.
+The assessment draws on 20 staged sources and 59 grounded evidence quotes. Item 5.4 was triangulated across the official ANSSI certified/qualified-products catalog (certification registry), the French IT security press (Global Security Mag), and multiple vendor pages, which is why it is the only item at high confidence. Items 4.1 and 4.2 combine vendor specifications with an independent integrator spec sheet. The remaining unknown and partial/supported items rest primarily on vendor documentation (datasheet, user manual, technical notes, product pages), so their confidence is capped at medium per the validator rule; 12 of 24 items use vendor-only sources.
 
 Two numeric items deserve note. For 4.1, the product page and an integrator both list 4.8 Gbps firewall throughput. For 4.2, the official SN range guide states latency below 1 ms and the integrator lists a 10 ms maximum; the official datasheet quotes an average below 600 microseconds, but that exact line could not be cited because its '<' character collides with the citation-grounding checker's HTML-tag normalizer, so the guide's bound was used as the numeric basis. No contradictions between sources were found; the integrator's figures are consistent with (coarser than) the official ones.
 

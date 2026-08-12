@@ -1,16 +1,16 @@
-"""Batch-run screen or standard mode assessment across a product list — pi edition.
+"""Batch-run standard mode assessment across a product list — pi edition.
 
 Same logic as run_batch.py but uses `pi --mode json` instead of `claude -p
 --output-format stream-json`. All file paths, validation, and summary
 collection are identical to run_batch.py.
 
-Modes:
-  --mode screen    → runs <domain>/prompts/screen_mode.md
-  --mode standard  → runs <domain>/prompts/standard_mode.md
+Mode:
+  --mode standard  → runs the shared skill's prompt
+                     (.claude/skills/provider-assessment/prompts/standard_mode.md)
 
 For each product:
-  1. Render the mode-specific prompt template with {VENDOR}, {PRODUCT_NAME},
-     {product_id}.
+  1. Render the mode-specific prompt template with {DOMAIN}, {VENDOR},
+     {PRODUCT_NAME}, {product_id}.
   2. Spawn a FRESH `pi --mode json` session (--no-session) with project skills
      auto-loaded (cwd = repo root).
   3. Stream the full trace into runs/<pid>/pi_run.jsonl.
@@ -46,7 +46,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # Domain-specific config. Each domain is a self-contained sibling of
-# microsegmentation/ with its own checklist, prompts, runs/, and scripts/.
+# microsegmentation/ with its own checklist and runs/ tree.
 DOMAINS = {
     "microsegmentation": {
         "csv": REPO_ROOT / "providers" / "Microsegmentation.csv",
@@ -60,29 +60,29 @@ DOMAINS = {
 
 # Module-level defaults — reassigned in main() via select_domain().
 CSV_PATH = DOMAINS["microsegmentation"]["csv"]
-PROMPTS_DIR = DOMAINS["microsegmentation"]["dir"] / "prompts"
+PROMPTS_DIR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "prompts"
 PROMPT_FILES = {
-    "screen": PROMPTS_DIR / "screen_mode.md",
     "standard": PROMPTS_DIR / "standard_mode.md",
 }
 RUNS_ROOT = DOMAINS["microsegmentation"]["dir"] / "runs"
-VALIDATOR = DOMAINS["microsegmentation"]["dir"] / "scripts" / "validate_assessment.py"
+VALIDATOR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "scripts" / "validate_assessment.py"
+CURRENT_DOMAIN = "microsegmentation"
 VENV_PY = REPO_ROOT / "venv" / "Scripts" / "python.exe"
 BATCH_DIR = RUNS_ROOT / "_batch"
 
 
 def select_domain(domain: str) -> None:
     """Reassign the module-level path constants for the chosen domain."""
-    global CSV_PATH, PROMPTS_DIR, PROMPT_FILES, RUNS_ROOT, VALIDATOR, BATCH_DIR
+    global CSV_PATH, PROMPTS_DIR, PROMPT_FILES, RUNS_ROOT, VALIDATOR, CURRENT_DOMAIN, BATCH_DIR
     cfg = DOMAINS[domain]
     CSV_PATH = cfg["csv"]
-    PROMPTS_DIR = cfg["dir"] / "prompts"
+    PROMPTS_DIR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "prompts"
     PROMPT_FILES = {
-        "screen": PROMPTS_DIR / "screen_mode.md",
         "standard": PROMPTS_DIR / "standard_mode.md",
     }
     RUNS_ROOT = cfg["dir"] / "runs"
-    VALIDATOR = cfg["dir"] / "scripts" / "validate_assessment.py"
+    VALIDATOR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "scripts" / "validate_assessment.py"
+    CURRENT_DOMAIN = domain
     BATCH_DIR = RUNS_ROOT / "_batch"
 
 
@@ -177,6 +177,7 @@ def filter_products(products, only, start_at, limit, queue_pids):
 
 def render_prompt(template: str, product: dict) -> str:
     return (template
+            .replace("{DOMAIN}", CURRENT_DOMAIN)
             .replace("{VENDOR}", product["vendor"])
             .replace("{PRODUCT_NAME}", product["product_name"])
             .replace("{product_id}", product["product_id"]))
@@ -445,7 +446,7 @@ def run_validator(pid: str) -> dict | None:
         return {"exit_code": None, "note": "assessment.json missing"}
     py = str(VENV_PY) if VENV_PY.exists() else sys.executable
     proc = subprocess.run(
-        [py, str(VALIDATOR), str(assessment),
+        [py, str(VALIDATOR), "--domain", CURRENT_DOMAIN, str(assessment),
          "--evidence-store", str(RUNS_ROOT / pid)],
         capture_output=True, text=True,
     )
@@ -628,8 +629,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--domain", choices=list(DOMAINS.keys()), required=True,
                     help="Which project to run against.")
-    ap.add_argument("--mode", choices=["screen", "standard"], required=True,
-                    help="Assessment mode: screen (gate items) | standard (all items).")
+    ap.add_argument("--mode", choices=["standard"], required=True,
+                    help="Assessment mode: standard (all items).")
     ap.add_argument("--csv", type=Path, default=None,
                     help="Defaults to the domain's vendor CSV under providers/.")
     ap.add_argument("--queue-file", type=Path, default=None,

@@ -1,0 +1,32 @@
+{
+  "product_id": "cisco-catalyst-industrial-gateway",
+  "vendor": "Cisco Systems",
+  "product_name": "Cisco Catalyst Industrial Gateway",
+  "started_at": "2026-08-11T09:55:47Z",
+  "elapsed_seconds": 1534.9,
+  "exit_code": 0,
+  "status": "ok",
+  "agent": "pi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-flash",
+  "num_turns": 184,
+  "duration_ms": 1525836,
+  "total_cost_usd": 0.0940195816,
+  "stop_reason": "stop",
+  "error_message": null,
+  "usage": {
+    "input_tokens": 113405,
+    "output_tokens": 94187,
+    "cache_read_input_tokens": 18489472,
+    "cache_creation_input_tokens": 0
+  },
+  "session_id": "019ff03f-eb11-714b-8df4-9b8631da46fe",
+  "validator": {
+    "exit_code": 0,
+    "stdout_tail": [
+      "OK   D:\\vcs\\provider-screening\\bsg\\runs\\cisco-catalyst-industrial-gateway\\assessment.json (24 items, mode=standard, gate=-, default=needs-more-info)"
+    ],
+    "stderr_tail": []
+  },
+  "log_path": "bsg\\runs\\cisco-catalyst-industrial-gateway\\pi_run.jsonl"
+}

@@ -25,19 +25,10 @@ R&S SITGate is a security gateway product of Rohde & Schwarz Cybersecurity (form
 | supported        | 2     | 0                | 2      | 0   |
 | partial          | 3     | 0                | 3      | 0   |
 | not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 12    | 0                | 0      | 12  |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| unknown          | 19    | 0                | 0      | 19  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 8 items backed by ≥ 2 source_types; 5 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Vendor documentation positions SITGate as a next-generation firewall and Crypto Museum lists it as a secure firewall (formerly a Siemens product), not a protocol-break guard or data diode; the brochure documents a stateful firewall with application detection rather than session termination with IP routing cut.
-- **1.2:** As a firewall-class appliance documented in standard 1U/2U form factors with Ethernet ports, SITGate has no documented dual processing-board design connected via FPGA or isolated shared memory; the two-node guard architecture this item describes is not part of its category.
-- **1.5:** SITGate's documented architecture is a firewall that inspects and forwards traffic; no guard-style internal control core that cryptographically stamps clean data before re-initiating sessions is part of that category.
-- **2.1:** SITGate is documented as a firewall-class product, so format-level content disarm and reconstruction (CDR) of Office/PDF/image/CAD files is outside its documented function; only inline malware screening of downloaded files in the data stream is described.
-- **2.4:** Schema validation of XML/JSON/FIXM/AIXM structures is a guard/CDS-specific capability; SITGate is documented as a firewall-class product and no schema-check function is part of its documented category.
-- **2.5:** Filtering based on security labels attached to files is a guard/CDS-specific capability; SITGate is documented as a firewall-class product with user/group-based rules, not security-label (IFC) filtering.
-- **2.7:** Anti-steganography detection in image files is a guard/CDS-specific capability; SITGate is documented as a firewall-class product and no image steganography scanning is part of its documented category.
+**Evidence quality:** 1 items backed by ≥ 2 source_types; 5 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ R&S SITGate is a security gateway product of Rohde & Schwarz Cybersecurity (form
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Vendor documentation positions SITGate as a next-generation firewall and Crypto Museum lists it as a secure firewall (formerly a Siemens product), not a protocol-break guard or data diode; the brochure documents a stateful firewall with application detection rather than session termination with IP routing cut. [1], [2], [5], [6], [7] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | As a firewall-class appliance documented in standard 1U/2U form factors with Ethernet ports, SITGate has no documented dual processing-board design connected via FPGA or isolated shared memory; the two-node guard architecture this item describes is not part of its category. [1], [5] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found (Documentation positions SITGate as a next-generation firewall, but no documentation describes TCP/IP session-termination (protocol-break) architecture or IP routing cut either way.) |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No documentation describes a dual processing-board design connected via FPGA or isolated shared memory.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The vendor describes positive application-based validation in which only data that is fully validated and understood can be transmitted, and documents whitelist/blacklist support with immediate blocking of protocol violations. [1], [2], [3] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (No hardening details (hardened OS, microkernel, SELinux strict mode) are documented in the flyer or product brochure.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | SITGate's documented architecture is a firewall that inspects and forwards traffic; no guard-style internal control core that cryptographically stamps clean data before re-initiating sessions is part of that category. [1], [5] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No documentation describes an internal control core that cryptographically stamps clean data before re-initiating sessions.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | SITGate is documented as a firewall-class product, so format-level content disarm and reconstruction (CDR) of Office/PDF/image/CAD files is outside its documented function; only inline malware screening of downloaded files in the data stream is described. [1], [3], [5] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (Documentation describes inline malware screening of files in the data stream, but no content disarm and reconstruction (CDR) of Office, PDF, image or CAD files is described.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No removal of VBA macros, Javascript, DDE links or embedded objects is documented.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | Downloaded documents and files are screened inline for malware using protection based on Bitdefender antimalware technology; parallel scanning with two or more antivirus engines is not documented. [3] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | Schema validation of XML/JSON/FIXM/AIXM structures is a guard/CDS-specific capability; SITGate is documented as a firewall-class product and no schema-check function is part of its documented category. [1], [5] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Filtering based on security labels attached to files is a guard/CDS-specific capability; SITGate is documented as a firewall-class product with user/group-based rules, not security-label (IFC) filtering. [1], [5] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No documentation describes schema validation of XML, JSON, FIXM or AIXM structures.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (Documentation describes user/group-based rules, but no information-flow control based on security labels attached to files is described.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (HTTPS analysis is described as exposing threats and unauthorized data leaks, but no content-based DLP (keywords, national ID numbers, account numbers, custom regex) is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | Anti-steganography detection in image files is a guard/CDS-specific capability; SITGate is documented as a firewall-class product and no image steganography scanning is part of its documented category. [1], [5] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No documentation describes detection or removal of hidden data in image files (PNG, JPEG, BMP).) |
 
 ### Category 3 — Protocol Support
 
@@ -104,16 +95,16 @@ R&S SITGate is a security gateway product of Rohde & Schwarz Cybersecurity (form
 ## 5. Notable Gaps / Risks
 
 - **Product availability risk (overall):** SITGate no longer appears on the vendor's website and every located source dates from 2012-2016; buyers should verify current availability, support, and product form before further evaluation.
-- **No protocol-break or CDS architecture (items 1.1, 1.2, 2.1):** SITGate is a firewall, not a guard or data diode; deployments requiring session termination at a boundary, dual-board hardware isolation, or content disarm and reconstruction need a different product class.
+- **Protocol-break, hardware-isolation and CDR capabilities undocumented (items 1.1, 1.2, 2.1):** the documented firewall-class feature set does not describe session termination at a boundary, dual-board hardware isolation, or content disarm and reconstruction, so these items remain unknown rather than confirmed present.
 - **No OT/ICS, database, or realtime-stream protocol support documented (items 3.2, 3.3, 3.4):** OPC UA/Modbus/DNP3 proxies, SQL query-whitelisting proxies, and RTSP/syslog relays are absent from the documented feature set.
 - **Latency, HA, and fail-close behavior unspecified (items 4.2, 4.3, 4.4):** no processing-latency figures, HA switchover times, or DoS fail-close behavior are published, so the <= 10 ms and <= 100 ms requirements are unverifiable.
 - **Management and integration gaps (items 5.1, 5.2, 5.3):** no RBAC role separation (system/policy/auditor), SIEM/CEF/Syslog integration, or compliance-report templates are documented.
 
 ## 6. Evidence Quality Notes
 
-Only 7 distinct sources were collected, of which 6 are vendor-authored or vendor-advertising material (the 2012 flyer, three brochure pages, and two vendor advertisements reproduced in independent publications); Crypto Museum is the sole independent source, used to confirm the product category. No Common Criteria registry entry, analyst report, independent lab test, or third-party deployment reference could be located. Consequently every non-unknown verdict rests on vendor documentation and is capped at medium confidence, and 12 of 24 items are unknown because the documented feature set simply does not cover them.
+Only 7 distinct sources were collected, of which 6 are vendor-authored or vendor-advertising material (the 2012 flyer, three brochure pages, and two vendor advertisements reproduced in independent publications); Crypto Museum is the sole independent source, used to confirm the product category. No Common Criteria registry entry, analyst report, independent lab test, or third-party deployment reference could be located. Consequently every non-unknown verdict rests on vendor documentation and is capped at medium confidence, and 19 of 24 items are unknown because the documented feature set simply does not cover them.
 
-The dominant limitation is vintage: all evidence dates from 2012-2016 and the product is no longer listed on the vendor's website. Search engines (DuckDuckGo, Bing, Google, Ecosia, Yahoo, Mojeek) blocked automated access from this network and the Wayback Machine returned HTTP 429 for the entire run, so current product pages, newer brochures, and the BSI Common Criteria registry could not be retrieved; a re-run from a different network should re-check product status and certifications before relying on the not_applicable categorization. No contradictions between sources were found - every source consistently describes SITGate as a firewall.
+The dominant limitation is vintage: all evidence dates from 2012-2016 and the product is no longer listed on the vendor's website. Search engines (DuckDuckGo, Bing, Google, Ecosia, Yahoo, Mojeek) blocked automated access from this network and the Wayback Machine returned HTTP 429 for the entire run, so current product pages, newer brochures, and the BSI Common Criteria registry could not be retrieved; a re-run from a different network should re-check product status and certifications before relying on the unknown verdicts for guard/CDS-specific items. No contradictions between sources were found - every source consistently describes SITGate as a firewall.
 
 ---
 

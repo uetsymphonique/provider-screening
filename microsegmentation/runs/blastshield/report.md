@@ -24,11 +24,14 @@ BlastShield is BlastWave's zero-trust software-defined perimeter (SDP) for OT, I
 |------------------|-------|------------------|--------|-----|
 | supported        | 11    | 1                | 10     | 0   |
 | partial          | 12    | 0                | 12     | 0   |
-| not_supported    | 2     | 0                | 2      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
 | unknown          | 8     | 0                | 0      | 8   |
-| not_applicable   | 0     | 0                | 0      | 0   |
+| not_applicable   | 1     | 0                | 1      | 0   |
 
 **Evidence quality:** 18 items backed by ≥ 2 source_types; 9 items backed by vendor_doc only (confidence capped at medium per validator rule).
+
+**Not-applicable items:**
+- **6.1:** Enforcement is documented at the network layer (Layer 2/3 microsegmentation of users, agents and gateway endpoints); no process-level access control is described.
 
 ---
 
@@ -87,7 +90,7 @@ BlastShield is BlastWave's zero-trust software-defined perimeter (SDP) for OT, I
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | Enforcement is documented at the network layer (Layer 2/3 microsegmentation of users, agents and gateway endpoints); no process-level access control is described. [3], [25] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | Enforcement is documented at the network layer (Layer 2/3 microsegmentation of users, agents and gateway endpoints); no process-level access control is described. [3], [25] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | Threat intelligence and asset discovery are delivered through integrations with partners (Dragos, Nozomi Networks, Phosphorus) rather than a built-in capability; no honeypot/deception feature is documented. [14], [18] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Vendor documentation maps BlastShield to frameworks including IEC 62443-3-3, ISO/IEC 27001 and NIST SP 800-207, but no built-in compliance report templates for the listed standards are documented. [16], [23], [25] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Supported | medium | — | Data in motion is encrypted with AES-256-GCM over mutually authenticated sessions (ECDSA challenge/response key exchange, ECDHE + HKDF); TLS 1.3 specifically is not named but mutual authentication is documented. [4], [16] |

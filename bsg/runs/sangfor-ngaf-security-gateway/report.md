@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-Sangfor NGAF is a converged next-generation firewall appliance line (NSF hardware series plus virtual vNGAF) that the vendor now markets as "Sangfor Athena NGFW" (previously "Network Secure") [1]. The product page and NGAF brochure position it as an enterprise perimeter NGFW integrating firewall, IPS, antivirus, AI-based malware inspection (Engine Zero), cloud threat intelligence and sandboxing (Neural-X), a next-generation web application firewall, and SD-WAN in one appliance [1][3]. It is not marketed as a cross-domain solution or protocol-break guard, so the guard-specific checklist items are treated as not applicable rather than unverified. Deployments cover routed, transparent/bridge, virtual-wire, bypass and hybrid modes, in physical and virtual form factors, with centralized management via Platform-X / Sangfor Central Manager [2][3]. Independent validation comes from CyberRatings.org Enterprise Firewall tests ("Recommended" in 2023 and 2024) [4][5] and Gartner Magic Quadrant recognition (Visionary, 2022) [10].
+Sangfor NGAF is a converged next-generation firewall appliance line (NSF hardware series plus virtual vNGAF) that the vendor now markets as "Sangfor Athena NGFW" (previously "Network Secure") [1]. The product page and NGAF brochure position it as an enterprise perimeter NGFW integrating firewall, IPS, antivirus, AI-based malware inspection (Engine Zero), cloud threat intelligence and sandboxing (Neural-X), a next-generation web application firewall, and SD-WAN in one appliance [1][3]. It is not marketed as a cross-domain solution or protocol-break guard, and the reviewed vendor material does not document guard-specific capabilities (protocol break, hardware isolation, internal data stamping, CDR, schema validation, security labels, anti-steganography) one way or the other, so those checklist items are scored `unknown` rather than exempted. Deployments cover routed, transparent/bridge, virtual-wire, bypass and hybrid modes, in physical and virtual form factors, with centralized management via Platform-X / Sangfor Central Manager [2][3]. Independent validation comes from CyberRatings.org Enterprise Firewall tests ("Recommended" in 2023 and 2024) [4][5] and Gartner Magic Quadrant recognition (Visionary, 2022) [10].
 
 ---
 
@@ -25,19 +25,10 @@ Sangfor NGAF is a converged next-generation firewall appliance line (NSF hardwar
 | supported        | 4     | 0                | 4      | 0   |
 | partial          | 8     | 0                | 8      | 0   |
 | not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| unknown          | 12    | 0                | 0      | 12  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 3 items backed by ≥ 2 source_types; 18 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Sangfor markets the product as a next-generation firewall using DPI-based inspection, not a protocol-break cross-domain guard; no TCP/IP session-termination with IP-routing separation is claimed.
-- **1.2:** The vendor positions Athena NGFW as a standard next-generation firewall appliance; no dual-board FPGA/shared-memory isolation architecture is documented.
-- **1.5:** Product category is a standard NGFW; no internal cryptographic data-stamping of sanitized content before new-session initiation is documented.
-- **2.1:** The product is marketed as an NGFW, not a CDS/guard; content is inspected and malware removed from files, but no 100% content disarming and reconstruction (CDR) engine for Office/PDF/image/CAD formats is documented.
-- **2.4:** No W3C-schema structural validation of XML/JSON/FIXM/AIXM documents is documented; the product category is NGFW rather than a CDS content-validation engine.
-- **2.5:** No security-label (IFC)-based filtering of files is documented; the product category is NGFW.
-- **2.7:** No anti-steganography inspection of image files is documented; the product category is NGFW.
+**Evidence quality:** 3 items backed by ≥ 2 source_types; 11 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ Sangfor NGAF is a converged next-generation firewall appliance line (NSF hardwar
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Sangfor markets the product as a next-generation firewall using DPI-based inspection, not a protocol-break cross-domain guard; no TCP/IP session-termination with IP-routing separation is claimed. [1] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The vendor positions Athena NGFW as a standard next-generation firewall appliance; no dual-board FPGA/shared-memory isolation architecture is documented. [1] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found (No description of TCP/IP session termination or IP-routing separation at a protocol-break boundary; only generic DPI-based NGFW inspection is documented.) |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual-board FPGA or shared-memory hardware isolation architecture is documented; only generic NGFW appliance positioning is described.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Partial | medium | — | Vendor documents rule-based access control that allows or denies traffic per policy with first-match processing, but an explicit default-deny whitelist-only posture for unmatched traffic is not stated. [1], [2], [3] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (No public documentation of the underlying OS hardening approach (hardened OS, microkernel or SELinux strict mode); the vendor's own advisory documents web-stack vulnerabilities (e.g. CVE-2023-30802) fixed in later firmware.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Product category is a standard NGFW; no internal cryptographic data-stamping of sanitized content before new-session initiation is documented. [1] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic data-stamping/signing control of sanitized content prior to new-session initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | The product is marketed as an NGFW, not a CDS/guard; content is inspected and malware removed from files, but no 100% content disarming and reconstruction (CDR) engine for Office/PDF/image/CAD formats is documented. [1] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No 100% content-disarm-and-reconstruction capability for Office/PDF/image/CAD formats is documented beyond generic DPI-based malware inspection.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (File filtering and malware removal are documented, but no macro/script removal capability (VBA, JavaScript, DDE links, embedded objects) is described.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Supported | medium | — | Vendor documents multiple gateway malware-inspection engines (signature AV, AI-based Engine Zero, Neural-X cloud sandbox and threat intelligence) inspecting HTTP, HTTPS, FTP, SMB, SMTP, POP3 and IMAP payloads. [2], [3] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No W3C-schema structural validation of XML/JSON/FIXM/AIXM documents is documented; the product category is NGFW rather than a CDS content-validation engine. [1] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label (IFC)-based filtering of files is documented; the product category is NGFW. [1] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No W3C-schema structural validation of XML/JSON/FIXM/AIXM documents is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control / file filtering is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Supported | medium | — | Vendor documents data-leakage detection and prevention over customizable sensitive-information types including identity-card numbers, bank/credit-card numbers and phone numbers, plus file-download control. [3] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography inspection of image files is documented; the product category is NGFW. [1] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection or removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 

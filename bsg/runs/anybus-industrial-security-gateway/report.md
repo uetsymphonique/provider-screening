@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-The product assessed under the screening-list name "Anybus Industrial Security Gateway" is the Anybus Defender family from HMS Networks (Anybus brand): ruggedized DIN-rail industrial network security appliances spanning the Compact 1004 (4x 10/100 Mbit ports, ABD1004-NATFW) and the 4002/6004/6024 (and 6000/8000 series) with Gigabit Ethernet and SFP interfaces, sold in NAT/FW, DPI/FW and PRO/FW license tiers [1][4][5][8]. The vendor positions the lineup as industrial firewalls for OT networks - "a suite of industrial network security appliances designed to safeguard critical infrastructures" - with primary use cases of ISA/IEC 62443-3-3 network segmentation, NAT with traffic filtering, and deep packet inspection on industrial protocols [15][16]. It is therefore a firewall/DPI/VPN appliance class product, not a protocol-break cross-domain guard; the CDS-only checklist items (1.1, 1.2, 1.5, 2.1, 2.4, 2.5, 2.7) are marked not applicable on that documented category [1][5][15]. Documented deployment shapes include zone segmentation between IT and OT, transparent layer-2 bridging (bridge mode) for HMI/PLC traffic inspection, OT-SDWAN VPN (WireGuard, OpenSSL, IPsec), and active-standby high availability on 6000/8000 series with PRO licenses [1][10][11].
+The product assessed under the screening-list name "Anybus Industrial Security Gateway" is the Anybus Defender family from HMS Networks (Anybus brand): ruggedized DIN-rail industrial network security appliances spanning the Compact 1004 (4x 10/100 Mbit ports, ABD1004-NATFW) and the 4002/6004/6024 (and 6000/8000 series) with Gigabit Ethernet and SFP interfaces, sold in NAT/FW, DPI/FW and PRO/FW license tiers [1][4][5][8]. The vendor positions the lineup as industrial firewalls for OT networks - "a suite of industrial network security appliances designed to safeguard critical infrastructures" - with primary use cases of ISA/IEC 62443-3-3 network segmentation, NAT with traffic filtering, and deep packet inspection on industrial protocols [15][16]. It is therefore a firewall/DPI/VPN appliance class product, not a protocol-break cross-domain guard: item 1.1 is marked not_supported because the documented NAT/routing/bridging datapath contradicts session-terminating protocol break [1][5][15], while the remaining CDS-only checklist items (1.2, 1.5, 2.1, 2.4, 2.5, 2.7) are marked unknown for lack of any specific supporting or excluding evidence. Documented deployment shapes include zone segmentation between IT and OT, transparent layer-2 bridging (bridge mode) for HMI/PLC traffic inspection, OT-SDWAN VPN (WireGuard, OpenSSL, IPsec), and active-standby high availability on 6000/8000 series with PRO licenses [1][10][11].
 
 ---
 
@@ -24,20 +24,11 @@ The product assessed under the screening-list name "Anybus Industrial Security G
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 8     | 0                | 8      | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 7     | 0                | 0      | 7   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 2     | 0                | 2      | 0   |
+| unknown          | 13    | 0                | 0      | 13  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 12 items backed by ≥ 2 source_types; 9 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** HMS markets the Anybus Defender as an industrial firewall/VPN security appliance for OT networks (stateful firewall, NAT, DPI, VPN); no protocol-break (TCP/IP session termination) architecture is described.
-- **1.2:** The devices are documented as single-unit rugged DIN-rail firewall appliances (fan-less, metal housing, IP20/IP30); no dual processing board or FPGA/shared-memory isolation design is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is documented as a firewall/VPN/DPI appliance rather than a protocol-break guard.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is a firewall/DPI appliance rather than a CDS guard with a CDR engine.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall/DPI appliance rather than a guard with a content validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is a firewall/VPN appliance rather than a classified-data guard.
-- **2.7:** No anti-steganography detection/removal capability for image files is documented; the product is a firewall/VPN appliance rather than a CDS guard.
+**Evidence quality:** 6 items backed by ≥ 2 source_types; 9 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The product assessed under the screening-list name "Anybus Industrial Security G
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | HMS markets the Anybus Defender as an industrial firewall/VPN security appliance for OT networks (stateful firewall, NAT, DPI, VPN); no protocol-break (TCP/IP session termination) architecture is described. [1], [5], [15] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The devices are documented as single-unit rugged DIN-rail firewall appliances (fan-less, metal housing, IP20/IP30); no dual processing board or FPGA/shared-memory isolation design is described. [4], [15] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | HMS documents the Anybus Defender as featuring NAT, Routing, DPI and VPN functionality, and trade press confirms Network Address Translation with traffic filtering for network segmentation -- an affirmative IP-routing/NAT datapath that excludes a protocol-break architecture terminating TCP/IP sessions at the boundary. [1], [15] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual processing board or FPGA/shared-memory hardware isolation design is documented; datasheets describe enclosure form factor (rugged fan-less housing, DIN-rail mount, port configuration) only, not internal board architecture.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The stateful firewall blocks all traffic that does not match a rule by default: the support article states removing all rules still blocks traffic until an explicit allow rule is created, and the manual documents default block rules and a 'Blocking Unknown Traffic' DPI option. Note that only the WAN ships with a secure default profile; the LAN interface ships open by default. [8], [12] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | Secure boot and RSA-encrypted, device-uniquely-paired project configurations are documented as 'security by design', and the manual exposes kernel-hardening controls such as kernel page-table isolation (Meltdown mitigation). No explicit hardened-OS / microkernel / SELinux-strict-mode claim is made. [5], [8] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is documented as a firewall/VPN/DPI appliance rather than a protocol-break guard. [1], [15] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic stamping of cleaned data before session re-initiation is documented for this product.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is a firewall/DPI appliance rather than a CDS guard with a CDR engine. [1], [15] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the documented inspection engines are NAT/routing, DPI and VPN, which do not address file-content sanitization.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-content inspection, macro/script removal or embedded-object sanitization is documented for this network firewall.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of payload is documented; the documented inspection engines are the industrial-protocol DPI and Snort/Suricata IDS/IPS.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall/DPI appliance rather than a guard with a content validation engine. [1], [15] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is a firewall/VPN appliance rather than a classified-data guard. [1], [15] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema validation capability is documented for this product.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented for this product.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No keyword/regex-based data-leakage detection on traffic content is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal capability for image files is documented; the product is a firewall/VPN appliance rather than a CDS guard. [1], [15] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal capability for image files is documented for this product.) |
 
 ### Category 3 — Protocol Support
 

@@ -24,20 +24,11 @@ Red Lion's FlexEdge (DA50A/DA70A series) is a ruggedized industrial edge gateway
 |------------------|-------|------------------|--------|-----|
 | supported        | 0     | 0                | 0      | 0   |
 | partial          | 6     | 1                | 5      | 0   |
-| not_supported    | 2     | 0                | 2      | 0   |
-| unknown          | 9     | 0                | 0      | 9   |
-| not_applicable   | 7     | 1                | 6      | 0   |
+| not_supported    | 4     | 1                | 3      | 0   |
+| unknown          | 14    | 0                | 0      | 14  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 14 items backed by ≥ 2 source_types; 9 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** HMS/Red Lion positions FlexEdge as a ruggedized industrial edge gateway/router platform (networking-gateway edition with firewall, VPN, NAT and routing) and a protocol converter, not a cross-domain guard; no TCP/IP session-termination or protocol-break architecture is described.
-- **1.2:** FlexEdge is documented as a single DIN-rail unit with a modular communications-sled design (up to three sleds) and on-board I/O; no dual processing-board or FPGA/shared-memory isolation architecture is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is documented; the product is marketed as a networking/protocol gateway and automation controller, not a guard that re-initiates sessions on sanitized content.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product converts protocols and moves data between OT and IT systems rather than acting as a CDS guard with a CDR engine.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is a protocol-conversion gateway, not a guard with a content validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is a networking/protocol gateway rather than a classified-data guard.
-- **2.7:** No anti-steganography detection/removal capability for image files is documented; the product is a firewall/gateway that connects PLCs and moves data rather than a CDS guard.
+**Evidence quality:** 9 items backed by ≥ 2 source_types; 5 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ Red Lion's FlexEdge (DA50A/DA70A series) is a ruggedized industrial edge gateway
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | high | — | HMS/Red Lion positions FlexEdge as a ruggedized industrial edge gateway/router platform (networking-gateway edition with firewall, VPN, NAT and routing) and a protocol converter, not a cross-domain guard; no TCP/IP session-termination or protocol-break architecture is described. [1], [2], [6], [10] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | FlexEdge is documented as a single DIN-rail unit with a modular communications-sled design (up to three sleds) and on-board I/O; no dual processing-board or FPGA/shared-memory isolation architecture is described. [1], [2], [3] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | high | — | HMS/Red Lion documents FlexEdge as a ruggedized industrial edge gateway/router platform (networking-gateway edition with firewall, VPN, NAT and routing) and a protocol converter, not a cross-domain guard; a device documented as routing and forwarding traffic does not terminate sessions in a protocol-break architecture. [1], [2], [6], [10] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No documentation of the processing-board architecture or FPGA/shared-memory isolation was found; the modular communications-sled design does not establish whether dual processor boards exist.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Partial | medium | — | A stateful firewall with access control lists (ACL) and packet filtering is documented on the brochure and product page, alongside encrypted communication and RADIUS authentication; an explicit default-deny whitelist policy for all non-listed packets/protocols is not stated in the reviewed sources. [2], [3], [4] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (Press coverage states FlexEdge runs a Linux-based OS combined with Crimson 3.2, but no hardened-OS / microkernel / SELinux-strict-mode claim for the device OS was found.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is documented; the product is marketed as a networking/protocol gateway and automation controller, not a guard that re-initiates sessions on sanitized content. [1], [2] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Not Supported | medium | — | FlexEdge is documented as a networking/protocol gateway and automation controller that routes and converts protocols rather than terminating sessions; with no protocol-break session re-initiation, there is no internal control core that signs clean data before a new session. [1], [2] |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product converts protocols and moves data between OT and IT systems rather than acting as a CDS guard with a CDR engine. [2], [3] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm and reconstruction (CDR) of Office, PDF, image or CAD files is documented; the documented function set is protocol conversion and firewall filtering, which does not establish CDR absence.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-content inspection, macro/script removal or embedded-object sanitization is documented.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of payload is documented.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is a protocol-conversion gateway, not a guard with a content validation engine. [1], [2] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is a networking/protocol gateway rather than a classified-data guard. [1], [2] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No W3C-schema validation of XML/JSON/FIXM/AIXM structures is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No keyword/regex-based data-leakage detection on traffic content is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal capability for image files is documented; the product is a firewall/gateway that connects PLCs and moves data rather than a CDS guard. [1], [10] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal for image files (PNG, JPEG, BMP) is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -112,9 +103,9 @@ Red Lion's FlexEdge (DA50A/DA70A series) is a ruggedized industrial edge gateway
 
 ## 6. Evidence Quality Notes
 
-Fourteen of 24 items are backed by at least two source types; items 1.1, 3.2, 5.4 and the category basis for the seven not_applicable verdicts are corroborated by independent sources (Automation.com/ISA press coverage 2020-2024 and an ARC Industry Forum deployment writeup), which allows high confidence on 1.1 and 3.2. Nine items (1.4, 2.2, 2.3, 2.6, 3.4, 4.2, 4.4, 5.2, 5.3) are unknown because the reviewed public material never discusses the capability; the vendor's user manual and the retired DA50D datasheet on redlion.net could not be retrieved this run (the site has migrated to HMS Networks and both web archives rate-limited requests), so manual-level claims such as syslog forwarding, firewall default policy and role separation could not be verified.
+Fourteen of 24 items are backed by at least two source types; items 1.1, 3.2, 5.4 and the gateway/router classification underlying the protocol-break and inspection-item verdicts are corroborated by independent sources (Automation.com/ISA press coverage 2020-2024 and an ARC Industry Forum deployment writeup), which allows high confidence on 1.1 and 3.2. Fourteen items (1.2, 1.4, 2.1-2.7, 3.4, 4.2, 4.4, 5.2, 5.3) are unknown because the reviewed public material never discusses the capability; the vendor's user manual and the retired DA50D datasheet on redlion.net could not be retrieved this run (the site has migrated to HMS Networks and both web archives rate-limited requests), so manual-level claims such as syslog forwarding, firewall default policy and role separation could not be verified.
 
-Items 1.2, 1.3, 1.5, 2.1, 2.4, 2.5, 2.7, 4.1, 4.3 and 5.1 rest on vendor documentation only, capping confidence at medium per the validator rule; 4.1's numeric verdict (100 Mbps) derives from the vendor's own "Dual 10/100TX Ethernet communications sled" specification. One minor discrepancy exists: the HMS platform page says Crimson converts "up to 20 protocols simultaneously" while the DA50A page says "converts 10 protocols"; the platform-level figure was used with the broader driver count (300+). The ARC article names a "FlexEdge DA50N" while HMS pages list DA50A/DA70A; both were treated as the same FlexEdge platform family.
+Items 1.3, 1.5, 4.1, 4.3 and 5.1 rest on vendor documentation only, capping confidence at medium per the validator rule; 4.1's numeric verdict (100 Mbps) derives from the vendor's own "Dual 10/100TX Ethernet communications sled" specification. One minor discrepancy exists: the HMS platform page says Crimson converts "up to 20 protocols simultaneously" while the DA50A page says "converts 10 protocols"; the platform-level figure was used with the broader driver count (300+). The ARC article names a "FlexEdge DA50N" while HMS pages list DA50A/DA70A; both were treated as the same FlexEdge platform family.
 
 ---
 

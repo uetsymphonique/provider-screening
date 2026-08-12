@@ -24,9 +24,9 @@ FireMon Security Manager (now sold as FireMon Policy Manager) is an agentless ne
 |------------------|-------|------------------|--------|-----|
 | supported        | 6     | 0                | 6      | 0   |
 | partial          | 11    | 0                | 10     | 1   |
-| not_supported    | 0     | 0                | 0      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
 | unknown          | 7     | 0                | 0      | 7   |
-| not_applicable   | 9     | 0                | 9      | 0   |
+| not_applicable   | 8     | 0                | 8      | 0   |
 
 **Evidence quality:** 18 items backed by ≥ 2 source_types; 21 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
@@ -37,7 +37,6 @@ FireMon Security Manager (now sold as FireMon Policy Manager) is an agentless ne
 - **4.3:** FireMon is an out-of-band management plane (governance separated from enforcement on network devices), so no in-path agent adds latency and the <0.1ms metric does not apply.
 - **4.4:** There is no in-path agent whose failure could interrupt workload traffic; the agent fail-safe requirement does not apply.
 - **4.5:** No agent is installed or updated on servers, so the reboot-free agent installation requirement does not apply.
-- **6.1:** No endpoint agent exists, so process-level enforcement is outside the product architecture; enforcement is delegated to network devices and partner segmentation platforms.
 - **6.4:** There is no agent-controller channel to encrypt; FireMon is an out-of-band management plane with no workload enforcement agent.
 - **7.2:** No enforcement agent exists to enter an autonomous enforcement mode; policy enforcement continues on network devices independent of FireMon availability.
 
@@ -98,7 +97,7 @@ FireMon Security Manager (now sold as FireMon Policy Manager) is an agentless ne
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | No endpoint agent exists, so process-level enforcement is outside the product architecture; enforcement is delegated to network devices and partner segmentation platforms. [5], [17] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | FireMon explicitly separates governance from enforcement, ingesting and normalizing policies from partner platforms rather than creating or pushing enforcement rules itself; no evidence documents FireMon performing enforcement at any level, process or otherwise. [5], [17] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | Threat-intelligence correlation through SIEM/SOAR and vulnerability-scanner integrations is documented, and Lumeta detects anomalous conditions; no deception/honeypot capability was found. [10], [18], [19] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Preconfigured compliance reports cover PCI-DSS, ISO 27001, NIST (including a documented NIST 800-207 component mapping), SOX, HIPAA, NERC-CIP and others; IEC 62443-specific reporting was not found. [7], [18], [21], [30] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | N/A | medium | — | There is no agent-controller channel to encrypt; FireMon is an out-of-band management plane with no workload enforcement agent. [2], [5] |

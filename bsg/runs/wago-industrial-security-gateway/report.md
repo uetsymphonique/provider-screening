@@ -3,7 +3,7 @@
 **Product ID:** `wago-industrial-security-gateway`
 **Version reference:** n/a
 **Assessment mode:** standard
-**Checklist version:** 1
+**Checklist version:** 2
 **Assessed at:** 2026-08-11T09:13:40Z
 **Total evidence items collected:** 5
 **Total distinct sources:** 4

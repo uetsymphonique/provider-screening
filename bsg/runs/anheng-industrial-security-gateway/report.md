@@ -24,20 +24,11 @@ The product under review is DBAPPSECurity's (Hangzhou Anheng Information Technol
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 8     | 0                | 8      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 8     | 0                | 0      | 8   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 14    | 0                | 0      | 14  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 1 items backed by ≥ 2 source_types; 16 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Vendor documents the Anheng Industrial Firewall as a boundary-protection firewall using stateful inspection plus DPI and routing/transparent/mixed deployment - a standard firewall class, not a protocol-break guard.
-- **1.2:** Vendor describes the product as a combined software/hardware boundary-protection firewall deployed between networks; no dual-board FPGA/shared-memory isolation architecture is documented.
-- **1.5:** Vendor markets the product as a boundary-protection industrial firewall; internal data stamping (signing sanitized data before new session initiation) is a guard/CDS mechanism not applicable to this category.
-- **2.1:** Vendor documents stateful inspection with DPI on a firewall-class product; no content disarm & reconstruction (CDR) of Office/PDF/image/CAD files is documented or applicable.
-- **2.4:** Vendor documents firewall-class inspection (stateful + DPI); XML/JSON/FIXM/AIXM schema validation is a guard/CDR feature not documented or applicable for this category.
-- **2.5:** Vendor markets the product as a boundary-protection industrial firewall; security-label (IFC) filtering is a guard/CDS mechanism not documented for this category.
-- **2.7:** Vendor documents firewall-class inspection; anti-steganography detection in images is a guard/CDS feature not documented for this category.
+**Evidence quality:** 1 items backed by ≥ 2 source_types; 10 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The product under review is DBAPPSECurity's (Hangzhou Anheng Information Technol
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Vendor documents the Anheng Industrial Firewall as a boundary-protection firewall using stateful inspection plus DPI and routing/transparent/mixed deployment - a standard firewall class, not a protocol-break guard. [1], [3] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | Vendor describes the product as a combined software/hardware boundary-protection firewall deployed between networks; no dual-board FPGA/shared-memory isolation architecture is documented. [1], [3] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Vendor documentation states the firewall supports routing and transparent (bridge) deployment modes using stateful inspection plus DPI for access control -- an affirmative pass-through/forwarding datapath that excludes a protocol-break architecture terminating TCP/IP sessions at the boundary. [1] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (Internal board architecture is not published in reviewed vendor documentation.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | Vendor documents both blacklist and whitelist access-control modes with instruction-level filtering that intercepts illegal operation commands, so whitelist (default-deny) enforcement is available. [1], [3] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (Hardened-OS details are not published in the reviewed product page, product manual or knowledge-center article.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Vendor markets the product as a boundary-protection industrial firewall; internal data stamping (signing sanitized data before new session initiation) is a guard/CDS mechanism not applicable to this category. [1] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (Internal data-stamping mechanism is not published in reviewed vendor documentation.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | Vendor documents stateful inspection with DPI on a firewall-class product; no content disarm & reconstruction (CDR) of Office/PDF/image/CAD files is documented or applicable. [1], [3] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (CDR capability is not published in reviewed vendor documentation.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (Macro/script-stripping is not documented for this product.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | Vendor documents a built-in industrial ISP rule library with industrial-protocol virus filtering and an AV capability; the number of concurrently running antivirus engines is not specified. [1], [2], [3] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | Vendor documents firewall-class inspection (stateful + DPI); XML/JSON/FIXM/AIXM schema validation is a guard/CDR feature not documented or applicable for this category. [1] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Vendor markets the product as a boundary-protection industrial firewall; security-label (IFC) filtering is a guard/CDS mechanism not documented for this category. [1] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (Schema-validation capability is not published in reviewed vendor documentation.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (IFC/label-based filtering is not published in reviewed vendor documentation.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Partial | medium | — | Vendor capability map lists keyword filtering and file filtering on the firewall; specific sensitive-data patterns (confidential keywords, ID numbers, accounts) and custom regex rules are not documented. [2] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | Vendor documents firewall-class inspection; anti-steganography detection in images is a guard/CDS feature not documented for this category. [1] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (Anti-steganography capability is not published in reviewed vendor documentation.) |
 
 ### Category 3 — Protocol Support
 
@@ -114,7 +105,7 @@ The product under review is DBAPPSECurity's (Hangzhou Anheng Information Technol
 
 Four items were triangulated across three or more sources (2.3, 3.2, 4.3, 4.4; 3.2 across four), while the rest rest on one or two sources; all 38 evidence quotes were verified as exact substrings of the staged artifacts by verify_citation_grounding.py (0 fabricated, 0 unverifiable). Every cited source is vendor-authored: the product page, the official product manual PDF (industrial firewall section), the vendor knowledge-center article, and one B2B marketplace listing (afzhan.com / 智慧城市网) that mirrors vendor-provided text and is tagged vendor_datasheet. No independent test-lab report, analyst note, or certification-registry entry for this product could be located - general search engines were bot-blocked in this environment and only a reader proxy over DuckDuckGo returned results - so confidence is capped at medium on all non-unknown items per the vendor-only rule.
 
-The sources did not contradict each other; the marketplace mirror reproduces the vendor's own wording. The main evidence limitation is the absence of quantitative data (throughput, latency, failover time) and of any product-level certification statement, which forced unknown verdicts on 4.1, 4.2, 5.4 and several management items. Product-class items (1.1, 1.2, 1.5, 2.1, 2.4, 2.5, 2.7) were rated not_applicable because the vendor documentation itself establishes the firewall category (stateful inspection + DPI, routing-capable, standard firewall functions [1], [3]); the product's Chinese documentation is the authoritative source and was quoted verbatim.
+The sources did not contradict each other; the marketplace mirror reproduces the vendor's own wording. The main evidence limitation is the absence of quantitative data (throughput, latency, failover time) and of any product-level certification statement, which forced unknown verdicts on 4.1, 4.2, 5.4 and several management items. Item 1.1 (protocol-break architecture) was rated not_supported because the vendor documentation states the firewall supports routing and transparent deployment modes with stateful inspection + DPI access control [1], a pass-through datapath that contradicts session-terminating protocol break; the remaining guard-specific items (1.2, 1.5, 2.1, 2.4, 2.5, 2.7) were rated unknown because the same documentation establishes the firewall category but states no specific fact for or against those capabilities. The product's Chinese documentation is the authoritative source and was quoted verbatim.
 
 ---
 

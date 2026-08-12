@@ -1,11 +1,9 @@
-"""Batch-run screen or standard mode assessment across a product list.
+"""Batch-run standard-mode assessment across a product list.
 
-Modes:
-  --mode screen    (default) → runs microsegmentation/prompts/screen_mode.md;
-                     source is providers/Microsegmentation.csv (all 50 rows).
-  --mode standard  → runs microsegmentation/prompts/standard_mode.md;
-                     source should be --queue-file microsegmentation/decisions/deep_queue.txt
-                     produced by promote_to_deep.py.
+Mode:
+  --mode standard → runs the shared skill's prompt
+                    (.claude/skills/provider-assessment/prompts/standard_mode.md)
+                    against the domain's vendor CSV.
 
 For each product:
   1. Render the mode-specific prompt template with {VENDOR}, {PRODUCT_NAME},
@@ -17,7 +15,13 @@ For each product:
      record the outcome in runs/<pid>/claude_run.meta.json.
 
 --skip-done skips a product only when its existing assessment.json is in the
-SAME mode as the current run (so a screen result doesn't block a standard rerun).
+SAME mode as the current run (so a partial pass doesn't block a re-run).
+
+--concurrency N runs up to N products in parallel (ThreadPoolExecutor). Any
+concurrency > 1 forces quiet=True for every product regardless of --quiet, so
+the --overwrite line-window (which redraws via ANSI cursor moves) is never
+driven by more than one thread at a time — at concurrency=1 (the default)
+--overwrite behaves exactly as before.
 
 Requires:  claude CLI on PATH, venv Python for the validator.
 Docs cross-checked: https://code.claude.com/docs/en/headless.md
@@ -26,6 +30,7 @@ Docs cross-checked: https://code.claude.com/docs/en/headless.md
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import json
 import os
@@ -60,32 +65,32 @@ DOMAINS = {
 # (load_prompt_template, already_done_for_mode, run_validator, run_one,
 # BATCH_DIR) don't need a domain parameter threaded through every call.
 CSV_PATH = DOMAINS["microsegmentation"]["csv"]
-PROMPTS_DIR = DOMAINS["microsegmentation"]["dir"] / "prompts"
+PROMPTS_DIR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "prompts"
 PROMPT_FILES = {
-    "screen": PROMPTS_DIR / "screen_mode.md",
     "standard": PROMPTS_DIR / "standard_mode.md",
 }
 RUNS_ROOT = DOMAINS["microsegmentation"]["dir"] / "runs"
-VALIDATOR = DOMAINS["microsegmentation"]["dir"] / "scripts" / "validate_assessment.py"
+VALIDATOR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "scripts" / "validate_assessment.py"
+CURRENT_DOMAIN = "microsegmentation"
 VENV_PY = REPO_ROOT / "venv" / "Scripts" / "python.exe"
 BATCH_DIR = RUNS_ROOT / "_batch"
 
 
 def select_domain(domain: str) -> None:
     """Reassign the module-level path constants for the chosen domain."""
-    global CSV_PATH, PROMPTS_DIR, PROMPT_FILES, RUNS_ROOT, VALIDATOR, BATCH_DIR
+    global CSV_PATH, PROMPTS_DIR, PROMPT_FILES, RUNS_ROOT, VALIDATOR, CURRENT_DOMAIN, BATCH_DIR
     cfg = DOMAINS[domain]
     CSV_PATH = cfg["csv"]
-    PROMPTS_DIR = cfg["dir"] / "prompts"
+    PROMPTS_DIR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "prompts"
     PROMPT_FILES = {
-        "screen": PROMPTS_DIR / "screen_mode.md",
         "standard": PROMPTS_DIR / "standard_mode.md",
     }
     RUNS_ROOT = cfg["dir"] / "runs"
-    VALIDATOR = cfg["dir"] / "scripts" / "validate_assessment.py"
+    VALIDATOR = REPO_ROOT / ".claude" / "skills" / "provider-assessment" / "scripts" / "validate_assessment.py"
+    CURRENT_DOMAIN = domain
     BATCH_DIR = RUNS_ROOT / "_batch"
 
-# Pre-approve the tools the screen-mode prompt actually needs. Combined with
+# Pre-approve the tools the standard-mode prompt actually needs. Combined with
 # --permission-mode acceptEdits this covers file R/W without blanket approval.
 ALLOWED_TOOLS = "Bash,Read,Edit,Write,Grep,Glob,WebFetch,WebSearch,Skill,TodoWrite"
 
@@ -173,6 +178,7 @@ def filter_products(products, only, start_at, limit, queue_pids):
 
 def render_prompt(template: str, product: dict) -> str:
     return (template
+            .replace("{DOMAIN}", CURRENT_DOMAIN)
             .replace("{VENDOR}", product["vendor"])
             .replace("{PRODUCT_NAME}", product["product_name"])
             .replace("{product_id}", product["product_id"]))
@@ -336,7 +342,7 @@ def run_validator(pid: str) -> dict | None:
         return {"exit_code": None, "note": "assessment.json missing"}
     py = str(VENV_PY) if VENV_PY.exists() else sys.executable
     proc = subprocess.run(
-        [py, str(VALIDATOR), str(assessment),
+        [py, str(VALIDATOR), "--domain", CURRENT_DOMAIN, str(assessment),
          "--evidence-store", str(RUNS_ROOT / pid)],
         capture_output=True, text=True,
     )
@@ -391,7 +397,7 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
         }
 
     # Only create the run directory + write prompt for real runs, so a dry-run
-    # doesn't pollute runs/ with empty per-product dirs (breaks promote_to_deep).
+    # doesn't pollute runs/ with empty per-product dirs.
     run_dir.mkdir(parents=True, exist_ok=True)
     prompt_path = run_dir / "prompt.txt"
     log_path = run_dir / "claude_run.jsonl"
@@ -500,13 +506,13 @@ def run_one(product, prompt_text, model, timeout, dry_run, max_turns=None, max_b
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--domain", choices=list(DOMAINS.keys()), required=True,
-                    help="Which project (checklist/prompts/runs tree) to run against. Required — "
+                    help="Which project (checklist/runs tree) to run against. Required — "
                          "no default, so a mistyped command fails fast instead of silently running "
                          "against the wrong domain.")
-    ap.add_argument("--mode", choices=["screen", "standard"], required=True,
-                    help="Assessment mode: screen (6 gate items) | standard (all items). Required — "
+    ap.add_argument("--mode", choices=["standard"], required=True,
+                    help="Assessment mode: standard (all items). Required — "
                          "no default, so a mistyped command fails fast instead of silently running "
-                         "screen mode when you meant standard (or vice versa).")
+                         "the wrong pass.")
     ap.add_argument("--csv", type=Path, default=None,
                     help="Defaults to the domain's vendor CSV under providers/.")
     ap.add_argument("--queue-file", type=Path, default=None,
@@ -546,8 +552,15 @@ def main() -> int:
     ap.add_argument("--overwrite", type=int, nargs="?", const=5, default=None, metavar="N",
                     help="Show a live N-line window of progress (default 5 if flag given with no "
                          "value; pass 1 for a single overwritten line), redrawn in place instead of "
-                         "scrolling one line per event. No effect if --quiet is set. The full "
-                         "stream-json trace is still written to claude_run.jsonl either way.")
+                         "scrolling one line per event. No effect if --quiet is set, or if "
+                         "--concurrency > 1 (multiple threads redrawing the same cursor position "
+                         "would corrupt the display, so concurrency > 1 forces quiet=True). The "
+                         "full stream-json trace is still written to claude_run.jsonl either way.")
+    ap.add_argument("--concurrency", type=int, default=1, metavar="N",
+                    help="Run up to N products in parallel (default 1 = sequential, same as before). "
+                         "Products run in separate `claude -p` subprocesses via ThreadPoolExecutor; "
+                         "final summary table is reordered back to CSV/queue order regardless of "
+                         "completion order.")
     args = ap.parse_args()
 
     select_domain(args.domain)
@@ -572,27 +585,45 @@ def main() -> int:
     print()
 
     summary: list[dict] = []
-    for i, prod in enumerate(products, 1):
+    print_lock = threading.Lock()
+
+    def _run_product(i: int, prod: dict) -> dict:
         pid = prod["product_id"]
-        print(f"--- [{i}/{len(products)}] {pid} ({prod['vendor']}) ---")
+        with print_lock:
+            print(f"--- [{i}/{len(products)}] {pid} ({prod['vendor']}) ---")
         if args.skip_done and already_done_for_mode(pid, args.mode):
-            print(f"[{pid}] skipped (assessment.json already in mode={args.mode})")
-            summary.append({"product_id": pid, "status": "skipped"})
-            continue
+            with print_lock:
+                print(f"[{pid}] skipped (assessment.json already in mode={args.mode})")
+            return {"product_id": pid, "status": "skipped"}
 
         prompt_text = render_prompt(template, prod)
         try:
+            # Concurrent runs always use quiet per-product output — interleaved
+            # progress lines (or worse, interleaved --overwrite cursor moves)
+            # from multiple threads writing to the same terminal are unreadable.
             meta = run_one(prod, prompt_text, args.model, args.timeout, args.dry_run,
                             max_turns=args.max_turns, max_budget_usd=args.max_budget_usd,
                             skip_permissions=args.dangerously_skip_permissions,
-                            quiet=args.quiet, overwrite=args.overwrite)
+                            quiet=args.quiet or args.concurrency > 1, overwrite=args.overwrite)
         except Exception as e:  # noqa: BLE001
-            print(f"[{pid}] EXCEPTION: {e}", file=sys.stderr)
+            with print_lock:
+                print(f"[{pid}] EXCEPTION: {e}", file=sys.stderr)
             meta = {"product_id": pid, "status": f"exception: {e}", "total_cost_usd": None}
-        summary.append(meta)
+        return meta
 
-        if args.sleep and i < len(products) and not args.dry_run:
-            time.sleep(args.sleep)
+    if args.concurrency > 1:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency) as ex:
+            futures = {ex.submit(_run_product, i, prod): i for i, prod in enumerate(products, 1)}
+            for fut in concurrent.futures.as_completed(futures):
+                summary.append(fut.result())
+        order = {p["product_id"]: idx for idx, p in enumerate(products)}
+        summary.sort(key=lambda s: order.get(s.get("product_id"), 9999))
+    else:
+        for i, prod in enumerate(products, 1):
+            meta = _run_product(i, prod)
+            summary.append(meta)
+            if args.sleep and i < len(products) and not args.dry_run:
+                time.sleep(args.sleep)
 
     BATCH_DIR.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")

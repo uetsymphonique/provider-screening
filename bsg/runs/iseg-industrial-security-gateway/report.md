@@ -24,20 +24,11 @@ Radiflow's iSEG is a family of ruggedized industrial secure gateways — current
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 11    | 0                | 8      | 3   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 11    | 0                | 0      | 11  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 6 items backed by ≥ 2 source_types; 17 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Vendor datasheets, the vendor blog and an ARC Advisory Group review position iSEG as a DPI SCADA firewall and ruggedized gateway with L3 routing (OSPF, RIPv2, VRRP) and NAT, not a protocol-break guard that terminates and re-originates TCP/IP sessions.
-- **1.2:** The datasheet describes a single ruggedized DIN-rail appliance (IP30, fanless, 1.4 kg), an industrial gateway form factor with no dual processing-board / FPGA-isolated architecture, consistent with its firewall category.
-- **1.5:** The product category is an in-line DPI firewall/gateway; the vendor does not describe a guard-style internal signing funnel that stamps data before re-initiating sessions.
-- **2.1:** iSEG validates SCADA protocol packets (source, destination, protocol, content) rather than files, and no content disarm and reconstruction of Office/PDF/image documents is offered, consistent with its firewall category.
-- **2.4:** The policy engine operates on SCADA protocol fields through profile-based rules rather than XML/JSON/FIXM/AIXM schema validation; the product is a firewall, not a message-schema gateway.
-- **2.5:** Filtering is whitelist/policy-based at the packet level; security-label-based information flow control attached to files is not part of the DPI firewall design.
-- **2.7:** iSEG inspects protocol packets, not image files, and no anti-steganography file sanitization capability is described, consistent with the firewall category.
+**Evidence quality:** 6 items backed by ≥ 2 source_types; 12 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ Radiflow's iSEG is a family of ruggedized industrial secure gateways — current
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Vendor datasheets, the vendor blog and an ARC Advisory Group review position iSEG as a DPI SCADA firewall and ruggedized gateway with L3 routing (OSPF, RIPv2, VRRP) and NAT, not a protocol-break guard that terminates and re-originates TCP/IP sessions. [4], [8], [10] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The datasheet describes a single ruggedized DIN-rail appliance (IP30, fanless, 1.4 kg), an industrial gateway form factor with no dual processing-board / FPGA-isolated architecture, consistent with its firewall category. [4] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The RF-3180 datasheet documents an L3 feature set with static routing, OSPF and RIPv2 plus VRRP, and the gateway adds IPsec VPN for remote access — an IP-routed datapath that contradicts a protocol-break architecture terminating every TCP/IP session at the boundary. [4], [8] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No evidence of a dual processing-board / FPGA / isolated shared-memory hardware isolation design.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | Both iSEG datasheets describe a whitelist-based distributed DPI firewall installed at every port that validates each SCADA packet and forwards only what its rules allow, with Monitoring and Enforcement modes for non-whitelisted traffic. [2], [4], [8] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | low | — | The datasheet documents OS image encryption and a Safe Mode for the gateway software, but no microkernel or SELinux-style hardening claims are made. [4] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | The product category is an in-line DPI firewall/gateway; the vendor does not describe a guard-style internal signing funnel that stamps data before re-initiating sessions. [4] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No evidence of an internal signing core that stamps clean data before session re-initiation.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | iSEG validates SCADA protocol packets (source, destination, protocol, content) rather than files, and no content disarm and reconstruction of Office/PDF/image documents is offered, consistent with its firewall category. [4] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No CDR (disarm and reconstruction) of Office/PDF/Image/CAD formats is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No evidence found on macro/script (VBA, Javascript, DDE) removal.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No evidence of multi-engine antivirus scanning in iSEG.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | The policy engine operates on SCADA protocol fields through profile-based rules rather than XML/JSON/FIXM/AIXM schema validation; the product is a firewall, not a message-schema gateway. [4] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Filtering is whitelist/policy-based at the packet level; security-label-based information flow control attached to files is not part of the DPI firewall design. [3] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM W3C schema validation is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control attached to files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No evidence of DLP (keyword/pattern blocking) functionality.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | iSEG inspects protocol packets, not image files, and no anti-steganography file sanitization capability is described, consistent with the firewall category. [4] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography engine for hidden data in image files is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -108,7 +99,7 @@ Radiflow's iSEG is a family of ruggedized industrial secure gateways — current
 - **HA switchover time not specified (item 4.3):** VRRP redundancy is documented, but no failover/switchover time is published, leaving the <=100 ms requirement unverifiable [3, 4].
 - **OPC UA and MQTT not evidenced (item 3.2):** DPI coverage is limited to Modbus TCP, IEC 101/104, DNP3 and S7; organizations standardizing on OPC UA or MQTT at the gateway would need vendor confirmation [2, 4].
 - **No Common Criteria / FIPS / national crypto certification (item 5.4):** No evidence of CC EAL4+, FIPS 140-3 or a national cryptographic certification was found; the datasheets document utility/EMC conformance (IEC 61850-3, IEEE 1613) instead [4].
-- **CDR-class capabilities absent by design (items 2.1, 2.2, 2.3, 2.6):** As a protocol DPI firewall the product offers no file content disarm/reconstruction, macro removal, multi-AV scanning or DLP — buyers needing file sanitization must pair it with a separate guard/CDR product [4].
+- **File-inspection capabilities not evidenced (items 2.1, 2.2, 2.3, 2.6):** No CDR (disarm/reconstruction), macro/script removal, multi-AV scanning or DLP capability is documented for this protocol DPI firewall; buyers needing file sanitization should seek vendor confirmation or pair it with a separate guard/CDR product [4].
 
 ## 6. Evidence Quality Notes
 

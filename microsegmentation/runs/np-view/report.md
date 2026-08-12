@@ -24,21 +24,19 @@ NP-View is an agentless, read-only OT network access modeling platform from Netw
 |------------------|-------|------------------|--------|-----|
 | supported        | 4     | 0                | 4      | 0   |
 | partial          | 9     | 0                | 9      | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
+| not_supported    | 3     | 0                | 3      | 0   |
 | unknown          | 9     | 0                | 0      | 9   |
-| not_applicable   | 10    | 0                | 10     | 0   |
+| not_applicable   | 8     | 0                | 8      | 0   |
 
 **Evidence quality:** 7 items backed by ≥ 2 source_types; 20 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 **Not-applicable items:**
 - **3.1:** NP-View is agentless and requires no endpoint software, so per-OS endpoint agent support (Windows Server/Linux/AIX/Solaris) does not apply.
-- **3.2:** NP-View models network-device configurations and does not provide container/Kubernetes workload isolation; its own Server component deploys via Docker containers.
 - **4.1:** No endpoint agent is installed, so the <1% agent CPU overhead metric does not apply.
 - **4.2:** No endpoint agent is installed, so the <100MB agent RAM footprint metric does not apply.
 - **4.3:** No in-path agent or enforcement engine exists, so network latency impact does not apply.
 - **4.4:** No in-path agent exists whose failure could interrupt workload traffic; NP-View is a read-only analysis application.
 - **4.5:** No agent is installed or updated on servers, so the reboot-free agent installation requirement does not apply.
-- **6.1:** No endpoint agent or enforcement engine exists, so process-level enforcement does not apply.
 - **6.4:** No agent-controller channel exists to encrypt; connector data is retrieved via HTTPS/SSH and the connector file store is PGP-encrypted at rest and in transit.
 - **7.2:** No agent exists to enter an autonomous enforcement mode; policy enforcement is not performed by NP-View.
 
@@ -71,7 +69,7 @@ NP-View is an agentless, read-only OT network access modeling platform from Netw
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
 | 3.1 | Hỗ trợ đa dạng OS: Windows Server (2003-2022), Linux RHEL/CentOS/Ubuntu, AIX, Solaris. | N/A | medium | — | NP-View is agentless and requires no endpoint software, so per-OS endpoint agent support (Windows Server/Linux/AIX/Solaris) does not apply. [1], [50] |
-| 3.2 | Hỗ trợ Container / Kubernetes / OpenShift native isolation. | N/A | medium | — | NP-View models network-device configurations and does not provide container/Kubernetes workload isolation; its own Server component deploys via Docker containers. [22], [50] |
+| 3.2 | Hỗ trợ Container / Kubernetes / OpenShift native isolation. | Not Supported | medium | — | NP-View has no enforcement engine of any kind (confirmed by item 6.1): it models and visualizes network-device configurations offline and never applies or pushes container, Kubernetes, or any other workload isolation itself; its own Server component running in Docker is unrelated to isolating customer workloads. [22], [50] |
 | 3.3 | Hỗ trợ cả giải pháp Agent-based và Agentless/Network Integration. | Partial | medium | — | Agentless/network-integration mode is fully supported via config-file connectors (HTTPS/SSH/SMB to devices and config managers), but agent-based deployment is explicitly not offered by design. [1], [8], [40] |
 | 3.4 | Tương thích môi trường cách ly hoàn toàn không có Internet (Air-gapped Network). | Supported | medium | — | NP-View runs on-premise in offline mode without internet connectivity and can build the model from config-file backups, confirmed by the product FAQ and a customer case study. [1], [46] |
 | 3.5 | Khả năng mở rộng (Scalability) lên tới trên 50,000 Workloads tập trung. | Partial | medium | n/a (qualitative) | Scale is documented in managed devices (tiers up to 500 devices, larger by request) and 25+ supported manufacturers, not in workloads, so the >=50,000-workload threshold cannot be confirmed. [1], [22] |
@@ -99,7 +97,7 @@ NP-View is an agentless, read-only OT network access modeling platform from Netw
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | N/A | medium | — | No endpoint agent or enforcement engine exists, so process-level enforcement does not apply. [1] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | NP-View is a read-only analysis tool with no enforcement engine of any kind (network or process-level); it evaluates existing device configs but never enforces access control itself. [1] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Unknown | low | — | no evidence found |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Automated compliance reports and evidence collection cover NERC CIP (CIP-002/003/005/007/010), TSA, IEC 62443 and NIST SP 800-82r3 alignment; a PCI DSS page exists; ISO 27001 and NIST SP 800-207 are not documented. [5], [20], [39], [54] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | N/A | medium | — | No agent-controller channel exists to encrypt; connector data is retrieved via HTTPS/SSH and the connector file store is PGP-encrypted at rest and in transit. [1], [16] |

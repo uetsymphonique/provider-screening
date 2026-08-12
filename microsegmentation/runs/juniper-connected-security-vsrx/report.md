@@ -25,16 +25,13 @@ Juniper Connected Security is Juniper's security portfolio built around the SRX 
 | supported        | 9     | 0                | 9      | 0   |
 | partial          | 15    | 1                | 9      | 5   |
 | not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 4     | 0                | 4      | 0   |
+| unknown          | 8     | 0                | 0      | 8   |
+| not_applicable   | 1     | 0                | 1      | 0   |
 
-**Evidence quality:** 19 items backed by ≥ 2 source_types; 20 items backed by vendor_doc only (confidence capped at medium per validator rule).
+**Evidence quality:** 16 items backed by ≥ 2 source_types; 19 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 **Not-applicable items:**
-- **4.1:** Segmentation enforcement is network-based via the vSRX virtual firewall (a 2-17 vCPU, 4-32 GB virtual appliance), not a host agent on workloads; the CWP in-app agent is described only as lightweight with no CPU figures.
-- **4.2:** Same architecture: no workload host agent is deployed for segmentation; the Cloud Workload Protection agent memory footprint is only described qualitatively as lightweight and serverless.
 - **4.4:** There is no in-path host agent for vSRX-based segmentation (enforcement is the inline virtual firewall itself), so an agent-crash fail-safe requirement does not apply; the CWP in-app runtime agent's failure behavior is not documented.
-- **4.5:** No host agent is installed on workloads; the Cloud Workload Protection agent is described as installing in minutes, and vSRX upgrades follow documented VM procedures rather than a host-agent reboot model.
 
 ---
 
@@ -74,11 +71,11 @@ Juniper Connected Security is Juniper's security portfolio built around the SRX 
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | N/A | medium | — | Segmentation enforcement is network-based via the vSRX virtual firewall (a 2-17 vCPU, 4-32 GB virtual appliance), not a host agent on workloads; the CWP in-app agent is described only as lightweight with no CPU figures. [10], [28] |
-| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | N/A | medium | — | Same architecture: no workload host agent is deployed for segmentation; the Cloud Workload Protection agent memory footprint is only described qualitatively as lightweight and serverless. [10], [29] |
+| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | Unknown | low | — | no evidence found (The Cloud Workload Protection agent is confirmed to exist and to enforce at process level (item 6.1), so a CPU-overhead referent exists, but its CPU usage is described only qualitatively as 'lightweight' with no published percentage.) |
+| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | Unknown | low | — | no evidence found (The Cloud Workload Protection agent is confirmed to exist (item 6.1), so a RAM-footprint referent exists, but its memory usage is described only qualitatively as 'lightweight and serverless' with no published figure.) |
 | 4.3 | Không làm tăng độ trễ mạng (< 0.1ms network latency). | Partial | medium | n/a (qualitative) | vSRX is an inline NGFW; CyberRatings.org measured 1,678 Mbps plain-text and 779 Mbps HTTPS throughput on an AWS c5n.2xlarge, but no latency figure in milliseconds is published. [20], [32] |
 | 4.4 | Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng giữ nguyên không bị gián đoạn. | N/A | medium | — | There is no in-path host agent for vSRX-based segmentation (enforcement is the inline virtual firewall itself), so an agent-crash fail-safe requirement does not apply; the CWP in-app runtime agent's failure behavior is not documented. [2], [10] |
-| 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | N/A | medium | — | No host agent is installed on workloads; the Cloud Workload Protection agent is described as installing in minutes, and vSRX upgrades follow documented VM procedures rather than a host-agent reboot model. [3], [10] |
+| 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | Unknown | low | — | no evidence found (The Cloud Workload Protection agent is confirmed to exist (item 6.1) and is described as 'installing in minutes', but no explicit statement of whether install/update requires a restart is documented in staged sources.) |
 
 ### Category 5 — Integration & Automation
 

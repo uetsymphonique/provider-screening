@@ -25,18 +25,10 @@ The Check Point Quantum Rugged Gateway is a ruggedized industrial Next Generatio
 | supported        | 5     | 0                | 5      | 0   |
 | partial          | 7     | 0                | 7      | 0   |
 | not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 6     | 0                | 6      | 0   |
+| unknown          | 11    | 0                | 0      | 11  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 12 items backed by ≥ 2 source_types; 17 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Check Point positions the Quantum Rugged series as a Next Generation Firewall for ICS/OT and critical infrastructure; no protocol-break (TCP/IP session termination at a boundary) architecture is described.
-- **1.2:** The product is a solid-state single-appliance NGFW; no dual processing board or FPGA/shared-memory isolation design is documented.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is an NGFW rather than a guard with a signed-data core.
-- **2.4:** No XML/JSON/FIXM/AIXM schema-validation engine is documented; the product is an NGFW rather than a CDS guard with a content-validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is an NGFW rather than a classified-data guard.
-- **2.7:** No anti-steganography detection/removal capability for image files is documented; the product is an NGFW rather than a CDS guard.
+**Evidence quality:** 6 items backed by ≥ 2 source_types; 11 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -46,11 +38,11 @@ The Check Point Quantum Rugged Gateway is a ruggedized industrial Next Generatio
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Check Point positions the Quantum Rugged series as a Next Generation Firewall for ICS/OT and critical infrastructure; no protocol-break (TCP/IP session termination at a boundary) architecture is described. [1], [2] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The product is a solid-state single-appliance NGFW; no dual processing board or FPGA/shared-memory isolation design is documented. [1], [2] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found (No protocol-break (TCP/IP session termination, no IP routing) architecture is documented for the Quantum Rugged gateway.) |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual-processing-board hardware isolation design (FPGA or isolated shared memory) is documented.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The R81.20 admin guide documents a boot-time default filter that drops all inbound and outbound packets and an implicit default rule whose Action is Drop, i.e. forwarding is whitelist-based; the firewall also holds an ICSA Labs firewall certification. [4], [16] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (Gaia is documented as a Linux-based OS with restricted shells (Clish) and role-based administration, but no explicit hardened-OS / microkernel / SELinux-strict-mode claim was found in the reviewed sources.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is an NGFW rather than a guard with a signed-data core. [1], [2] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic stamping of cleaned data prior to session re-initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
@@ -59,10 +51,10 @@ The Check Point Quantum Rugged Gateway is a ruggedized industrial Next Generatio
 | 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Partial | medium | — | The SandBlast Threat Extraction blade removes active content and embedded objects, reconstructs files and delivers sanitized content (CDR-style), but exhaustive coverage of Office/PDF/Image/CAD formats is not documented. [4] |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Partial | medium | — | Threat Extraction removes active content and embedded objects from files and delivers sanitized content; specific enumeration of VBA macros / Javascript / DDE links is not documented. [4] |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | The Anti-Virus blade is documented to correlate information from multiple detection engines to detect and block malware; parallel scanning of raw payload by two or more distinct AV engines is not explicitly enumerated. [4] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema-validation engine is documented; the product is an NGFW rather than a CDS guard with a content-validation engine. [1], [2] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is an NGFW rather than a classified-data guard. [1], [2] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema-validation engine is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Supported | medium | — | The Data Loss Prevention software blade identifies, monitors and protects data transfer through deep content inspection and blocks the unauthorized transmission of confidential information. [4] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal capability for image files is documented; the product is an NGFW rather than a CDS guard. [1], [2] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 

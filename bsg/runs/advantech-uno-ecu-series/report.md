@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-The Advantech UNO series comprises ruggedized, fanless embedded automation computers / industrial IoT edge gateways in pocket, small and regular form factors, which Advantech describes as bridging data from edge devices to the cloud "as protocol converters, data collectors, or data loggers" [5]. The ECU series — exemplified by the ECU-4784/4784-V2 — is a family of IEC 61850-3 certified power/substation automation servers with up to 8 x GbE, serial interfaces, redundant power input and TPM 2.0 [3][4][6]. Neither line is marketed as a security gateway, network firewall or cross-domain guard: Advantech's network security appliance hardware is a separate product family, and no protocol-break or content-inspection engine is documented for UNO/ECU [1][5]. Documented deployment shapes include smart-factory equipment connectivity, process visualization, environment/dispatch management, substation automation and edge gateway roles; select UNO models (e.g. UNO-2271G-V2) are certified with Ubuntu Core 20 for secure embedded OS deployment [5][8]. Against the 24-item BSG checklist the series therefore scores no supported items: seven CDS-specific items are Not Applicable by category, six are Partial, one is Not Supported (certifications), and ten are Unknown.
+The Advantech UNO series comprises ruggedized, fanless embedded automation computers / industrial IoT edge gateways in pocket, small and regular form factors, which Advantech describes as bridging data from edge devices to the cloud "as protocol converters, data collectors, or data loggers" [5]. The ECU series — exemplified by the ECU-4784/4784-V2 — is a family of IEC 61850-3 certified power/substation automation servers with up to 8 x GbE, serial interfaces, redundant power input and TPM 2.0 [3][4][6]. Neither line is marketed as a security gateway, network firewall or cross-domain guard: Advantech's network security appliance hardware is a separate product family, and no protocol-break or content-inspection engine is documented for UNO/ECU [1][5]. Documented deployment shapes include smart-factory equipment connectivity, process visualization, environment/dispatch management, substation automation and edge gateway roles; select UNO models (e.g. UNO-2271G-V2) are certified with Ubuntu Core 20 for secure embedded OS deployment [5][8]. Against the 24-item BSG checklist the series therefore scores no supported items: six items are Partial, two are Not Supported (item 1.1, whose documented gateway/protocol-converter datapath contradicts a protocol-break architecture, and item 5.4, certifications), and sixteen are Unknown for lack of specific documentation.
 
 ---
 
@@ -24,20 +24,11 @@ The Advantech UNO series comprises ruggedized, fanless embedded automation compu
 |------------------|-------|------------------|--------|-----|
 | supported        | 0     | 0                | 0      | 0   |
 | partial          | 6     | 0                | 6      | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 10    | 0                | 0      | 10  |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 2     | 0                | 2      | 0   |
+| unknown          | 16    | 0                | 0      | 16  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 12 items backed by ≥ 2 source_types; 12 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Advantech positions the UNO-2000 series as ruggedized fanless embedded automation computers / IoT edge gateways that bridge data from edge devices to cloud as protocol converters, data collectors or data loggers, and the ECU-4784 as an IEC 61850-3 certified power automation server; no protocol-break (TCP/IP session termination) architecture is described.
-- **1.2:** The UNO-2484G is documented as a modular compact embedded box PC (single enclosure, aluminum housing) and the ECU-4784 as a fanless substation server; no dual processing board or FPGA/shared-memory isolation design is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways, not cross-domain guards.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than CDS guards with a CDR engine.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than guard appliances with a content validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than classified-data guards.
-- **2.7:** No anti-steganography detection/removal capability for image files is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than CDS guards.
+**Evidence quality:** 5 items backed by ≥ 2 source_types; 6 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The Advantech UNO series comprises ruggedized, fanless embedded automation compu
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Advantech positions the UNO-2000 series as ruggedized fanless embedded automation computers / IoT edge gateways that bridge data from edge devices to cloud as protocol converters, data collectors or data loggers, and the ECU-4784 as an IEC 61850-3 certified power automation server; no protocol-break (TCP/IP session termination) architecture is described. [1], [2], [3], [4], [5] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The UNO-2484G is documented as a modular compact embedded box PC (single enclosure, aluminum housing) and the ECU-4784 as a fanless substation server; no dual processing board or FPGA/shared-memory isolation design is described. [1], [2], [3], [4], [5] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Advantech documents its IoT edge gateways as bridging data from edge devices to the cloud, acting as protocol converters, data collectors, or data loggers -- an affirmative pass-through/bridging datapath that excludes a protocol-break architecture terminating TCP/IP sessions at the boundary. [5] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual processing board or FPGA/shared-memory hardware isolation design is documented for the UNO/ECU platforms; datasheets describe enclosure form factor and CPU only, not internal board architecture.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Unknown | low | — | no evidence found (No default-deny / whitelist firewall behavior is documented for the UNO/ECU computing platforms; they ship with general-purpose OS images (Windows, Linux) rather than a firewall appliance OS.) |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | Select UNO models (e.g. UNO-2271G-V2) are pre-loaded and certified with Ubuntu Core 20, which provides secure boot, full disk encryption, secure device recovery and transactional over-the-air updates, and UNO-2484G / ECU-4784-V2 document TPM 2.0 hardware security; no microkernel or SELinux-strict-mode claim is made for the platform. [2], [6], [8] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways, not cross-domain guards. [1], [2], [3], [4], [5] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic stamping of cleaned data before session re-initiation is documented for the UNO/ECU platforms.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than CDS guards with a CDR engine. [1], [2], [3], [4], [5] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm & reconstruction of Office/PDF/image/CAD files is documented for the UNO/ECU platforms.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-content inspection or macro/script/embedded-object removal capability is documented for the UNO/ECU platforms.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of payloads is documented for the UNO/ECU platforms.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than guard appliances with a content validation engine. [1], [2], [3], [4], [5] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than classified-data guards. [1], [2], [3], [4], [5] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema validation capability is documented for the UNO/ECU platforms.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented for the UNO/ECU platforms.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No keyword/regex-based data-leakage detection on traffic content is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal capability for image files is documented; the UNO/ECU lines are documented as general-purpose industrial computing platforms and gateways rather than CDS guards. [1], [2], [3], [4], [5] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal capability for image files is documented for the UNO/ECU platforms.) |
 
 ### Category 3 — Protocol Support
 
@@ -114,7 +105,7 @@ The Advantech UNO series comprises ruggedized, fanless embedded automation compu
 
 The assessment rests on 12 distinct sources and 33 evidence entries, every quote verified verbatim against staged artifacts (0 fabricated, 0 unverifiable). Eight sources are Advantech-authored (product pages and datasheets for UNO-2484G/2483G, ECU-4784/4784-V2, and the embedded automation computers category page); four are non-vendor (Everest Automation and WPG Americas reseller pages [7][9], a Canonical blog on Ubuntu Core certification [8], and an ARMdevices.net article on IEC 62443-4-2 pre-certification [11]). Because the category and specification claims rest heavily on vendor material, all non-unknown verdicts are capped at medium confidence; no verdict reached high confidence.
 
-Triangulation: the not-applicable and partial items each draw on 3-5 sources, but only items 1.4, 5.3 and 5.4 include a non-vendor source, while items 3.2, 4.1, 4.3 and 4.4 rest on vendor documentation only. No outright contradictions were found: the reseller pages mirror the vendor's category and ruggedness language, and the Canonical and ARMdevices sources describe adjacent capabilities (OS-level hardening, IEC 62443-4-2 pre-certification) that the vendor's own pages do not contradict. Numeric-threshold items 4.1 and 4.3 are Partial with null numeric_value because the only documented figures are interface line rates and power/storage redundancy — not the inspection throughput or device switchover metrics the checklist requires.
+Triangulation: the partial items each draw on 3-5 sources (item 1.1's not_supported verdict rests on a single vendor source), but only items 1.4, 5.3 and 5.4 include a non-vendor source, while items 1.1, 3.2, 4.1, 4.3 and 4.4 rest on vendor documentation only. No outright contradictions were found: the reseller pages mirror the vendor's category and ruggedness language, and the Canonical and ARMdevices sources describe adjacent capabilities (OS-level hardening, IEC 62443-4-2 pre-certification) that the vendor's own pages do not contradict. Numeric-threshold items 4.1 and 4.3 are Partial with null numeric_value because the only documented figures are interface line rates and power/storage redundancy — not the inspection throughput or device switchover metrics the checklist requires.
 
 ---
 

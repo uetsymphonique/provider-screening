@@ -24,20 +24,11 @@ Lantech Communications (Taiwan, founded 1986) is an industrial networking vendor
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 8     | 0                | 8      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 8     | 0                | 0      | 8   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 1     | 0                | 1      | 0   |
+| unknown          | 14    | 0                | 0      | 14  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 13 items backed by ≥ 2 source_types; 15 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Lantech markets industrial Ethernet switches, security switches and multifunction VPN routers with a stateful inspection firewall appliance line; no protocol-break (TCP/IP session termination) guard architecture exists.
-- **1.2:** Vendor documents industrial switches, security switches and multifunction VPN routers/firewall appliances; no dual-board protocol-break isolation is described anywhere in the product line.
-- **1.5:** Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope.
-- **2.1:** No content disarm & reconstruction engine is documented; the products are switches, VPN routers and a stateful inspection firewall appliance.
-- **2.4:** Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope.
-- **2.5:** Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope.
-- **2.7:** Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope.
+**Evidence quality:** 7 items backed by ≥ 2 source_types; 9 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ Lantech Communications (Taiwan, founded 1986) is an industrial networking vendor
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Lantech markets industrial Ethernet switches, security switches and multifunction VPN routers with a stateful inspection firewall appliance line; no protocol-break (TCP/IP session termination) guard architecture exists. [3], [6], [8] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | Vendor documents industrial switches, security switches and multifunction VPN routers/firewall appliances; no dual-board protocol-break isolation is described anywhere in the product line. [2], [3], [8] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The documented product families are industrial L2/L3 managed switches, multifunction VPN routers and a stateful-inspection firewall appliance whose datasheets specify policy-based routing, NAT and VPN — an IP-routed datapath that contradicts a protocol-break architecture terminating every TCP/IP session at the boundary. [3], [6], [8] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual processing-board / FPGA / isolated shared-memory hardware isolation design is documented anywhere in the product line.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Unknown | low | — | no evidence found (No source documents a default-deny / whitelist-only forwarding policy; firewall and ACL behavior is not described in the gathered documentation.) |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | OS5 documents secure boot with signature verification, SSH hardening per BSI TR-02102-4, memory purging, a hardware security IC, and IEC 62443-4-2 SL2 security measures; no microkernel/SELinux strict-mode OS is claimed. [1], [4], [8] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope. [3], [6] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal data-stamping / signing core for clean data before session re-initiation is documented in the product line.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction engine is documented; the products are switches, VPN routers and a stateful inspection firewall appliance. [3], [6], [8] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm and reconstruction (CDR) of Office/PDF/Image/CAD files is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-content inspection or macro/script removal capability is documented for any Lantech device.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No antivirus engine integration is documented.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope. [3], [6] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope. [2], [3] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM W3C schema validation capability is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control attached to files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No data-loss-prevention (keyword/regex) filtering is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | Vendor documents only industrial switches, security switches and multifunction VPN routers/firewall appliances; no guard/CDS architecture exists in the documented portfolio, so this guard-specific capability is out of scope. [3], [8] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography / hidden-data detection or removal engine for image files is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -108,14 +99,14 @@ Lantech Communications (Taiwan, founded 1986) is an industrial networking vendor
 - **No inspection-throughput spec (item 4.1):** only switching-fabric figures (e.g. 20 Gbps back-plane on T(P)GS-3208GF) are published; no firewall/CDR inspection throughput per model, so the >=1000 Mbps threshold cannot be confirmed [7].
 - **No latency figures (item 4.2):** no processing-latency specification is published for any Lantech security gateway-class device.
 - **No active-standby switchover spec (item 4.3):** ring-based recovery (<20 ms) and VRRP are documented, but no <=100 ms session-preserving active-standby switchover time [4, 6, 7].
-- **Content-security gap (items 2.2, 2.3, 2.6, 3.1):** no CDR, multi-AV, DLP or file-transfer cleaning exists on the documented platform; buyers requiring file sanitization or whitelist-protocol database proxying must select a different product class.
+- **Content-security capabilities not documented (items 2.1, 2.2, 2.3, 2.6, 3.1):** no CDR, multi-AV, DLP or file-transfer cleaning is documented on the platform; buyers requiring file sanitization should verify with the vendor or select a different product class.
 - **SIEM/audit depth (items 5.2, 5.3):** Syslog over TLS and machine-readable security reports are documented, but no CEF/SOAR integration or named NIST/IEC/ISO report templates [1, 4].
 
 ## 6. Evidence Quality Notes
 
-Every non-unknown verdict (16 items) rests on vendor-authored material: solution pages, product pages, the company profile, two current datasheets (OS5 software v2.7; T(P)GS-3208GF v1.6), a 2026 certification press release, and the 2011 LFW-1003 firewall datasheet. Only item 5.4 additionally cites a non-vendor host (Arcobel, a partner-distributor whose article mirrors the vendor's certification announcement), so no fully independent lab, analyst or registry source was obtained; discovery was constrained because major search engines bot-blocked this environment and the wayback machine rate-limited direct access. Per the project rule, all vendor-only verdicts are confidence-capped at medium. Multiple items were triangulated across 2-4 vendor sources (e.g. 4.4 uses the security-switch page, the OS5 datasheet and the T(P)GS-3208GF datasheet; 4.3 uses the OS5 datasheet, the T(P)GS datasheet and the router page), and no contradictions between sources were found.
+Every non-unknown verdict (10 items) rests on vendor-authored material: solution pages, product pages, the company profile, two current datasheets (OS5 software v2.7; T(P)GS-3208GF v1.6), a 2026 certification press release, and the 2011 LFW-1003 firewall datasheet. Only item 5.4 additionally cites a non-vendor host (Arcobel, a partner-distributor whose article mirrors the vendor's certification announcement), so no fully independent lab, analyst or registry source was obtained; discovery was constrained because major search engines bot-blocked this environment and the wayback machine rate-limited direct access. Per the project rule, all vendor-only verdicts are confidence-capped at medium. Multiple items were triangulated across 2-4 vendor sources (e.g. 4.4 uses the security-switch page, the OS5 datasheet and the T(P)GS-3208GF datasheet; 4.3 uses the OS5 datasheet, the T(P)GS datasheet and the router page), and no contradictions between sources were found.
 
-Two transparency caveats apply. First, the Arcobel page is Cloudflare-protected and could not be fetched as raw HTML; it was staged manually from the r.jina.ai reader rendering, which is flagged in the artifact manifest. Second, the exact "Industrial Security Gateway" SKU could not be located on the current site, the live legacy pages, or archived 2016-2022 snapshots, so the assessment anchors to the documented security gateway-class families; the 8 "unknown" verdicts reflect genuine absence of published evidence, not confirmed absence of capability, and are the items a follow-up with the vendor should prioritize.
+Two transparency caveats apply. First, the Arcobel page is Cloudflare-protected and could not be fetched as raw HTML; it was staged manually from the r.jina.ai reader rendering, which is flagged in the artifact manifest. Second, the exact "Industrial Security Gateway" SKU could not be located on the current site, the live legacy pages, or archived 2016-2022 snapshots, so the assessment anchors to the documented security gateway-class families; the 14 "unknown" verdicts reflect genuine absence of published evidence, not confirmed absence of capability, and are the items a follow-up with the vendor should prioritize.
 
 ---
 

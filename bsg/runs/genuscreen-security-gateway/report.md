@@ -24,20 +24,11 @@ GENUA genuscreen is a Firewall & VPN-Appliance from GENUA GmbH (Kirchheim, Germa
 |------------------|-------|------------------|--------|-----|
 | supported        | 5     | 2                | 3      | 0   |
 | partial          | 3     | 0                | 3      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 9     | 0                | 0      | 9   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 3     | 0                | 3      | 0   |
+| unknown          | 13    | 0                | 0      | 13  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 14 items backed by ≥ 2 source_types; 3 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** genuscreen is positioned and CC-certified as a distributed stateful-packet-filter firewall and VPN appliance, not a protocol-break guard/CDS; the TCP-session-termination requirement does not apply to this product class.
-- **1.2:** The certified TOE is software running on standard single-server appliances; no dual-board or FPGA-isolated processing design is documented, consistent with its firewall-appliance category.
-- **1.5:** No internal data-stamping/signing mechanism is documented; genuscreen is a firewall/VPN appliance for which this guard-specific capability does not apply.
-- **2.1:** No content disarm and reconstruction is documented; genuscreen is a stateful packet filter, not a CDR guard.
-- **2.4:** No XML/JSON schema validation is documented; the requirement targets guard/CDS content pipelines that genuscreen does not implement.
-- **2.5:** Filtering is rule/state-based (IP address, protocol, port, interface, flags and state); no security-label-based information flow control is documented for this firewall appliance.
-- **2.7:** No anti-steganography engine is documented; this guard-specific capability does not apply to the firewall appliance category.
+**Evidence quality:** 8 items backed by ≥ 2 source_types; 4 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ GENUA genuscreen is a Firewall & VPN-Appliance from GENUA GmbH (Kirchheim, Germa
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | genuscreen is positioned and CC-certified as a distributed stateful-packet-filter firewall and VPN appliance, not a protocol-break guard/CDS; the TCP-session-termination requirement does not apply to this product class. [1], [4], [9] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The certified TOE is software running on standard single-server appliances; no dual-board or FPGA-isolated processing design is documented, consistent with its firewall-appliance category. [1], [9] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The BSI CC certification report describes the TOE as a distributed stateful packet filter firewall system that filters traffic at the network border; a stateful packet filter forwards traffic under rule/state evaluation and does not terminate every TCP/IP session at a boundary funnel. [4], [9] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Not Supported | medium | — | The BSI CC certification report states the TOE 'consists only of software and documentation', running on standard genuscreen filter appliances plus a separate genucenter management machine; no dual-processing-board, FPGA- or shared-memory-isolated hardware architecture is part of the certified design. [9] |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | high | — | Vendor documentation and three independent reseller/tool pages state that genuscreen permits only explicitly allowed connections and blocks all other requests, i.e. whitelist-style default-deny filtering. [1], [11], [12], [14], [15] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Supported | medium | — | The CC certification report documents that the packet filter runs in the kernel of the OpenBSD operating system, and the datasheet lists privileged separation and sandboxing as enhanced protection. [4], [9] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal data-stamping/signing mechanism is documented; genuscreen is a firewall/VPN appliance for which this guard-specific capability does not apply. [1], [9] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm and reconstruction is documented; genuscreen is a stateful packet filter, not a CDR guard. [1], [9] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No macro/script/DDE/embedded-object removal feature is documented.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of payloads is documented.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON schema validation is documented; the requirement targets guard/CDS content pipelines that genuscreen does not implement. [1], [9] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | Filtering is rule/state-based (IP address, protocol, port, interface, flags and state); no security-label-based information flow control is documented for this firewall appliance. [1], [4], [9] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Not Supported | medium | — | The datasheet's firewall feature table enumerates the supported filter criteria as IP address, network protocol, port, interface, flags and state only; security-label-based filtering is absent from this exhaustive criteria list. [4] |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No DLP keyword/ID/regex filtering is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography engine is documented; this guard-specific capability does not apply to the firewall appliance category. [1], [9] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found |
 
 ### Category 3 — Protocol Support
 
@@ -115,7 +106,7 @@ GENUA genuscreen is a Firewall & VPN-Appliance from GENUA GmbH (Kirchheim, Germa
 
 Sixteen distinct sources and 31 evidence entries support this assessment; every quoted fragment was verified (normalized exact-substring) against the sha256-anchored staged text in artifacts/, and the citation-grounding check reports all 31 entries grounded with zero fabricated or unverifiable quotes. Items 1.3 and 5.4 are triangulated across multiple independent sources (three reseller/tool pages for 1.3; BSI and NATO registries plus ECOS and CybersecTools for 5.4), giving high confidence; items 4.1, 4.3, 1.4, 5.1 and 5.2 combine vendor datasheets/docs with the CC certificate or Security Target. Four items (4.1, 4.4, 5.2 and the 4.3 partial) rest only on vendor documentation, so their confidence is capped at medium per the project contract.
 
-The nine "unknown" items (2.2, 2.3, 2.6, 3.1-3.4, 4.2, 5.3) reflect genuine absence of documentation in the reviewed material rather than confirmed absence of capability; the vendor publishes a separate industrial firewall (genuwall) and a high-resistance firewall (genugate) that were not in scope. No contradictions were found between sources; the only discrepancy of note is a throughput figure of 37,490 Mbit/s (hardware datasheet, XL rev. 5.0, TCP) versus 19,699 Mbit/s (Facts & Features marketing summary) — both vendor-published, the lower figure likely reflecting a different measurement configuration, and both far above the 1 Gbps checklist threshold. One access caveat: genua.de/genua.eu block direct TLS from the research network, so those pages and PDFs were staged via reader/raw proxies (r.jina.ai, cors.lol) with the original URLs retained as the manifest origin; the Common Criteria portal, BSI, NATO NIAPC, ECOS, NORLAN and CybersecTools were fetched directly.
+The thirteen "unknown" items (1.5, 2.1, 2.2, 2.3, 2.4, 2.6, 2.7, 3.1-3.4, 4.2, 5.3) reflect genuine absence of documentation in the reviewed material rather than confirmed absence of capability; the vendor publishes a separate industrial firewall (genuwall) and a high-resistance firewall (genugate) that were not in scope. No contradictions were found between sources; the only discrepancy of note is a throughput figure of 37,490 Mbit/s (hardware datasheet, XL rev. 5.0, TCP) versus 19,699 Mbit/s (Facts & Features marketing summary) — both vendor-published, the lower figure likely reflecting a different measurement configuration, and both far above the 1 Gbps checklist threshold. One access caveat: genua.de/genua.eu block direct TLS from the research network, so those pages and PDFs were staged via reader/raw proxies (r.jina.ai, cors.lol) with the original URLs retained as the manifest origin; the Common Criteria portal, BSI, NATO NIAPC, ECOS, NORLAN and CybersecTools were fetched directly.
 
 ---
 

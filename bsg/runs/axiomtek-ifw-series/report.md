@@ -24,20 +24,11 @@ The Axiomtek IFW series is a DIN-rail-mountable industrial firewall appliance li
 |------------------|-------|------------------|--------|-----|
 | supported        | 1     | 0                | 1      | 0   |
 | partial          | 7     | 0                | 7      | 0   |
-| not_supported    | 2     | 0                | 2      | 0   |
-| unknown          | 7     | 0                | 0      | 7   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 3     | 0                | 3      | 0   |
+| unknown          | 13    | 0                | 0      | 13  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 11 items backed by ≥ 2 source_types; 8 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Axiomtek markets the IFW320/IFW330 as all-in-one industrial firewall/NAT/VPN appliances based on stateful packet inspection, and its current IT/OT portfolio is positioned around firewall/VPN/UTM security gateways; no TCP/IP session termination or protocol-break architecture is described, so the protocol-break requirement does not apply to this product class.
-- **1.2:** The IFW320 is documented as a single DIN-rail appliance built on one Intel Atom E3815 processor with two GbE ports; no dual processing board or FPGA/shared-memory isolation design is described, consistent with an industrial firewall rather than a guard.
-- **1.5:** No internal cryptographic stamping of data before session re-initiation is described; the product is positioned as an industrial firewall appliance, not a CDS guard with data stamping.
-- **2.1:** No content disarm and reconstruction of Office/PDF/image/CAD files is documented; inspection is packet-level (stateful inspection, IDP, anti-virus on WEB/FTP transfers) rather than a CDR engine, consistent with the firewall product class.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is an industrial firewall rather than a content-validating guard.
-- **2.5:** No security-label-based information flow control on files is documented; the product is an industrial firewall rather than a classified-data guard.
-- **2.7:** No anti-steganography detection or removal for image files is documented; the product is an industrial firewall rather than a CDS guard.
+**Evidence quality:** 5 items backed by ≥ 2 source_types; 8 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The Axiomtek IFW series is a DIN-rail-mountable industrial firewall appliance li
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Axiomtek markets the IFW320/IFW330 as all-in-one industrial firewall/NAT/VPN appliances based on stateful packet inspection, and its current IT/OT portfolio is positioned around firewall/VPN/UTM security gateways; no TCP/IP session termination or protocol-break architecture is described, so the protocol-break requirement does not apply to this product class. [1], [2], [6], [7], [10] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The IFW320 is documented as a single DIN-rail appliance built on one Intel Atom E3815 processor with two GbE ports; no dual processing board or FPGA/shared-memory isolation design is described, consistent with an industrial firewall rather than a guard. [1], [2], [6], [7] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The IFW330 datasheet markets the appliance as 'Firewall/NAT/Router all in one' and independent coverage confirms NAT-based operation on the IFW320 -- an affirmative IP-routing/NAT-forwarding datapath that excludes a protocol-break architecture terminating TCP/IP sessions at the boundary. [2], [7] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual processing board or FPGA/shared-memory hardware isolation design is documented; datasheets list a single Intel Atom E3815 CPU and DIN-rail enclosure, not internal isolation architecture.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The IFW320/IFW330 manuals document a policy-based stateful firewall in which packets not meeting any policy criteria are not permitted to pass, and the datasheet lists URL and IP whitelist modes; forwarding is rule/whitelist driven rather than implicitly permissive. [1], [3], [4] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (No hardened-OS / microkernel / SELinux-strict-mode claim for the device firmware was found in the datasheets or manuals; the manuals reference only generic IP-stack/kernel behavior.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of data before session re-initiation is described; the product is positioned as an industrial firewall appliance, not a CDS guard with data stamping. [1], [2], [6], [7] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic stamping of cleaned data before session re-initiation is documented for this product.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm and reconstruction of Office/PDF/image/CAD files is documented; inspection is packet-level (stateful inspection, IDP, anti-virus on WEB/FTP transfers) rather than a CDR engine, consistent with the firewall product class. [1], [2], [6], [7] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm and reconstruction of Office/PDF/image/CAD files is documented; documented inspection (stateful packet inspection, DoS protection, IDP, WEB/FTP anti-virus) does not address file-content reconstruction.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No macro/script removal or embedded-object sanitization for files is documented.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | The manuals document a WEB/FTP anti-virus filter applied per policy that filters viruses in files transferred over WEB and FTP; no parallel multi-engine (2+) antivirus scanning of raw payload is documented. [3], [4] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is an industrial firewall rather than a content-validating guard. [1], [2], [6], [7] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is an industrial firewall rather than a classified-data guard. [1], [2], [6], [7] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema validation capability is documented for this product.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented for this product.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No keyword/regex-based data-leakage detection on traffic content is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection or removal for image files is documented; the product is an industrial firewall rather than a CDS guard. [1], [2], [6], [7] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection or removal capability for image files is documented for this product.) |
 
 ### Category 3 — Protocol Support
 
@@ -112,7 +103,7 @@ The Axiomtek IFW series is a DIN-rail-mountable industrial firewall appliance li
 
 ## 6. Evidence Quality Notes
 
-Evidence was staged from the official IFW320/IFW330 datasheets (2017), the IFW320 User's Manual VA1 (January 2015, archived copy) and the IFW330 series User's Manual (reseller-hosted copy), with corroboration from a CTIMES launch article, distributor/reseller listings (Mouser, IPC Station, nt-rt.ru) and Axiomtek's current IT/OT portfolio page. Items 1.1, 2.1, 2.4, 2.5, 2.7 and 4.1 are triangulated across vendor documentation and at least one independent source (CTIMES, IPC Station); items 1.3, 2.3, 3.1, 4.3, 4.4, 5.1 and 5.2 rest on vendor documentation only (datasheets/manuals), so their confidence is capped at medium per the validator rule. The seven items marked unknown (1.4, 2.2, 2.6, 3.3, 3.4, 4.2, 5.3) have no supporting evidence in any staged source; they were not upgraded to not_supported because no source affirmatively documents the capability's absence (with the exception of 5.4, where the documented certification list rules out the required certifications). No contradictions between sources were found — the datasheet figures (500 Mbps throughput, certification list, protocol list) are consistent across the official documents, the CTIMES article and the reseller listings.
+Evidence was staged from the official IFW320/IFW330 datasheets (2017), the IFW320 User's Manual VA1 (January 2015, archived copy) and the IFW330 series User's Manual (reseller-hosted copy), with corroboration from a CTIMES launch article, distributor/reseller listings (Mouser, IPC Station, nt-rt.ru) and Axiomtek's current IT/OT portfolio page. Items 1.1 and 4.1 are triangulated across vendor documentation and at least one independent source (CTIMES, IPC Station); items 1.3, 2.3, 3.1, 4.3, 4.4, 5.1 and 5.2 rest on vendor documentation only (datasheets/manuals), so their confidence is capped at medium per the validator rule. Thirteen items are marked unknown (1.2, 1.4, 1.5, 2.1, 2.2, 2.4, 2.5, 2.6, 2.7, 3.3, 3.4, 4.2, 5.3) because no staged source documents a specific supporting or excluding fact for them; they were not marked not_supported because nothing in the evidence affirmatively excludes the capability (the exceptions are item 1.1, where the documented NAT/router datapath excludes protocol break, and item 5.4, where the documented certification list rules out the required certifications). No contradictions between sources were found — the datasheet figures (500 Mbps throughput, certification list, protocol list) are consistent across the official documents, the CTIMES article and the reseller listings.
 
 ---
 

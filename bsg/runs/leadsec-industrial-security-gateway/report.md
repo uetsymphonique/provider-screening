@@ -25,20 +25,10 @@ Venustech's Leadsec Industrial Security Gateway is the Tianqing Hanma / NetEye-L
 | supported        | 4     | 2                | 2      | 0   |
 | partial          | 7     | 0                | 7      | 0   |
 | not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 8     | 0                | 8      | 0   |
+| unknown          | 13    | 0                | 0      | 13  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 10 items backed by ≥ 2 source_types; 7 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Vendor and independent sources describe the product as an industrial firewall for ICS (SCADA/DCS/PCS/PLC) boundary protection, not a protocol-break guard; no session-terminating, non-routable link architecture is documented.
-- **1.2:** The product is a rack/rail-mounted industrial firewall appliance (stateful firewall with DPI); a dual processing board with FPGA or isolated shared-memory link is not part of the documented design.
-- **1.5:** Firewall-class product; no internal digital stamping of clean data before new session initiation is documented or applicable to the product category.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is an industrial firewall, not a CDR gateway.
-- **2.2:** Firewall-class product; no file-level macro/script/DDE/embedded-object removal capability is documented.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation capability is documented for the firewall-class product.
-- **2.5:** No security-label-based information flow control is documented; filtering is by protocol whitelist and content rules rather than attached-file security labels.
-- **2.7:** No anti-steganography engine is documented for the firewall-class product.
+**Evidence quality:** 7 items backed by ≥ 2 source_types; 2 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -48,23 +38,23 @@ Venustech's Leadsec Industrial Security Gateway is the Tianqing Hanma / NetEye-L
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Vendor and independent sources describe the product as an industrial firewall for ICS (SCADA/DCS/PCS/PLC) boundary protection, not a protocol-break guard; no session-terminating, non-routable link architecture is documented. [1], [3], [4] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The product is a rack/rail-mounted industrial firewall appliance (stateful firewall with DPI); a dual processing board with FPGA or isolated shared-memory link is not part of the documented design. [1], [4] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found (No session-terminating, non-routable protocol-break architecture is documented; sources describe the product only as an industrial firewall.) |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual processing-board / FPGA / isolated shared-memory hardware isolation design is documented.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | high | — | Whitelist-based access control is central: a reseller listing describes packets not on the whitelist being directly rejected, and the vendor whitepaper describes whitelist protection of industrial protocols and whitelists that block unauthorized packets. Independent sources corroborate the default-deny posture. [1], [3], [4], [5] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | The industrial firewall is adapted to domestic Phytium/Zhaoxin/Hygon hardware platforms and the Kylin (银河麒麟) domestic OS per vendor news releases citing Frost & Sullivan reports. No explicit hardened-OS claim (microkernel or SELinux strict mode) is published. [8], [13] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Firewall-class product; no internal digital stamping of clean data before new session initiation is documented or applicable to the product category. [1], [4] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal data-stamping / signing core for clean data before session re-initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is an industrial firewall, not a CDR gateway. [1], [3], [4] |
-| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | N/A | medium | — | Firewall-class product; no file-level macro/script/DDE/embedded-object removal capability is documented. [1], [3] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm and reconstruction (CDR) of Office/PDF/Image/CAD files is documented.) |
+| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-level macro/script (VBA, Javascript, DDE) / embedded-object removal capability is documented.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Partial | medium | — | An antivirus (AV) engine is described as part of the deep security-detection chain, and a reseller page lists antivirus capability. Parallel scanning by two or more AV engines is not documented. [5], [8] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation capability is documented for the firewall-class product. [1], [4] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control is documented; filtering is by protocol whitelist and content rules rather than attached-file security labels. [1], [4] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM W3C schema validation capability is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control attached to files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Partial | medium | — | A natural-language, extensible content-level detection engine with functions/operators enables custom deep inspection of non-encrypted protocol payloads, and the packet-parsing module supports content filtering and audit by item. Prebuilt sensitive-data keyword dictionaries (secrets, ID numbers, accounts) are not documented. [4], [10] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography engine is documented for the firewall-class product. [1], [4] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography / hidden-data detection or removal engine for image files is documented.) |
 
 ### Category 3 — Protocol Support
 
@@ -110,13 +100,13 @@ Venustech's Leadsec Industrial Security Gateway is the Tianqing Hanma / NetEye-L
 - **No EAL4+/FIPS 140-3/national-crypto certificate for the IFW (item 5.4):** GB/T 37933-2019 enhanced-level design is vendor-claimed and sibling gateways hold CNITSEC EAL3+ only [7], [8], [9]; an IFW-specific Common Criteria or crypto certificate is not public.
 - **SIEM delivery lacks TLS (item 5.2):** syslog to SIEM is documented on port 514 (UDP) via Juniper JSA DSM, but no TLS-encrypted CEF/Syslog channel is specified [4], [6].
 - **Management/audit evidence gaps (items 5.1, 5.3):** no public documentation of RBAC role separation (admin/policy/auditor) or of NIST SP 800-82 / IEC 62443 / ISO 27001 report templates was found for this product.
-- **CDS-class capabilities not offered (items 1.1, 2.1):** no protocol break or content disarm & reconstruction — by design for this firewall class, so buyers requiring guard/CDS functions must look elsewhere.
+- **CDS-class capabilities not documented (items 1.1, 2.1):** no protocol break or content disarm & reconstruction is documented for this firewall-class product; buyers requiring guard/CDS functions should verify with the vendor or look elsewhere.
 
 ## 6. Evidence Quality Notes
 
 Evidence was triangulated across 13 staged sources: 8 vendor pages/whitepapers, 3 independent sources (the Gongkong industrial-automation portal listing [3], the Zhongtao Tianyou reseller spec sheet [5], and Juniper JSA integration documentation [6]) and 2 registries (the SAMR national-standard platform [7] and the CNITSEC product-evaluation page [9]). Items 1.3 and 3.2 reached high confidence with independent corroboration; 4.1 and 4.2 rest on a single reseller-listed spec figure that almost certainly mirrors the vendor datasheet, so confidence is capped at medium and the figure is flagged as not independently lab-measured. Items 1.4, 2.3, 2.6, 4.3, 4.4, 5.2 and 5.4 rely on vendor documentation (some citing Frost & Sullivan reports) plus at most one independent source, hence medium confidence.
 
-Chinese-language sources were checked against staged raw text with exact whitespace-normalized substring matching; because the grounding checker's normalizer drops non-ASCII characters, quotes that are purely Chinese verify only via the ASCII tokens they contain (model numbers, figures such as 1Gbps/40us) — a limitation of the tool, not of quote provenance. No source contradictions were found; the main judgment calls were (a) treating the product as firewall-class (not_applicable on CDS-specific items) based on vendor and third-party category statements, and (b) marking 4.3/4.4 partial because HA is documented but the numeric failover and fail-close-under-DoS behaviors are not.
+Chinese-language sources were checked against staged raw text with exact whitespace-normalized substring matching; because the grounding checker's normalizer drops non-ASCII characters, quotes that are purely Chinese verify only via the ASCII tokens they contain (model numbers, figures such as 1Gbps/40us) — a limitation of the tool, not of quote provenance. No source contradictions were found; the main judgment calls were (a) treating the product as firewall-class (marking CDS-specific items unknown) based on vendor and third-party category statements, since product class alone does not establish a specific excluding fact, and (b) marking 4.3/4.4 partial because HA is documented but the numeric failover and fail-close-under-DoS behaviors are not.
 
 ---
 

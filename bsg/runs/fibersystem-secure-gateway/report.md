@@ -5,14 +5,14 @@
 **Assessment mode:** standard
 **Checklist version:** 1
 **Assessed at:** 2026-08-11T09:00:00Z
-**Total evidence items collected:** 60
+**Total evidence items collected:** 61
 **Total distinct sources:** 13
 
 ---
 
 ## 1. Overview
 
-Fibersystem AB (Stockholm, Sweden) is a TEMPEST/RÖS equipment manufacturer with more than 40 years of fiber-optical cyber security work and certified TEMPEST supplier status to NATO [8][11]. Its "Secure Gateway" listing on the provider matrix matches no product of that exact name on the vendor site; it maps to the vendor's secure hardware gateway family, chiefly the Bidirectional Data Diode 1Gbit (part nos. 60-00-7563/7564, AC or DC power) optionally paired with the Data Diode Middleware (DDMW) 1.0 [1][3]. The product is a hardware-based, fully transparent data diode: it forwards Syslog, NTP broadcast, SNMP traps and UDP traffic in both directions over fiber or copper, with galvanic isolation between completely separated send and receive nodes and no software on the data path [1][2]. Deployment shapes are 1 HU 19-inch rack units with redundant hot-swappable power supplies, card modules for rack integration, and DDMW software nodes for controlled file, stream, mail and UDP transfer between domains [2][3][6]. It is neither an application-layer protocol-break CDS nor a stateful NGFW; the content-inspection checklist items are not applicable to its documented transparent-hardware category [1][6].
+Fibersystem AB (Stockholm, Sweden) is a TEMPEST/RÖS equipment manufacturer with more than 40 years of fiber-optical cyber security work and certified TEMPEST supplier status to NATO [8][11]. Its "Secure Gateway" listing on the provider matrix matches no product of that exact name on the vendor site; it maps to the vendor's secure hardware gateway family, chiefly the Bidirectional Data Diode 1Gbit (part nos. 60-00-7563/7564, AC or DC power) optionally paired with the Data Diode Middleware (DDMW) 1.0 [1][3]. The product is a hardware-based, fully transparent data diode: it forwards Syslog, NTP broadcast, SNMP traps and UDP traffic in both directions over fiber or copper, with galvanic isolation between completely separated send and receive nodes and no software on the data path [1][2]. Deployment shapes are 1 HU 19-inch rack units with redundant hot-swappable power supplies, card modules for rack integration, and DDMW software nodes for controlled file, stream, mail and UDP transfer between domains [2][3][6]. It is neither an application-layer protocol-break CDS nor a stateful NGFW; the content-inspection checklist items are marked not supported because the documented transparent-hardware category performs no content inspection [1][6].
 
 ---
 
@@ -23,24 +23,12 @@ Fibersystem AB (Stockholm, Sweden) is a TEMPEST/RÖS equipment manufacturer with
 | Verdict          | Count | Confidence: high | medium | low |
 |------------------|-------|------------------|--------|-----|
 | supported        | 2     | 0                | 2      | 0   |
-| partial          | 9     | 0                | 9      | 0   |
-| not_supported    | 0     | 0                | 0      | 0   |
+| partial          | 10    | 0                | 10     | 0   |
+| not_supported    | 9     | 0                | 9      | 0   |
 | unknown          | 3     | 0                | 0      | 3   |
-| not_applicable   | 10    | 0                | 10     | 0   |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 12 items backed by ≥ 2 source_types; 14 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Vendor documents the Secure Gateway family as a hardware-based bidirectional data diode with galvanic separation that forwards data transparently between networks; the checklist's application-layer protocol break with TCP/IP session termination is not part of this product category.
-- **1.4:** Vendor documents the diode data path as hardware-based with no extra software or OS, so the hardened-OS item does not apply to the diode; DDMW middleware nodes run on customer-provided common operating systems (Windows/Linux) with no hardening documented.
-- **1.5:** Vendor documents the gateway as transparent hardware with no content processing on the data path; internal data stamping/signing of clean data before session initiation is not part of this product category.
-- **2.1:** Vendor documents the gateway as fully transparent for all data types with a hardware-only design; content disarm and reconstruction of Office/PDF/image/CAD files is not part of this product category.
-- **2.2:** Vendor documents transparent forwarding with no content inspection; removal of macros/scripts (VBA, JavaScript, DDE links, embedded objects) is not part of this product category.
-- **2.3:** Vendor documents transparent forwarding without additional software; multi-engine antivirus scanning of payloads is not part of this product category.
-- **2.4:** The diode performs no payload inspection by documented design; XML/JSON/FIXM/AIXM schema validation is not part of this product category.
-- **2.5:** The diode performs no content-based filtering; filtering on security labels attached to files is not part of this product category.
-- **2.6:** The diode performs no content inspection, so keyword/regex data-loss-prevention rules are not part of this product category; DDMW middleware provides hashing-based transfer verification rather than a DLP rule engine.
-- **2.7:** The diode performs no image content analysis; steganography detection/removal is not part of this product category.
+**Evidence quality:** 14 items backed by ≥ 2 source_types; 14 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -50,23 +38,23 @@ Fibersystem AB (Stockholm, Sweden) is a TEMPEST/RÖS equipment manufacturer with
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Vendor documents the Secure Gateway family as a hardware-based bidirectional data diode with galvanic separation that forwards data transparently between networks; the checklist's application-layer protocol break with TCP/IP session termination is not part of this product category. [1], [2], [6] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Vendor documents the bidirectional diode as a fully hardware-based, galvanically separated device requiring no extra software on its core data path (additional software is needed even for basic mail/FTP/SNMP relay); this is passive physical-layer forwarding, not an active TCP/IP session-terminating protocol-break architecture. [1], [2] |
 | 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Supported | medium | — | Vendor documents completely isolated send and receive nodes connected by fiber-optic links with galvanic separation between the two networks, corroborated by distributor material; isolation is physical (separate nodes over fiber) rather than dual processing boards over FPGA/shared memory. [1], [2], [12] |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Partial | medium | — | Vendor documents hardware-enforced direction control that eliminates the risk of data flowing in a false direction, with transparent forwarding of all data types; packet- or protocol-level whitelist filtering is not documented for the bidirectional model. [1], [5], [12] |
-| 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | N/A | medium | — | Vendor documents the diode data path as hardware-based with no extra software or OS, so the hardened-OS item does not apply to the diode; DDMW middleware nodes run on customer-provided common operating systems (Windows/Linux) with no hardening documented. [1], [3] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | Vendor documents the gateway as transparent hardware with no content processing on the data path; internal data stamping/signing of clean data before session initiation is not part of this product category. [1], [6] |
+| 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | The diode data path itself is hardware-based with no extra software or OS, so it has no OS-level attack surface to harden; however, DDMW middleware nodes are delivered as software packages for customer-provided common operating systems (Windows/Linux), and no hardening measures (SELinux, microkernel, etc.) are documented for that OS. [1], [3] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Not Supported | medium | — | Vendor documents the diode's core data path as hardware-only with no extra software, so there is no internal control core capable of cryptographically signing 'clean' data or gating a new session before initiation — no session-terminating funnel or signing software exists on the documented data path. [1], [2] |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | Vendor documents the gateway as fully transparent for all data types with a hardware-only design; content disarm and reconstruction of Office/PDF/image/CAD files is not part of this product category. [1], [6] |
-| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | N/A | medium | — | Vendor documents transparent forwarding with no content inspection; removal of macros/scripts (VBA, JavaScript, DDE links, embedded objects) is not part of this product category. [1], [2] |
-| 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | N/A | medium | — | Vendor documents transparent forwarding without additional software; multi-engine antivirus scanning of payloads is not part of this product category. [5], [6] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | The diode performs no payload inspection by documented design; XML/JSON/FIXM/AIXM schema validation is not part of this product category. [1], [6] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | The diode performs no content-based filtering; filtering on security labels attached to files is not part of this product category. [1], [6] |
-| 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | N/A | medium | — | The diode performs no content inspection, so keyword/regex data-loss-prevention rules are not part of this product category; DDMW middleware provides hashing-based transfer verification rather than a DLP rule engine. [1], [3], [6] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | The diode performs no image content analysis; steganography detection/removal is not part of this product category. [1], [6] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Not Supported | medium | — | Vendor documents the diode's core data path as fully hardware-based, needing no extra software; content disarm and reconstruction requires software-based file parsing and rebuilding, which is documented as absent from the hardware path and not listed among DDMW's software-add-on functions (queue mgmt, logging, mail, FTP, SNMP, SDK). [1], [2] |
+| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Not Supported | medium | — | Vendor documents the diode's core path as hardware-only, no extra software; macro/script removal requires software-based document parsing, which is documented as absent from the hardware path and not among DDMW's listed software functions. [1], [2] |
+| 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Not Supported | medium | — | The diode forwards all data types transparently with a hardware-only path and no additional software; multi-engine antivirus scanning of payloads would require software-based content inspection that the documented data path does not perform. [5], [6] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Not Supported | medium | — | The diode performs no payload inspection - it forwards all data types transparently with a hardware-only path; W3C-schema validation of XML/JSON/FIXM/AIXM structures requires content parsing the documented data path does not perform. [1], [6] |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Not Supported | medium | — | The diode performs no content-based filtering - it forwards all data types transparently with a hardware-only path; security-label-based information flow control on files is not present in the documented data path. [1], [6] |
+| 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Not Supported | medium | — | The diode performs no content inspection, and DDMW middleware documents only hashing-based transfer verification; keyword/regex DLP rules require content inspection the documented data path does not perform. [1], [3], [6] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Not Supported | medium | — | The diode forwards all data types transparently with no image-content analysis; steganography detection/removal requires content inspection the documented data path does not perform. [1], [6] |
 
 ### Category 3 — Protocol Support
 
@@ -107,7 +95,7 @@ Fibersystem AB (Stockholm, Sweden) is a TEMPEST/RÖS equipment manufacturer with
 
 ## 5. Notable Gaps / Risks
 
-- **No content inspection (items 2.1-2.7):** the device is transparent to all data types, so CDR, macro/script removal, multi-AV, schema validation, IFC, DLP and anti-steganography are outside its category; buyers needing payload sanitization must pair the diode with an external content-inspection solution [1][6].
+- **No content inspection (items 2.1-2.7):** the device is transparent to all data types, so CDR, macro/script removal, multi-AV, schema validation, IFC, DLP and anti-steganography are scored not supported; buyers needing payload sanitization must pair the diode with an external content-inspection solution [1][6].
 - **No application-layer protocol break (item 1.1):** TCP/IP sessions are not terminated or inspected, only direction is enforced, so protocol-level filtering is absent [1][2].
 - **OT/ICS protocol proxies unverified (item 3.2):** OPC UA, Modbus TCP, IEC 60870-5-104, DNP3 and MQTT proxy support is not documented; only transparent passthrough and SCADA integration interfaces are claimed [3].
 - **No SIEM-grade log export (item 5.2):** only Syslog and SNMP traps are documented; CEF format and TLS-encrypted export to a SIEM are not specified [1][3].
@@ -115,7 +103,7 @@ Fibersystem AB (Stockholm, Sweden) is a TEMPEST/RÖS equipment manufacturer with
 
 ## 6. Evidence Quality Notes
 
-All 24 items were assessed from 60 evidence entries across 13 sources; 12 items are backed by at least two source types, and 7 items (1.2, 1.3, 3.2, 4.1, 4.3, 5.1, 5.4) triangulate vendor documentation with the German distributor Systerra's pages. Every non-unknown verdict rests on vendor documentation (product pages, datasheets, blog) or distributor mirrors of it: no independent lab test, analyst report, or certification-registry entry could be located because all general search engines returned bot blocks from this environment, so confidence is capped at medium throughout. The 10 not_applicable verdicts therefore depend entirely on the vendor's own transparency/hardware-only design statements, which the grounding check verified verbatim against staged copies.
+All 24 items were assessed from 60 evidence entries across 13 sources; 12 items are backed by at least two source types, and 7 items (1.2, 1.3, 3.2, 4.1, 4.3, 5.1, 5.4) triangulate vendor documentation with the German distributor Systerra's pages. Every non-unknown verdict rests on vendor documentation (product pages, datasheets, blog) or distributor mirrors of it: no independent lab test, analyst report, or certification-registry entry could be located because all general search engines returned bot blocks from this environment, so confidence is capped at medium throughout. The 9 not_supported verdicts (items 1.1, 1.5, 2.1-2.7) therefore depend entirely on the vendor's own transparency/hardware-only design statements, which the grounding check verified verbatim against staged copies.
 
 No source contradictions were found; the only wording divergence is the distributor's DDMW page listing transfer types "messages and streams and UDP" versus the vendor datasheet's "messages, streams and UDP", which was treated as consistent. The three unknown items (3.3 database proxy, 4.2 latency, 5.3 compliance reports) reflect absence of public documentation rather than evaluated absence of capability. Numeric-threshold handling followed the checklist contract: 4.1 uses the published 1 Gbps line speed (1,000 Mbps); 4.2 and 4.3 received no fabricated numbers, with 4.3 rated partial on redundant-power evidence alone.
 

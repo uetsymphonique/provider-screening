@@ -25,16 +25,13 @@ Check Point Quantum / CloudGuard is the vendor's network-centric route to micros
 | supported        | 8     | 0                | 8      | 0   |
 | partial          | 15    | 1                | 14     | 0   |
 | not_supported    | 0     | 0                | 0      | 0   |
-| unknown          | 6     | 0                | 0      | 6   |
-| not_applicable   | 4     | 0                | 4      | 0   |
+| unknown          | 9     | 0                | 0      | 9   |
+| not_applicable   | 1     | 0                | 1      | 0   |
 
-**Evidence quality:** 14 items backed by ≥ 2 source_types; 17 items backed by vendor_doc only (confidence capped at medium per validator rule).
+**Evidence quality:** 12 items backed by ≥ 2 source_types; 16 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 **Not-applicable items:**
-- **4.1:** CloudGuard's segmentation enforcement is agentless (network/cloud-native gateways, agentless workload posture), so per-agent CPU footprint does not apply; container agents exist for Kubernetes but no CPU figures are published.
-- **4.2:** CloudGuard's segmentation enforcement is agentless (network/cloud-native gateways, agentless workload posture), so per-agent RAM footprint does not apply; container agents exist for Kubernetes but no memory figures are published.
 - **4.4:** No in-path host agent exists for CloudGuard segmentation (agentless intercept/gateway enforcement), so an agent-crash fail-open/fail-closed question does not apply; no agent fail-safe behavior is documented.
-- **4.5:** CloudGuard segmentation does not install host agents (agentless enforcement), so reboot-free install/update requirements do not apply; Kubernetes agents are deployed via Helm chart without a documented reboot requirement.
 
 ---
 
@@ -74,11 +71,11 @@ Check Point Quantum / CloudGuard is the vendor's network-centric route to micros
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | N/A | medium | — | CloudGuard's segmentation enforcement is agentless (network/cloud-native gateways, agentless workload posture), so per-agent CPU footprint does not apply; container agents exist for Kubernetes but no CPU figures are published. [10], [32] |
-| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | N/A | medium | — | CloudGuard's segmentation enforcement is agentless (network/cloud-native gateways, agentless workload posture), so per-agent RAM footprint does not apply; container agents exist for Kubernetes but no memory figures are published. [10], [32] |
+| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | Unknown | low | — | no evidence found (CloudGuard deploys container agents for Kubernetes workloads (confirmed elsewhere in this assessment, e.g. items 3.1/6.4), so a CPU-overhead referent exists, but no CPU percentage figure for that agent is published in staged sources.) |
+| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | Unknown | low | — | no evidence found (CloudGuard deploys container agents for Kubernetes workloads (confirmed elsewhere in this assessment), so a RAM-footprint referent exists, but no memory figure for that agent is published in staged sources.) |
 | 4.3 | Không làm tăng độ trễ mạng (< 0.1ms network latency). | Partial | medium | n/a (qualitative) | Vendor cites sub-3μs accelerated firewalling latency on Quantum hardware gateways, below the 0.1ms threshold, but the figure is qualitative/marketing and no latency is published for cloud gateways or container agents. [6] |
 | 4.4 | Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng giữ nguyên không bị gián đoạn. | N/A | medium | — | No in-path host agent exists for CloudGuard segmentation (agentless intercept/gateway enforcement), so an agent-crash fail-open/fail-closed question does not apply; no agent fail-safe behavior is documented. [19], [32] |
-| 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | N/A | medium | — | CloudGuard segmentation does not install host agents (agentless enforcement), so reboot-free install/update requirements do not apply; Kubernetes agents are deployed via Helm chart without a documented reboot requirement. [19], [32] |
+| 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | Unknown | low | — | no evidence found (Kubernetes agents are deployed via Helm chart, so an install/update referent exists, but no explicit reboot-or-not statement for that agent is documented in staged sources.) |
 
 ### Category 5 — Integration & Automation
 

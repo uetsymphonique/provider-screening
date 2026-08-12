@@ -5,7 +5,7 @@
 **Assessment mode:** standard
 **Checklist version:** 1
 **Assessed at:** 2026-08-11T17:00:00Z
-**Total evidence items collected:** 50
+**Total evidence items collected:** 51
 **Total distinct sources:** 18
 
 ---
@@ -24,20 +24,11 @@ The Endian 4i is a family of ruggedized industrial security gateways — the Edg
 |------------------|-------|------------------|--------|-----|
 | supported        | 3     | 0                | 3      | 0   |
 | partial          | 6     | 0                | 6      | 0   |
-| not_supported    | 3     | 0                | 3      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 5     | 0                | 5      | 0   |
+| unknown          | 10    | 0                | 0      | 10  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 8 items backed by ≥ 2 source_types; 19 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Endian positions the 4i as an industrial security gateway combining firewall, VPN, micro-segmentation and IPS functionality, and the reference manual documents an iptables-based stateful firewall; no TCP/IP session-terminating protocol-break architecture is described.
-- **1.2:** The 4i Edge XL is documented as a ruggedized single-appliance gateway (ARM SoC, 2 GB RAM, 16 GB storage, 5x GbE ports) rather than a dual-board design separated via FPGA or shared memory; the hardware-isolation item is not applicable to this product category.
-- **1.5:** The product is documented as a firewall/IDS-IPS security gateway for OT networks; no internal control core that digitally stamps clean data before re-initiating sessions is described, so the item is not applicable to this product category.
-- **2.1:** The 4i line is documented as a firewall/IPS gateway with deep packet inspection and application control; no content disarm and reconstruction (CDR) engine that disassembles and rebuilds Office/PDF/image/CAD files is described, so the item is not applicable to this product category.
-- **2.4:** The 4i is documented as a firewall/IPS gateway for OT networks; schema validation of XML/JSON/FIXM/AIXM documents is not part of the documented product category.
-- **2.5:** The 4i is documented as a firewall/IPS gateway for OT networks; no security-label-based information flow control for transferred files is described, so the item is not applicable to this product category.
-- **2.7:** The 4i is documented as a firewall/IPS gateway for OT networks; no anti-steganography engine for hidden data in image files is described, so the item is not applicable to this product category.
+**Evidence quality:** 1 items backed by ≥ 2 source_types; 14 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The Endian 4i is a family of ruggedized industrial security gateways — the Edg
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Endian positions the 4i as an industrial security gateway combining firewall, VPN, micro-segmentation and IPS functionality, and the reference manual documents an iptables-based stateful firewall; no TCP/IP session-terminating protocol-break architecture is described. [1], [2], [6] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The 4i Edge XL is documented as a ruggedized single-appliance gateway (ARM SoC, 2 GB RAM, 16 GB storage, 5x GbE ports) rather than a dual-board design separated via FPGA or shared memory; the hardware-isolation item is not applicable to this product category. [2], [12] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | The reference manual documents an iptables-based firewall with dedicated port-forwarding, source-NAT and 'incoming routed traffic' modules, i.e. an IP-routed/NAT datapath rather than a TCP/IP session-terminating protocol-break architecture. [6] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (The 4i Edge XL hardware spec (ARM SoC, 2 GB RAM, 16 GB storage, 5x GbE ports) does not describe internal board layout; no dual processing-board FPGA/shared-memory isolation design is documented.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The firewall manual documents an implicit DROP rule that blocks every packet not matched by a rule, with everything else forbidden by default except system rules; a pre-configured whitelist of common outbound services (HTTP/HTTPS/FTP/DNS/ICMP) exists for the GREEN zone. [5], [6] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Supported | medium | — | Endian describes EndianOS as a hardened Linux-based operating system that powers the 4i gateways, running the Linux 6.6 LTS kernel; hardening specifics such as SELinux or a microkernel are not documented. [5], [12], [16] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | The product is documented as a firewall/IDS-IPS security gateway for OT networks; no internal control core that digitally stamps clean data before re-initiating sessions is described, so the item is not applicable to this product category. [2], [15] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Not Supported | medium | — | The documented datapath is an iptables-based routed/NAT firewall (port forwarding, source NAT, incoming routed traffic), not a session-terminating protocol-break funnel, so there is no internal control core that could gate re-initiation of a new session on a data-stamp. [6] |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | The 4i line is documented as a firewall/IPS gateway with deep packet inspection and application control; no content disarm and reconstruction (CDR) engine that disassembles and rebuilds Office/PDF/image/CAD files is described, so the item is not applicable to this product category. [1], [13], [15] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm and reconstruction (CDR) engine that disassembles and rebuilds Office/PDF/image/CAD files is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No vendor documentation found describing macro/VBA/script removal from transferred files.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Not Supported | medium | — | The vendor's feature matrix marks antivirus filtering and the Bitdefender anti-malware engine as EndianOS UTM-only with an empty EndianOS 4i column; no antivirus engine at all is documented for the 4i, so the two-plus-engine multi-AV requirement is not met. [5] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | The 4i is documented as a firewall/IPS gateway for OT networks; schema validation of XML/JSON/FIXM/AIXM documents is not part of the documented product category. [13], [15] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | The 4i is documented as a firewall/IPS gateway for OT networks; no security-label-based information flow control for transferred files is described, so the item is not applicable to this product category. [2], [15] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema validation capability is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control for transferred files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No vendor documentation found describing data-loss-prevention (keyword/regex) filtering of transferred content.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | The 4i is documented as a firewall/IPS gateway for OT networks; no anti-steganography engine for hidden data in image files is described, so the item is not applicable to this product category. [2], [15] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography engine for hidden data in image files is documented.) |
 
 ### Category 3 — Protocol Support
 

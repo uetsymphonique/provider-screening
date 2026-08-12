@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-Sophos Firewall running on XGS Series appliances is a standard enterprise next-generation firewall (NGFW) that the vendor presents as the center of a consolidated network security platform; the product family also includes SD-RED (Remote Ethernet Device) hardware that connects branch offices to the firewall over secure encrypted tunnels [1][2][5]. Sophos positions the platform as a zone-based stateful firewall with deep packet inspection, TLS 1.3 inspection, IPS, web and application control, VPN, and SD-WAN, deployable as hardware appliances, virtual machines, or cloud instances [2]. It is not a cross-domain solution or protocol-break guard: no session-termination architecture, content disarm and reconstruction, dual-board hardware isolation, or security-label flow control is described in the reviewed material [1][2][19]. The firewall is managed locally or from Sophos Central, supports HA in active-passive and active-active modes [7], and carries FIPS 140-3 (Level 1) and Common Criteria EAL4 certifications [9][10][11]. This assessment therefore treats the product as an enterprise/edge NGFW and marks CDS-specific checklist items not applicable on the documented product category.
+Sophos Firewall running on XGS Series appliances is a standard enterprise next-generation firewall (NGFW) that the vendor presents as the center of a consolidated network security platform; the product family also includes SD-RED (Remote Ethernet Device) hardware that connects branch offices to the firewall over secure encrypted tunnels [1][2][5]. Sophos positions the platform as a zone-based stateful firewall with deep packet inspection, TLS 1.3 inspection, IPS, web and application control, VPN, and SD-WAN, deployable as hardware appliances, virtual machines, or cloud instances [2]. It is not a cross-domain solution or protocol-break guard: RED tunnels are documented as making remote sites function as part of the local network, and zone-based firewall rules control traffic flow between zones — a bridging/IP-forwarding architecture that directly contradicts a protocol-break requirement (item 1.1, scored `not_supported`). Content disarm and reconstruction, dual-board hardware isolation, and security-label flow control are simply undocumented one way or the other in the reviewed material and are scored `unknown` rather than exempted [1][2][19]. The firewall is managed locally or from Sophos Central, supports HA in active-passive and active-active modes [7], and carries FIPS 140-3 (Level 1) and Common Criteria EAL4 certifications [9][10][11].
 
 ---
 
@@ -24,20 +24,11 @@ Sophos Firewall running on XGS Series appliances is a standard enterprise next-g
 |------------------|-------|------------------|--------|-----|
 | supported        | 6     | 1                | 5      | 0   |
 | partial          | 5     | 0                | 5      | 0   |
-| not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 5     | 0                | 0      | 5   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 2     | 0                | 2      | 0   |
+| unknown          | 11    | 0                | 0      | 11  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 13 items backed by ≥ 2 source_types; 16 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Sophos documents the XGS Series as next-generation firewall appliances with a zone-based stateful firewall, and SD-RED as remote Ethernet devices that build secure encrypted tunnels to the firewall; no protocol-break or TCP/IP session-termination guard architecture is described.
-- **1.2:** The XGS Series is documented as single appliances built around a high-speed CPU plus a dedicated Xstream Flow Processor for hardware acceleration; no dual processing-board or FPGA/shared-memory isolation design is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is documented; the product is a stateful firewall/VPN platform rather than a guard architecture.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; Sophos' file analysis executes files in a secure cloud-based sandbox to observe behavior, which is malware detonation rather than CDR.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall rather than a guard with a content-validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is a firewall rather than a classified-data guard.
-- **2.7:** No anti-steganography detection or removal capability for image files is documented; the product is a firewall rather than a CDS guard.
+**Evidence quality:** 7 items backed by ≥ 2 source_types; 10 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ Sophos Firewall running on XGS Series appliances is a standard enterprise next-g
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Sophos documents the XGS Series as next-generation firewall appliances with a zone-based stateful firewall, and SD-RED as remote Ethernet devices that build secure encrypted tunnels to the firewall; no protocol-break or TCP/IP session-termination guard architecture is described. [1], [2], [5], [19] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The XGS Series is documented as single appliances built around a high-speed CPU plus a dedicated Xstream Flow Processor for hardware acceleration; no dual processing-board or FPGA/shared-memory isolation design is described. [1], [2] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Sophos documents RED interfaces as building encrypted tunnels that let remote sites function as part of the local network, with zone-based firewall rules controlling traffic flow; this bridging/IP-forwarding architecture logically excludes a protocol-break design that terminates every session with no IP routing. [5], [19] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (The XGS Series is documented as a single appliance with a CPU plus a hardware-acceleration flow processor, but no dual-board FPGA/shared-memory security-isolation architecture is described one way or the other.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | A fixed 'Drop all' firewall rule (ID #0) at the bottom of the rule table drops traffic matching no firewall rule, and best-practice guidance directs admins to avoid ANY-to-ANY rules and only allow authenticated users to reach the internet. The NSS Labs group test coverage reports the firewall passing all firewall policy and application control tests. [13], [14], [17], [19] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | The datasheet documents hardening across kernel and user portals with containerization and isolation of trust boundaries, and the admin guide describes a hardened, containerized VPN portal; no microkernel or SELinux-strict-mode claim is made. [2], [17] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is documented; the product is a stateful firewall/VPN platform rather than a guard architecture. [1], [2], [19] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic data-stamping/signing control of sanitized content prior to new-session initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; Sophos' file analysis executes files in a secure cloud-based sandbox to observe behavior, which is malware detonation rather than CDR. [2], [19] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (Dynamic file analysis is documented as cloud sandbox detonation to observe file behavior, which is a different technique from content-disarm-and-reconstruction; no CDR capability for Office/PDF/image/CAD formats is documented either way.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No macro/script removal or embedded-object sanitization of files is documented in the reviewed sources.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Supported | medium | — | The admin guide states the firewall offers scanning by two antivirus engines (Sophos and Avira) and that dual-antivirus SMTP policies run the primary engine then the secondary engine; the datasheet notes the entry-level XGS 88 lacks dual AV scanning, implying other models support it. [2], [16] |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall rather than a guard with a content-validation engine. [2], [19] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is a firewall rather than a classified-data guard. [2], [19] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No W3C-schema structural validation of XML/JSON/FIXM/AIXM documents is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control / file filtering is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Partial | medium | — | Policy-based DLP is documented in the Email Protection module - it can automatically trigger encryption or block/notify based on sensitive data in emails leaving the organization; no general web-traffic DLP with custom keyword/ID-number/regex patterns is documented. [2] |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection or removal capability for image files is documented; the product is a firewall rather than a CDS guard. [2], [19] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection or removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 

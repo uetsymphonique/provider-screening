@@ -25,14 +25,12 @@ Faddom Hybrid Cloud Mapping is an agentless application dependency mapping platf
 | supported        | 9     | 3                | 6      | 0   |
 | partial          | 14    | 0                | 14     | 0   |
 | not_supported    | 2     | 0                | 2      | 0   |
-| unknown          | 4     | 0                | 0      | 4   |
-| not_applicable   | 4     | 0                | 4      | 0   |
+| unknown          | 6     | 0                | 0      | 6   |
+| not_applicable   | 2     | 0                | 2      | 0   |
 
-**Evidence quality:** 19 items backed by ≥ 2 source_types; 18 items backed by vendor_doc only (confidence capped at medium per validator rule).
+**Evidence quality:** 17 items backed by ≥ 2 source_types; 16 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 **Not-applicable items:**
-- **4.1:** No host agent runs on workloads in the standard architecture (agentless passive collection), so agent CPU usage does not apply; the optional Windows sFlow generator is described as lightweight (~1MB disk) without a published CPU percentage.
-- **4.2:** Agentless architecture means there is no workload agent RAM footprint to measure; the optional sFlow generator cites only ~1MB disk usage and no RAM figure is published.
 - **4.4:** There is no host enforcement agent whose failure could interrupt workload traffic; collection is passive and read-only, and enforcement executes on Nutanix Flow rather than on Faddom components.
 - **7.2:** Faddom has no enforcement agent: policies execute on Nutanix Flow (monitoring/enforce toggled in Prism Central), so there is no agent-controller enforcement dependency whose loss would interrupt traffic; collection is passive and read-only.
 
@@ -74,8 +72,8 @@ Faddom Hybrid Cloud Mapping is an agentless application dependency mapping platf
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | N/A | medium | — | No host agent runs on workloads in the standard architecture (agentless passive collection), so agent CPU usage does not apply; the optional Windows sFlow generator is described as lightweight (~1MB disk) without a published CPU percentage. [5], [7], [17] |
-| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | N/A | medium | — | Agentless architecture means there is no workload agent RAM footprint to measure; the optional sFlow generator cites only ~1MB disk usage and no RAM figure is published. [5], [17] |
+| 4.1 | Mức độ tiêu tốn tài nguyên Agent: CPU < 1%. | Unknown | low | — | no evidence found (The optional sFlow generator agent is confirmed to exist and to require no server restart on install (item 4.5), so a CPU-overhead referent exists, but no CPU usage figure is published — only its ~1MB disk footprint is documented.) |
+| 4.2 | Mức độ tiêu tốn tài nguyên Agent: RAM < 100MB. | Unknown | low | — | no evidence found (The optional sFlow generator agent is confirmed to exist (item 4.5), so a RAM-footprint referent exists, but no memory usage figure is published — only its ~1MB disk footprint is documented.) |
 | 4.3 | Không làm tăng độ trễ mạng (< 0.1ms network latency). | Partial | medium | n/a (qualitative) | Collection is passive and out-of-band, described as having 'no performance impact' or 'minimal performance overhead on the topology', but no measured latency figure is published, so the <0.1ms threshold is not demonstrated. [2], [7] |
 | 4.4 | Agent Fail-safe: Nếu Agent lỗi hoặc crash, giao tiếp mạng giữ nguyên không bị gián đoạn. | N/A | medium | — | There is no host enforcement agent whose failure could interrupt workload traffic; collection is passive and read-only, and enforcement executes on Nutanix Flow rather than on Faddom components. [5], [30] |
 | 4.5 | Cài đặt và cập nhật Agent không yêu cầu Reboot Server. | Supported | medium | — | The optional Faddom sFlow generator agent installer is documented as not requiring a server restart; configuration changes require only a Windows service restart. [17] |
@@ -93,7 +91,7 @@ Faddom Hybrid Cloud Mapping is an agentless application dependency mapping platf
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | The platform is explicitly read-only ('does not and cannot make any changes to your environment') and generates tier/category and IP/subnet-level rules for external enforcement points; process-level enforcement is ruled out by this documented architecture. [25], [30] |
+| 6.1 | Kiểm soát truy cập sâu tới cấp độ Tiến trình (Process-level enforcement). | Not Supported | medium | — | Faddom is explicitly read-only ('does not and cannot make any changes to your environment') and only generates IP/subnet and tier/category rule suggestions for external systems to apply; no evidence documents Faddom itself applying or pushing enforcement at any level, network or process. [25], [30] |
 | 6.2 | Tích hợp Threat Intelligence & Đánh lừa (Honeypot/Deception detection). | Partial | medium | — | Anomaly-based threat detection (Lighthouse) covers attack patterns including port scanning, data exfiltration, DoS and MITM, and external-traffic country blacklists are documented; no threat-intelligence feed integration or honeypot/deception capability is documented. [23], [24], [49] |
 | 6.3 | Báo cáo tuân thủ có sẵn theo chuẩn: PCI-DSS, NIST 800-207, ISO 27001, IEC 62443. | Partial | medium | — | Faddom is ISO/IEC 27001:2022 certified and documents compliance support for DORA, NIS2, HIPAA and SOC 2; PCI-DSS, NIST SP 800-207 and IEC 62443 report templates were not found in staged sources. [6], [8], [12] |
 | 6.4 | Mã hóa dữ liệu truyền giữa Agent và Controller (TLS 1.3 / Mutual Auth). | Partial | medium | — | Transmission channels are documented as encrypted (proxy-to-server encrypted connection, encrypted UDP event forwarding, HTTPS UI with a replaceable SSL certificate), but TLS 1.3 or mutual-authentication (mTLS) configuration for an agent-controller channel is not documented. [29], [34], [40], [43] |

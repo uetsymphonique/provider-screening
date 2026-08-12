@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-The Allen-Bradley Stratix 5900 Security Gateway is an industrial firewall/security gateway that Rockwell Automation sells as part of the Allen-Bradley Stratix networking portfolio, which is the Rockwell side of the Cisco-Rockwell Converged Plantwide Ethernet (CPwE) partnership [2]. Independent coverage places the Stratix 5900 in the Stratix security appliance family that Cisco documents as an Industrial Security Appliance based on Cisco ASA security software with FirePOWER Services, i.e. a stateful firewall/VPN/threat-detection platform rather than a protocol-break guard [1]; a third-party integration video titles the device a "cell zone firewall" [4]. ICS-CERT-based reporting confirms the unit runs Cisco IOS 15.6(3)M1, a Cisco router/firewall-class operating system [6]. Because the vendor's own product page and datasheet could not be retrieved from this environment (rockwellautomation.com and literature.rockwellautomation.com returned HTTP 403), capability verdicts are anchored to the reachable Cisco-partner, third-party, and certification-registry sources: guard-specific items are marked not applicable, while protocol, performance, and management details remain unknown pending vendor documentation.
+The Allen-Bradley Stratix 5900 Security Gateway is an industrial firewall/security gateway that Rockwell Automation sells as part of the Allen-Bradley Stratix networking portfolio, which is the Rockwell side of the Cisco-Rockwell Converged Plantwide Ethernet (CPwE) partnership [2]. Independent coverage places the Stratix 5900 in the Stratix security appliance family that Cisco documents as an Industrial Security Appliance based on Cisco ASA security software with FirePOWER Services, i.e. a stateful firewall/VPN/threat-detection platform rather than a protocol-break guard [1]; a third-party integration video titles the device a "cell zone firewall" [4]. ICS-CERT-based reporting confirms the unit runs Cisco IOS 15.6(3)M1, a Cisco router/firewall-class operating system [6]. Because the vendor's own product page and datasheet could not be retrieved from this environment (rockwellautomation.com and literature.rockwellautomation.com returned HTTP 403), capability verdicts are anchored to the reachable Cisco-partner, third-party, and certification-registry sources: those sources establish the product's firewall category but no specific architecture or content-processing fact, so guard-specific items (1.1, 1.2, 1.5, 2.1, 2.2, 2.4, 2.5, 2.7) as well as most protocol, performance, and management details remain unknown pending vendor documentation.
 
 ---
 
@@ -25,20 +25,10 @@ The Allen-Bradley Stratix 5900 Security Gateway is an industrial firewall/securi
 | supported        | 0     | 0                | 0      | 0   |
 | partial          | 2     | 0                | 1      | 1   |
 | not_supported    | 1     | 0                | 1      | 0   |
-| unknown          | 13    | 0                | 0      | 13  |
-| not_applicable   | 8     | 0                | 8      | 0   |
+| unknown          | 21    | 0                | 0      | 21  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 2 items backed by ≥ 2 source_types; 1 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Third-party and Cisco-partner sources characterize the Stratix 5900 as an industrial firewall: a third-party video titles it a 'cell zone firewall', ICS-CERT-based reporting lists it as a Cisco IOS 15.6(3)M1 device, and Cisco documents the Stratix security appliance family as ASA+FirePOWER-based. No protocol-break or session-termination architecture is documented or marketed for this product.
-- **1.2:** The same category evidence identifies the Stratix 5900 as a firewall-class Cisco IOS device; no dual processing-board/FPGA or shared-memory isolation architecture is documented for it.
-- **1.5:** The Stratix 5900 is a firewall-class device per the category sources; no internal data-stamping/session-re-initiation core of the kind found in guards is documented for it.
-- **2.1:** The product category is industrial firewall/security gateway (cell-zone firewall with Cisco ASA/FirePOWER-based security software), not a content-sanitizing CDS. No content disarm and reconstruction engine is documented for it.
-- **2.2:** Document-level macro/script removal (VBA, JavaScript, DDE, embedded objects) is a CDR content-sanitization capability that is not applicable to this firewall-class product per the category evidence.
-- **2.4:** XML/JSON/FIXM/AIXM schema validation is a CDS document-processing capability not applicable to this firewall-class product per the category evidence.
-- **2.5:** No security-label-based information flow control is documented for this firewall-class product; the category sources do not describe label-aware filtering.
-- **2.7:** Anti-steganography detection in image files is a CDS guard capability not applicable to this firewall-class product per the category evidence.
+**Evidence quality:** 0 items backed by ≥ 2 source_types; 1 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -48,23 +38,23 @@ The Allen-Bradley Stratix 5900 Security Gateway is an industrial firewall/securi
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Third-party and Cisco-partner sources characterize the Stratix 5900 as an industrial firewall: a third-party video titles it a 'cell zone firewall', ICS-CERT-based reporting lists it as a Cisco IOS 15.6(3)M1 device, and Cisco documents the Stratix security appliance family as ASA+FirePOWER-based. No protocol-break or session-termination architecture is documented or marketed for this product. [1], [4], [6] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The same category evidence identifies the Stratix 5900 as a firewall-class Cisco IOS device; no dual processing-board/FPGA or shared-memory isolation architecture is documented for it. [4], [6] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Unknown | low | — | no evidence found |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Partial | low | — | Cisco-partner documentation describes the Stratix security appliance family (ASA+FirePOWER-based) as providing access control and consistent policy enforcement across OT/IT infrastructure, which is the mechanism for default-deny filtering. An explicit whitelist-only/default-deny statement specific to the Stratix 5900 was not found in reachable sources. [1] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Partial | medium | — | ICS-CERT-based reporting documents that the Stratix 5900 runs Cisco IOS 15.6(3)M1, a purpose-built network operating system rather than a general-purpose OS. Microkernel or SELinux-strict-mode hardening of the OS is not documented in reachable sources. [6] |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | The Stratix 5900 is a firewall-class device per the category sources; no internal data-stamping/session-re-initiation core of the kind found in guards is documented for it. [4], [6] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | The product category is industrial firewall/security gateway (cell-zone firewall with Cisco ASA/FirePOWER-based security software), not a content-sanitizing CDS. No content disarm and reconstruction engine is documented for it. [1], [4], [6] |
-| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | N/A | medium | — | Document-level macro/script removal (VBA, JavaScript, DDE, embedded objects) is a CDR content-sanitization capability that is not applicable to this firewall-class product per the category evidence. [4], [6] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found |
+| 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No vendor documentation reachable to verify multi-AV integration.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | XML/JSON/FIXM/AIXM schema validation is a CDS document-processing capability not applicable to this firewall-class product per the category evidence. [4], [6] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control is documented for this firewall-class product; the category sources do not describe label-aware filtering. [4], [6] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No vendor documentation reachable to verify DLP.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | Anti-steganography detection in image files is a CDS guard capability not applicable to this firewall-class product per the category evidence. [4], [6] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found |
 
 ### Category 3 — Protocol Support
 

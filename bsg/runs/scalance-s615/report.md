@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-The SCALANCE S615 (order number 6GK5615-0AA00-2AA2) is a compact DIN-rail security module in Siemens' SIMATIC NET portfolio, marketed as a LAN router that protects automation networks "by means of VPN and firewall" [1]. Siemens positions the SCALANCE S family as industrial security appliances combining network segmentation, high-performance firewall and secure remote access [4], and describes the S615 specifically as optimized for compact deployments, machine-level protection and remote service connections [4]. Its documented security engine is a stateful inspection firewall with up to 128 IP rules per rule set [3][5], IPsec VPN for up to 20 connections (AES-256/3DES, PSK or X.509v3 certificates) [1], an OpenVPN client, NAT/NAPT, dynamic user-specific firewall rule sets, and VRRPv3 router redundancy [3][8]. It is therefore a ruggedized industrial firewall/VPN gateway, not a protocol-break cross-domain guard; the CDS-only checklist items (protocol break, hardware isolation, internal data stamping, CDR, schema validation, security labels, anti-steganography) are marked not applicable on the basis of this documented product category [1][4]. Documented deployment shapes include cell protection between plant subnets, remote-maintenance VPN access via SINEMA Remote Connect, and NAT-based integration of legacy machine networks [3][7].
+The SCALANCE S615 (order number 6GK5615-0AA00-2AA2) is a compact DIN-rail security module in Siemens' SIMATIC NET portfolio, marketed as a LAN router that protects automation networks "by means of VPN and firewall" [1]. Siemens positions the SCALANCE S family as industrial security appliances combining network segmentation, high-performance firewall and secure remote access [4], and describes the S615 specifically as optimized for compact deployments, machine-level protection and remote service connections [4]. Its documented security engine is a stateful inspection firewall with up to 128 IP rules per rule set [3][5], IPsec VPN for up to 20 connections (AES-256/3DES, PSK or X.509v3 certificates) [1], an OpenVPN client, NAT/NAPT, dynamic user-specific firewall rule sets, and VRRPv3 router redundancy [3][8]. It is therefore a ruggedized industrial firewall/VPN router, not a protocol-break cross-domain guard: its documented LAN-router/NAT/NAPT and stateful-inspection-firewall architecture is an IP-forwarding design that directly contradicts a protocol-break requirement (item 1.1, scored `not_supported`), while the remaining CDS-only checklist items (hardware isolation, internal data stamping, CDR, schema validation, security labels, anti-steganography) are simply undocumented one way or the other and are scored `unknown` rather than exempted [1][4]. Documented deployment shapes include cell protection between plant subnets, remote-maintenance VPN access via SINEMA Remote Connect, and NAT-based integration of legacy machine networks [3][7].
 
 ---
 
@@ -24,20 +24,11 @@ The SCALANCE S615 (order number 6GK5615-0AA00-2AA2) is a compact DIN-rail securi
 |------------------|-------|------------------|--------|-----|
 | supported        | 2     | 0                | 2      | 0   |
 | partial          | 3     | 0                | 3      | 0   |
-| not_supported    | 3     | 0                | 3      | 0   |
-| unknown          | 9     | 0                | 0      | 9   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 4     | 0                | 4      | 0   |
+| unknown          | 15    | 0                | 0      | 15  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 14 items backed by ≥ 2 source_types; 10 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Siemens positions the SCALANCE S615 as an industrial LAN router/security appliance that protects automation networks by means of VPN and firewall, and documents a stateful inspection firewall; no protocol-break (TCP/IP session termination) architecture is described.
-- **1.2:** The device is documented as a compact single security appliance/router (35 mm DIN-rail module) with no dual processing board or FPGA/shared-memory isolation design described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is marketed as a firewall/VPN LAN router for cell protection and remote access.
-- **2.1:** No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is a firewall/VPN router rather than a CDS guard with a CDR engine.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall/VPN router rather than a guard with a content validation engine.
-- **2.5:** No security-label-based information flow control on files is documented; the product is a firewall/VPN router rather than a classified-data guard.
-- **2.7:** No anti-steganography detection/removal capability for image files is documented; the product is a firewall/VPN router rather than a CDS guard.
+**Evidence quality:** 8 items backed by ≥ 2 source_types; 4 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The SCALANCE S615 (order number 6GK5615-0AA00-2AA2) is a compact DIN-rail securi
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Siemens positions the SCALANCE S615 as an industrial LAN router/security appliance that protects automation networks by means of VPN and firewall, and documents a stateful inspection firewall; no protocol-break (TCP/IP session termination) architecture is described. [1], [3], [4] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The device is documented as a compact single security appliance/router (35 mm DIN-rail module) with no dual processing board or FPGA/shared-memory isolation design described. [1], [3], [4] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Siemens documents the S615 as a LAN router performing NAT/NAPT address conversion with a stateful inspection firewall, an IP-forwarding architecture that logically excludes a protocol-break design terminating every session with no IP routing. [1], [3] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual-board FPGA or shared-memory hardware isolation architecture is documented; only generic router/appliance positioning is described.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Supported | medium | — | The stateful inspection firewall discards IP packets that do not match a firewall rule, i.e. default-deny for routed traffic, with whitelist rules for permitted protocols, sources and destinations. The manual notes the firewall has no effect on packets forwarded at layer 2 within a VLAN. [3], [5] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (Signed and encrypted firmware and encrypted administration access are documented, but no hardened-OS / microkernel / SELinux-strict-mode claim for the device OS was found.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is marketed as a firewall/VPN LAN router for cell protection and remote access. [1], [4] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Unknown | low | — | no evidence found (No internal cryptographic data-stamping/signing control of sanitized content prior to new-session initiation is documented.) |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm & reconstruction of Office/PDF/image/CAD files is documented; the product is a firewall/VPN router rather than a CDS guard with a CDR engine. [1], [3], [4] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No 100% content-disarm-and-reconstruction capability for Office/PDF/image/CAD formats is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No file-content inspection, macro/script removal or embedded-object sanitization is documented for this IP-layer firewall.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of payload is documented.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is a firewall/VPN router rather than a guard with a content validation engine. [1], [3], [4] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is a firewall/VPN router rather than a classified-data guard. [1], [3], [4] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No W3C-schema structural validation of XML/JSON/FIXM/AIXM documents is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control / file filtering is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No keyword/regex-based data-leakage detection on traffic content is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal capability for image files is documented; the product is a firewall/VPN router rather than a CDS guard. [1], [3], [4] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection or removal capability for image files is documented.) |
 
 ### Category 3 — Protocol Support
 

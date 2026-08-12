@@ -24,20 +24,11 @@ The EDR-810, EDR-G902 and EDR-G903 are Moxa's industrial secure routers: all-in-
 |------------------|-------|------------------|--------|-----|
 | supported        | 0     | 0                | 0      | 0   |
 | partial          | 6     | 0                | 6      | 0   |
-| not_supported    | 2     | 0                | 2      | 0   |
-| unknown          | 9     | 0                | 0      | 9   |
-| not_applicable   | 7     | 0                | 7      | 0   |
+| not_supported    | 4     | 0                | 4      | 0   |
+| unknown          | 14    | 0                | 0      | 14  |
+| not_applicable   | 0     | 0                | 0      | 0   |
 
-**Evidence quality:** 11 items backed by ≥ 2 source_types; 15 items backed by vendor_doc only (confidence capped at medium per validator rule).
-
-**Not-applicable items:**
-- **1.1:** Moxa positions the EDR-810, EDR-G902 and EDR-G903 as all-in-one industrial firewall/NAT/VPN secure routers for Ethernet networks; no TCP/IP session-termination protocol-break architecture is described.
-- **1.2:** The devices are documented as industrial secure routers with firewall/NAT/VPN functionality in one unit; no dual processing board or FPGA/shared-memory isolation design is described.
-- **1.5:** No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is documented as a firewall/VPN router, not a guard.
-- **2.1:** No content disarm and reconstruction (CDR) of Office/PDF/image/CAD files is documented; the product is documented as a firewall/VPN router.
-- **2.4:** No XML/JSON/FIXM/AIXM schema validation is documented; the product is documented as a firewall/VPN router rather than a data-sanitizing guard.
-- **2.5:** No security-label-based information flow control on files is documented; the product is documented as a firewall/VPN router.
-- **2.7:** No anti-steganography detection/removal for image files is documented; the product is documented as a firewall/VPN router.
+**Evidence quality:** 6 items backed by ≥ 2 source_types; 10 items backed by vendor_doc only (confidence capped at medium per validator rule).
 
 ---
 
@@ -47,23 +38,23 @@ The EDR-810, EDR-G902 and EDR-G903 are Moxa's industrial secure routers: all-in-
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | N/A | medium | — | Moxa positions the EDR-810, EDR-G902 and EDR-G903 as all-in-one industrial firewall/NAT/VPN secure routers for Ethernet networks; no TCP/IP session-termination protocol-break architecture is described. [1], [2] |
-| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | N/A | medium | — | The devices are documented as industrial secure routers with firewall/NAT/VPN functionality in one unit; no dual processing board or FPGA/shared-memory isolation design is described. [1], [2], [3] |
+| 1.1 | Kiến trúc Tách biệt Phiên (Protocol Break): Chấm dứt phiên TCP/IP tại phễu ranh giới, ngắt hoàn toàn IP routing. | Not Supported | medium | — | Vendor documentation states the device is a Gigabit all-in-one Firewall/VPN/Router that connects Ethernet-enabled devices with network IP security, i.e. it performs IP routing rather than terminating sessions at a protocol-break boundary. [1], [2] |
+| 1.2 | Cách ly Phần cứng (Hardware Isolation): Thiết kế 2 bo mạch xử lý tách biệt kết nối qua FPGA hoặc Shared Memory cách ly. | Unknown | low | — | no evidence found (No dual processing-board or FPGA/shared-memory hardware isolation design is documented; vendor material describes only the integrated router product, not its internal board architecture.) |
 | 1.3 | Chế độ Default-Deny: Tự động chặn tất cả gói tin/giao thức không nằm trong danh mục White-list. | Partial | medium | — | A stateful inspection firewall with ordered whitelist/blacklist policies and Accept/Drop actions is documented; a global default-deny for traffic not matching any policy is not explicitly stated. [1], [2] |
 | 1.4 | Bảo vệ chống Lỗ hổng OS: Hệ điều hành gia cố siêu cấp (Hardened OS / Microkernel / SELinux Strict Mode). | Unknown | low | — | no evidence found (Vendor documentation does not describe a hardened OS, microkernel, or SELinux strict mode; NVD and Cisco Talos record past web-server command-injection (CVE-2017-12120) and DoS (CVE-2023-4452) vulnerabilities that were fixed in later firmware.) |
-| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | N/A | medium | — | No internal cryptographic stamping of cleaned data before session re-initiation is described; the product is documented as a firewall/VPN router, not a guard. [1], [2] |
+| 1.5 | Chữ ký số Nội bộ (Internal Data Stamping): Lõi kiểm soát ký số dữ liệu sạch trước khi cho phép phễu nội khởi tạo phiên mới. | Not Supported | medium | — | The device forwards traffic as an IP router rather than terminating and reinitiating sessions, so there is no internal funnel that a data-stamping control core could gate before a new session is initiated. [1], [2] |
 
 ### Category 2 — Inspection & CDR Engine
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | N/A | medium | — | No content disarm and reconstruction (CDR) of Office/PDF/image/CAD files is documented; the product is documented as a firewall/VPN router. [1], [2] |
+| 2.1 | Giải phẫu & Tái tạo Nội dung (CDR): Bóc tách và tái tạo 100% các định dạng Office (DOCX, XLSX), PDF, Image, CAD. | Unknown | low | — | no evidence found (No content disarm and reconstruction (CDR) of Office/PDF/image/CAD files is documented.) |
 | 2.2 | Loại bỏ Macro & Script Độc hại: Xóa bỏ hoàn toàn VBA Macro, Javascript, DDE Links, Embedded Objects trong file. | Unknown | low | — | no evidence found (No macro/script removal capability (VBA, JavaScript, DDE links, embedded objects) is documented.) |
 | 2.3 | Quét Mã độc Đa nhân (Multi-AV): Tích hợp tối thiểu 2+ Engine Antivirus quét song song payload thô. | Unknown | low | — | no evidence found (No multi-engine antivirus scanning of raw payloads is documented.) |
-| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | N/A | medium | — | No XML/JSON/FIXM/AIXM schema validation is documented; the product is documented as a firewall/VPN router rather than a data-sanitizing guard. [1], [2] |
-| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | N/A | medium | — | No security-label-based information flow control on files is documented; the product is documented as a firewall/VPN router. [1], [2] |
+| 2.4 | Phân tích Cú pháp Schema (Schema Check): Kiểm tra tính hợp lệ của cấu trúc XML, JSON, FIXM, AIXM theo W3C Schema. | Unknown | low | — | no evidence found (No XML/JSON/FIXM/AIXM schema validation is documented.) |
+| 2.5 | Kiểm soát Luồng Thông tin (IFC): Lọc dữ liệu dựa trên Nhãn An ninh (Security Labels) gắn kèm tập tin. | Unknown | low | — | no evidence found (No security-label-based information flow control on files is documented.) |
 | 2.6 | Chống Rò rỉ Dữ liệu (DLP): Nhận diện và chặn từ khóa Mật, Mã số CMND, Tài khoản, Regex tùy biến. | Unknown | low | — | no evidence found (No DLP keyword/regex detection for confidential identifiers is documented.) |
-| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | N/A | medium | — | No anti-steganography detection/removal for image files is documented; the product is documented as a firewall/VPN router. [1], [2] |
+| 2.7 | Anti-Steganography Engine: Phát hiện và loại bỏ dữ liệu ẩn giấu bên trong file hình ảnh (PNG, JPEG, BMP). | Unknown | low | — | no evidence found (No anti-steganography detection/removal for image files is documented.) |
 
 ### Category 3 — Protocol Support
 
