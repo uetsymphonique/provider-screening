@@ -1,9 +1,9 @@
-# BSG / Cross Domain Product Assessment: ABB — ABB Ability Security Gateway
+# Product Assessment: ABB - ABB Ability Security Gateway
 
 **Product ID:** `abb-ability-security-gateway`
 **Version reference:** n/a
 **Assessment mode:** standard
-**Checklist version:** 1
+**Checklist version:** 2
 **Assessed at:** 2026-08-11T09:35:00Z
 **Total evidence items collected:** 7
 **Total distinct sources:** 4
