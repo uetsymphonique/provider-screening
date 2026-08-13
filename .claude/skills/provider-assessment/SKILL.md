@@ -28,7 +28,7 @@ The MACHINE-READABLE truth is `assessment.json` (validated against
 
 ## Core workflow
 
-Per product (one fresh `claude -p` session per vendor, no context leakage):
+Per product (one fresh agent session per vendor, no context leakage — `claude -p` or `pi --mode json`, see `scripts/batch/run_batch.py claude|pi`):
 
 1. **Prompt** — paste the domain's standard-mode prompt
    (`.claude/skills/provider-assessment/prompts/standard_mode.md`) with
@@ -38,21 +38,22 @@ Per product (one fresh `claude -p` session per vendor, no context leakage):
 2. **Validate** — `scripts/validate_assessment.py --domain <DOMAIN> <assessment.json>`
    Exit code 0 = pass. Fix in place; never fabricate evidence to pass.
 3. **Grounding check** — `scripts/verify_citation_grounding.py --dir <DOMAIN>/runs/<pid> --strict --require-staged`
-   (root-level shared script) catches fabricated quotes the validator can't see.
+   catches fabricated quotes the validator can't see.
 4. **Render** — `scripts/render_report.py --domain <DOMAIN> <assessment.json>`
    generates report.md's mechanical sections; write the 4 narrative sections
    by hand, then re-run to merge.
 5. **Aggregate** — `scripts/aggregate/aggregate_matrix.py --domain <DOMAIN> [--mode standard|deep|any]`
    produces `<DOMAIN>/comparison_matrix.xlsx`.
 
-## Scripts (shared, all take `--domain`)
+## Scripts (shared; `--domain`, except `verify_citation_grounding.py` which takes `--dir`)
 
 | Script | Purpose |
 |---|---|
 | `scripts/validate_assessment.py` | Schema + checklist-aware validation (coverage, evidence presence, confidence caps, numeric thresholds, not_applicable rules) |
+| `scripts/verify_citation_grounding.py` | Checks evidence.jsonl quotes against staged source text (`--dir`, not `--domain`); catches fabricated quotes validation can't see |
 | `scripts/render_report.py` | Regenerates report.md's mechanical sections from assessment.json (never drifts) |
 | `scripts/aggregate/aggregate_matrix.py` | Multi-sheet xlsx: Legend, Comparison Matrix, Coverage Summary, Raw/Weighted Scores, top-10 product sheets |
-| `scripts/run_batch.py` / `run_batch_pi.py` (repo root) | Batch one-prompt-per-product runs over a vendor CSV; `--domain` + `--mode` required |
+| `scripts/batch/run_batch.py claude\|pi` (repo root) | Batch one-prompt-per-product runs over a vendor CSV; `--domain` + `--mode` required. One entrypoint, subcommand per code agent — shared driver in `scripts/batch/`, per-agent handler in `scripts/batch/handlers/` |
 
 Per-domain checklist/guide/outputs stay in each domain folder
 (`bsg/checklist.yaml`, `microsegmentation/checklist.yaml`, ...). Only

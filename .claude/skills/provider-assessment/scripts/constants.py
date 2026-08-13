@@ -1,8 +1,9 @@
 """Shared constants and helpers for the provider-assessment skill.
 
-Domain-agnostic: every domain (bsg, microsegmentation, ...) resolves its own
-runs/ / checklist.yaml / out-dir from the `--domain` argument. Nothing here is
-domain-specific.
+This skill only applies to this repo (unlike deep-research, which is meant to
+stay portable/self-contained), so it depends on repo-root scripts/domains.py
+for the DOMAINS registry / domain_dir / domain_paths instead of keeping its
+own copy - see guides/append-provider-groups.md.
 """
 
 from __future__ import annotations
@@ -18,21 +19,10 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 
-DOMAINS = ("bsg", "microsegmentation")
-
-
-def domain_dir(domain: str) -> Path:
-    """Per-domain folder (checklist.yaml, runs/, outputs live here)."""
-    return REPO_ROOT / domain
-
-
-def domain_paths(domain: str) -> dict[str, Path]:
-    d = domain_dir(domain)
-    return {
-        "runs": d / "runs",
-        "checklist": d / "checklist.yaml",
-        "out": d,
-    }
+_scripts_dir = str(REPO_ROOT / "scripts")
+if _scripts_dir not in sys.path:
+    sys.path.append(_scripts_dir)
+from domains import DOMAINS, domain_dir, domain_paths  # noqa: E402
 
 
 VERDICT_LABEL = {

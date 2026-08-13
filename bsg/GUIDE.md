@@ -82,19 +82,20 @@ python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py 
 
 ```bash
 # --- Standard pass ---
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard --dry-run --skip-done
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard --skip-done --limit 3
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard --only zoneguard
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain bsg --mode standard --dry-run --skip-done
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain bsg --mode standard --skip-done --limit 3
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain bsg --mode standard --only zoneguard
 
 # Resume after interruption
-venv/Scripts/python.exe scripts/run_batch.py --domain bsg --mode standard \
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain bsg --mode standard \
     --start-at waterfall-bidirectional-security-gateway --skip-done
 ```
 
 Global summary + total cost dumped to `bsg/runs/_batch/summary-<ts>.json`.
 
 `--domain` and `--mode` are required for `run_batch.py` (argparse error if
-omitted). `pdf_to_text.py`/`html_to_text.py --domain` silently default to
+omitted), along with the agent subcommand (`claude` or `pi`).
+`pdf_to_text.py`/`html_to_text.py --domain` silently default to
 `microsegmentation`'s tree if you forget it — always pass `--domain bsg` for
 this project.
 

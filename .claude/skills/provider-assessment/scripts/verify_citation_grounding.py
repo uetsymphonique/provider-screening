@@ -33,9 +33,9 @@ Status per evidence entry:
   unverifiable  source_id has no staged artifact to check against
 
 Usage:
-  python scripts/verify_citation_grounding.py --dir bsg/runs/zoneguard
-  python scripts/verify_citation_grounding.py --dir bsg/runs/zoneguard --strict
-  python scripts/verify_citation_grounding.py --dir bsg/runs/zoneguard --json
+  python .claude/skills/provider-assessment/scripts/verify_citation_grounding.py --dir bsg/runs/zoneguard
+  python .claude/skills/provider-assessment/scripts/verify_citation_grounding.py --dir bsg/runs/zoneguard --strict
+  python .claude/skills/provider-assessment/scripts/verify_citation_grounding.py --dir bsg/runs/zoneguard --json
 
 --strict exits 1 if any evidence is `fabricated` (unverifiable does not fail
 by default -- pass --require-staged to also fail on unverifiable, once the

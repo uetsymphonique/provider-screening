@@ -1,10 +1,10 @@
 """Interactive live-tail viewer for concurrent pi batch runs.
 
-Reads the same runs/<pid>/pi_run.jsonl files run_batch_pi.py already writes
-and formats events with the exact same functions imported from
-run_batch_pi.py (summarize_event, _truncate, _safe_console) — no duplicated
+Reads the same runs/<pid>/pi_run.jsonl files `run_batch.py pi` already writes
+and formats events with the exact same PiHandler.summarize_event / truncate /
+safe_console helpers used by scripts/batch/driver.py — no duplicated
 formatting logic, so this can never drift from what the batch runner
-actually emits. run_batch_pi.py itself is untouched; this is a read-only
+actually emits. The batch runner itself is untouched; this is a read-only
 viewer that can be started/stopped independently of the batch run.
 
 The whole screen (header + N-line window) is one redraw-in-place block:
@@ -14,9 +14,9 @@ last N formatted lines already in that product's pi_run.jsonl, then keeps
 redrawing it live in place as new events arrive.
 
 Usage:
-  python scripts/tail_run_logs.py --domain microsegmentation
-  python scripts/tail_run_logs.py --domain bsg --only illumio-zero-trust-segmentation zero-networks-segment
-  python scripts/tail_run_logs.py --domain microsegmentation --overwrite 10
+  python scripts/batch/tail_run_logs.py --domain microsegmentation
+  python scripts/batch/tail_run_logs.py --domain bsg --only illumio-zero-trust-segmentation zero-networks-segment
+  python scripts/batch/tail_run_logs.py --domain microsegmentation --overwrite 10
 
 Keys while running:
   n / p     next / previous product
@@ -34,8 +34,11 @@ import time
 from collections import deque
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import run_batch_pi as rb  # noqa: E402  (reuse DOMAINS/select_domain/formatting helpers)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from batch import common  # noqa: E402  (reuse DOMAINS/select_domain/formatting helpers)
+from batch.handlers.pi_handler import PiHandler  # noqa: E402
+
+_pi = PiHandler()
 
 try:
     import msvcrt
@@ -46,28 +49,28 @@ except ImportError:  # pragma: no cover - non-Windows fallback
 def discover_products(only: list[str] | None) -> list[str]:
     if only:
         return only
-    if not rb.RUNS_ROOT.exists():
+    if not common.RUNS_ROOT.exists():
         return []
-    files = sorted(rb.RUNS_ROOT.glob("*/pi_run.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)
+    files = sorted(common.RUNS_ROOT.glob("*/pi_run.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)
     return [p.parent.name for p in files]
 
 
 def format_event(pid: str, ev: dict, text_buf: str) -> tuple[list[str], str]:
     """Returns (formatted_lines, updated_text_buf)."""
-    result = rb.summarize_event(ev)
+    result = _pi.summarize_event(ev)
     now = time.strftime("%H:%M:%S")
     if isinstance(result, tuple) and result[0] == "text":
         text_buf += result[1]
         if len(text_buf) >= 140:
-            line = rb._safe_console(f"  [{pid}] {now}  text      {rb._truncate(text_buf, 140)}")
+            line = common.safe_console(f"  [{pid}] {now}  text      {common.truncate(text_buf, 140)}")
             return [line], ""
         return [], text_buf
     lines: list[str] = []
     if text_buf:
-        lines.append(rb._safe_console(f"  [{pid}] {now}  text      {rb._truncate(text_buf, 140)}"))
+        lines.append(common.safe_console(f"  [{pid}] {now}  text      {common.truncate(text_buf, 140)}"))
         text_buf = ""
     if result:
-        lines.append(rb._safe_console(f"  [{pid}] {now}  {result}"))
+        lines.append(common.safe_console(f"  [{pid}] {now}  {result}"))
     return lines, text_buf
 
 
@@ -109,7 +112,7 @@ class LiveView:
 
     def __init__(self, pid: str, win_size: int):
         self.pid = pid
-        self.path = rb.RUNS_ROOT / pid / "pi_run.jsonl"
+        self.path = common.RUNS_ROOT / pid / "pi_run.jsonl"
         self.lines: deque[str] = deque(maxlen=win_size)
         self.text_buf = ""
         self.offset = 0
@@ -174,22 +177,22 @@ def header_lines(products: list[str], idx: int) -> list[str]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--domain", choices=list(rb.DOMAINS.keys()), required=True)
+    ap.add_argument("--domain", choices=list(common.DOMAINS.keys()), required=True)
     ap.add_argument("--only", nargs="+", metavar="PID",
                      help="Restrict to these product_ids (default: autodiscover all under runs/, newest first)")
     ap.add_argument("--overwrite", type=int, default=5, metavar="N",
                      help="Redraw-in-place window size: number of most-recent formatted log "
                           "lines shown per product (default 5), same mechanism as "
-                          "run_batch_pi.py's --overwrite.")
+                          "`run_batch.py pi`'s --overwrite.")
     args = ap.parse_args()
 
-    rb.select_domain(args.domain)
+    common.select_domain(args.domain)
     products = discover_products(args.only)
     if not products:
         print("no pi_run.jsonl files found yet under runs/ — start a batch first", file=sys.stderr)
         return 1
 
-    rb._enable_windows_ansi()
+    common.enable_windows_ansi()
     if msvcrt is None:
         print("WARN interactive key switching needs msvcrt (Windows); "
               "following product[0] only, Ctrl+C to quit.", file=sys.stderr)

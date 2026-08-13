@@ -24,11 +24,11 @@ import jsonschema
 import yaml
 
 try:
-    from .constants import SKILL_ROOT, domain_paths
+    from .constants import DOMAINS, SKILL_ROOT, domain_paths
 except ImportError:
     _parent = Path(__file__).resolve().parent
     sys.path.insert(0, str(_parent))
-    from constants import SKILL_ROOT, domain_paths  # type: ignore[no-redef]
+    from constants import DOMAINS, SKILL_ROOT, domain_paths  # type: ignore[no-redef]
 
 
 def load_json(path: Path):
@@ -185,7 +185,7 @@ def check_custom_rules(
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("assessment", type=Path)
-    ap.add_argument("--domain", required=True, choices=["bsg", "microsegmentation"])
+    ap.add_argument("--domain", required=True, choices=list(DOMAINS))
     ap.add_argument("--checklist", type=Path, default=None)
     ap.add_argument("--schema", type=Path, default=None)
     ap.add_argument(

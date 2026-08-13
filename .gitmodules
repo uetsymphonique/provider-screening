@@ -1,3 +1,21 @@
 [submodule ".claude/skills/deep-research"]
 	path = .claude/skills/deep-research
 	url = https://github.com/199-biotechnologies/claude-deep-research-skill
+[submodule "utils/trafilatura"]
+	path = utils/trafilatura
+	url = https://github.com/adbar/trafilatura
+[submodule "utils/cdx_tookit"]
+	path = utils/cdx_tookit
+	url = https://github.com/commoncrawl/cdx_toolkit
+[submodule "utils/curl_cffi"]
+	path = utils/curl_cffi
+	url = https://github.com/lexiforest/curl_cffi
+[submodule "utils/Scrapling"]
+	path = utils/Scrapling
+	url = https://github.com/d4vinci/Scrapling
+[submodule "utils/jina_ai_reader"]
+	path = utils/jina_ai_reader
+	url = https://github.com/jina-ai/reader
+[submodule "utils/ddgs"]
+	path = utils/ddgs
+	url = https://github.com/deedy5/ddgs

@@ -17,7 +17,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 try:
     from ..constants import (
-        SKILL_ROOT, domain_paths, VERDICT_FILLS, VERDICT_LABEL,
+        DOMAINS, SKILL_ROOT, domain_paths, VERDICT_FILLS, VERDICT_LABEL,
         collect_assessments, load_yaml,
     )
     from .scores import compute_total_score, build_raw_row, build_weighted_row, build_summary_row
@@ -30,7 +30,7 @@ except ImportError:
     sys.path.insert(0, str(_this))
     sys.path.insert(0, str(_scripts))
     from constants import (  # type: ignore[no-redef]
-        SKILL_ROOT, domain_paths, VERDICT_FILLS, VERDICT_LABEL,
+        DOMAINS, SKILL_ROOT, domain_paths, VERDICT_FILLS, VERDICT_LABEL,
         collect_assessments, load_yaml,
     )
     from scores import compute_total_score, build_raw_row, build_weighted_row, build_summary_row  # type: ignore[no-redef]
@@ -41,7 +41,7 @@ except ImportError:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--domain", required=True, choices=["bsg", "microsegmentation"])
+    ap.add_argument("--domain", required=True, choices=list(DOMAINS))
     ap.add_argument("--runs-root", type=Path, default=None)
     ap.add_argument("--checklist", type=Path, default=None)
     ap.add_argument("--out-dir", type=Path, default=None)

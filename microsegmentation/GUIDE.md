@@ -69,19 +69,21 @@ python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py 
 
 ```bash
 # --- Standard pass (all vendors from Microsegmentation.csv) ---
-venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode standard --dry-run --skip-done
-venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode standard --skip-done --limit 3
-venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode standard --only illumio-core
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain microsegmentation --mode standard --dry-run --skip-done
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain microsegmentation --mode standard --skip-done --limit 3
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain microsegmentation --mode standard --only illumio-core
 
 # Resume after interruption
-venv/Scripts/python.exe scripts/run_batch.py --domain microsegmentation --mode standard \
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain microsegmentation --mode standard \
     --start-at cato-sase-cloud --skip-done
 ```
 
-Global summary + total cost dumped to `microsegmentation/runs/_batch/summary-<ts>.json`.
+Global summary + total cost dumped to `microsegmentation/runs/_batch/summary-<ts>.json`
+(or `summary-pi-<ts>.json` for the `pi` subcommand).
 
-`--domain` and `--mode` are required for `run_batch.py`; `pdf_to_text.py` /
-`html_to_text.py --domain` silently default to `microsegmentation`'s tree, so
-for THIS domain omitting it is fine — but always pass it explicitly to be safe.
+`--domain` and `--mode` are required for `run_batch.py`, along with the agent
+subcommand (`claude` or `pi`); `pdf_to_text.py` / `html_to_text.py --domain`
+silently default to `microsegmentation`'s tree, so for THIS domain omitting
+it is fine — but always pass it explicitly to be safe.
 
 See the shared GUIDE for staging, citation grounding, and pitfalls.

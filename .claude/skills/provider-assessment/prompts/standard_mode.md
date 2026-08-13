@@ -76,7 +76,7 @@ that the script checks) or kill ONLY the specific PIDs you own.
        --product {product_id} --domain {DOMAIN}
    Web page source:
      d:/vcs/provider-screening/venv/Scripts/python.exe \
-       d:/vcs/provider-screening/scripts/html_to_text.py <page-url> \
+       d:/vcs/provider-screening/scripts/htmlstage/html_to_text.py <page-url> \
        --product {product_id} --domain {DOMAIN}
 
    Both stage the raw file into runs/{product_id}/artifacts/, write extracted
@@ -170,7 +170,7 @@ that the script checks) or kill ONLY the specific PIDs you own.
     Then run the grounding check (validate_assessment.py does NOT verify a
    quote is real, only that its IDs exist — this does):
      d:/vcs/provider-screening/venv/Scripts/python.exe \
-       d:/vcs/provider-screening/scripts/verify_citation_grounding.py \
+       d:/vcs/provider-screening/.claude/skills/provider-assessment/scripts/verify_citation_grounding.py \
        --dir d:/vcs/provider-screening/{DOMAIN}/runs/{product_id} --strict --require-staged
    If ANY evidence comes back `fabricated`, that quote is not real — go back
    to the staged .txt and fix the quote to an exact substring, or downgrade

@@ -44,8 +44,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-DOMAINS = ("microsegmentation", "bsg")
+from domains import DOMAINS, REPO_ROOT
 
 
 def slugify(value: str) -> str:
@@ -120,7 +119,7 @@ def append_manifest(manifest_path: Path, entry: dict) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("target", help="URL or local .pdf path")
-    ap.add_argument("--domain", choices=DOMAINS, default="microsegmentation",
+    ap.add_argument("--domain", choices=list(DOMAINS), default="microsegmentation",
                     help="Which project's runs/ tree --product stages into.")
     ap.add_argument("--product", default=None,
                     help="Stage into <domain>/runs/<product>/artifacts/ + write manifest.jsonl")

@@ -1,4 +1,7 @@
 attrs==26.1.0
+cdx_toolkit==0.9.39
+curl_cffi==0.16.0
+ddgs==9.14.4
 et_xmlfile==2.0.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
@@ -7,3 +10,5 @@ pypdf==6.14.2
 PyYAML==6.0.3
 referencing==0.37.0
 rpds-py==2026.6.3
+scrapling[fetchers]==0.4.14
+trafilatura==2.2.0

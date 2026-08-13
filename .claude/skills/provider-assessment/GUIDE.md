@@ -29,7 +29,7 @@ The evidence/claims/source registries from deep-research are **kept as-is** — 
 ├── GUIDE.md                   # domain-specific notes only (product classes, provider CSV, ...)
 ├── runs/                      # ONE SUBDIR PER PRODUCT
 │   ├── _pdf_cache/            # scripts/pdf_to_text.py default when no --product (shared, no manifest)
-│   ├── _html_cache/           # scripts/html_to_text.py default when no --product (shared, no manifest)
+│   ├── _html_cache/           # scripts/htmlstage/html_to_text.py default when no --product (shared, no manifest)
 │   └── <product_id>/
 │       ├── assessment.json    # canonical (validated)
 │       ├── report.md          # derived from assessment.json + template
@@ -40,7 +40,7 @@ The evidence/claims/source registries from deep-research are **kept as-is** — 
 │       └── artifacts/         # raw fetched material staged for audit -- EVERY
 │           │                  # cited source must land here (PDF or web page),
 │           │                  # not just PDFs; it's the ground truth
-│           │                  # scripts/verify_citation_grounding.py checks
+│           │                  # verify_citation_grounding.py checks
 │           │                  # evidence.jsonl quotes against.
 │           ├── <slug>.pdf     # staged raw PDF (kept)
 │           ├── <slug>.html    # staged raw HTML (kept)
@@ -63,10 +63,11 @@ All shared machinery lives in `.claude/skills/provider-assessment/`:
 │   └── standard_mode.md        # generic; {DOMAIN} filled at run time
 └── scripts/
     ├── __init__.py
-    ├── constants.py            # shared constants + domain path resolution
-    ├── validate_assessment.py  # validator (--domain)
-    ├── render_report.py        # report.md renderer (--domain)
-    └── aggregate/              # xlsx aggregation toolkit (--domain)
+    ├── constants.py                  # shared constants + domain path resolution
+    ├── validate_assessment.py        # validator (--domain)
+    ├── verify_citation_grounding.py  # quote-vs-staged-text grounding check (--dir)
+    ├── render_report.py              # report.md renderer (--domain)
+    └── aggregate/                    # xlsx aggregation toolkit (--domain)
         ├── __init__.py
         ├── aggregate_matrix.py # entry point
         ├── scores.py           # verdict/confidence scoring
@@ -75,10 +76,14 @@ All shared machinery lives in `.claude/skills/provider-assessment/`:
         └── styling.py          # xlsx styling helpers
 ```
 
-`pdf_to_text.py`, `html_to_text.py`, `verify_citation_grounding.py`, and
-`run_batch.py` are **not** under the skill's scripts/ — they live in the
-repo-root `scripts/` and are shared across every domain, selected at run time
-via `--domain`/`--product`.
+`pdf_to_text.py`, `html_to_text.py`, and `run_batch.py` are **not** under the
+skill's scripts/ — they live in the repo-root `scripts/` and are generic
+staging/batch tools shared across every domain and skill, selected at run
+time via `--domain`/`--product`. `verify_citation_grounding.py` is the
+provider-assessment-specific replacement for deep-research's own
+`verify_citations.py` (see the override table above), so it lives under the
+skill like its siblings `validate_assessment.py` and `render_report.py`,
+even though it's invoked with `--dir` rather than `--domain`.
 
 ## Assessment mode
 
@@ -160,39 +165,53 @@ python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py 
 python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py --domain <domain> --mode deep
 ```
 
-## Batch runner (`scripts/run_batch.py`)
+## Batch runner (`scripts/batch/run_batch.py`)
 
-Runs the standard-mode prompt against a product list, one fresh `claude -p`
-session per product (no context leakage between vendors). By default uses
-`--permission-mode acceptEdits` + a scoped `--allowedTools` list — no prompts,
-no full bypass. Pass `--dangerously-skip-permissions` to swap that for
+One entrypoint, one subcommand per code agent — `claude` or `pi`. Both
+subcommands share the same product loop, validator call, and summary
+aggregation (`scripts/batch/driver.py`); only the CLI invocation, stream-event
+schema, and per-agent meta fields differ (`scripts/batch/handlers/`). Each
+run is a fresh session per product (no context leakage between vendors).
+
+`claude` subcommand: by default uses `--permission-mode acceptEdits` + a
+scoped `--allowedTools` list — no prompts, no full bypass. Pass
+`--dangerously-skip-permissions` to swap that for
 `claude -p --dangerously-skip-permissions` instead — no prompt for ANY tool
 call, in or out of the project tree; off by default, opt in per invocation
-since it removes all guardrails for an unattended batch run. Full stream-json
-trace goes to `<domain>/runs/<pid>/claude_run.jsonl`; per-run summary (elapsed,
-exit code, cost, validator result) to `<domain>/runs/<pid>/claude_run.meta.json`.
-`--skip-done` skips products whose existing `assessment.json`'s
-`assessment_mode` matches the current run. `--domain` and `--mode` are required
-(no default) — the CLI errors out immediately if either is omitted. Optional
-`--max-turns`/`--max-budget-usd` cap agentic turns/spend per product
-(forwarded to `claude -p`); both unset by default — check a real run's
-`claude_run.meta.json` for actual `num_turns`/`total_cost_usd` before picking a
-cap, since a standard-mode pass over the full checklist needs meaningfully more
-than a typical single-skill task.
+since it removes all guardrails for an unattended batch run. Optional
+`--max-turns`/`--max-budget-usd` cap agentic turns/spend per product; both
+unset by default — check a real run's `claude_run.meta.json` for actual
+`num_turns`/`total_cost_usd` before picking a cap, since a standard-mode pass
+over the full checklist needs meaningfully more than a typical single-skill
+task. Full stream-json trace goes to `<domain>/runs/<pid>/claude_run.jsonl`;
+per-run summary to `<domain>/runs/<pid>/claude_run.meta.json`.
+
+`pi` subcommand: drives `pi --mode json --no-session`. Full stream trace goes
+to `<domain>/runs/<pid>/pi_run.jsonl`; per-run summary to
+`<domain>/runs/<pid>/pi_run.meta.json`. `scripts/batch/tail_run_logs.py` live-tails
+these using the same `PiHandler` formatting the batch runner uses, so the two
+can never drift apart.
+
+Both subcommands: `--skip-done` skips products whose existing
+`assessment.json`'s `assessment_mode` matches the current run. `--domain` and
+`--mode` are required (no default) — the CLI errors out immediately if either
+is omitted.
 
 ```bash
 # --- Standard pass ---
-venv/Scripts/python.exe scripts/run_batch.py --domain <domain> --mode standard --dry-run --skip-done
-venv/Scripts/python.exe scripts/run_batch.py --domain <domain> --mode standard --skip-done --limit 3
-venv/Scripts/python.exe scripts/run_batch.py --domain <domain> --mode standard --only <product_id>
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain <domain> --mode standard --dry-run --skip-done
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain <domain> --mode standard --skip-done --limit 3
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain <domain> --mode standard --only <product_id>
+venv/Scripts/python.exe scripts/batch/run_batch.py pi     --domain <domain> --mode standard --skip-done --limit 3
 
 # Resume after interruption
-venv/Scripts/python.exe scripts/run_batch.py --domain <domain> --mode standard \
+venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain <domain> --mode standard \
     --start-at <product_id> --skip-done
 ```
 
 Global summary + total cost dumped to `<domain>/runs/_batch/summary-<ts>.json`
-(mode + queue_file recorded so the batch is reproducible).
+(claude) or `summary-pi-<ts>.json` (pi) — mode + queue_file recorded so the
+batch is reproducible.
 
 Docs cross-checked: <https://code.claude.com/docs/en/headless.md>,
 <https://code.claude.com/docs/en/permission-modes.md>.
@@ -224,7 +243,8 @@ summarizes a web page through a small model in the same call, so nothing raw
 survives to check later. **Every source cited in `sources.jsonl` /
 `evidence.jsonl` — PDF or web page — must be staged first** with the matching
 helper, so a persisted, hash-anchored `.txt` exists for
-`scripts/verify_citation_grounding.py` to check quotes against.
+`.claude/skills/provider-assessment/scripts/verify_citation_grounding.py` to
+check quotes against.
 
 ```bash
 # PDF — stage into <domain>/runs/<product>/artifacts/ + append manifest.jsonl
@@ -232,7 +252,7 @@ python scripts/pdf_to_text.py https://example.com/datasheet.pdf \
     --product <product_id> --domain <domain>
 
 # Web page — same staging contract, HTML instead of PDF
-python scripts/html_to_text.py https://example.com/product-page/ \
+python scripts/htmlstage/html_to_text.py https://example.com/product-page/ \
     --product <product_id> --domain <domain>
 
 # Local file (e.g. re-processing a WebFetch-cached PDF the harness saved) —
@@ -242,12 +262,13 @@ python scripts/pdf_to_text.py C:/path/to/webfetch-cached.pdf \
 
 # Ad-hoc / shared cache (no product context, no manifest)
 python scripts/pdf_to_text.py https://example.com/datasheet.pdf --domain <domain>
-python scripts/html_to_text.py https://example.com/product-page/ --domain <domain>
+python scripts/htmlstage/html_to_text.py https://example.com/product-page/ --domain <domain>
 ```
 
 For each invocation with `--product`, the scripts:
 - Download (or copy, for local input) the raw file into `<domain>/runs/<product_id>/artifacts/<slug>.{pdf,html}`.
-- Extract text into `<slug>.txt` — `pdf_to_text.py` page-by-page via `pypdf`, delimited by `===== PAGE N =====` headers; `html_to_text.py` via a stdlib tag-stripper (nav/header/footer/aside/script/style dropped entirely; table cells separated with `" | "` so adjacent cells don't run together).
+- Extract text into `<slug>.txt` — `pdf_to_text.py` page-by-page via `pypdf`, delimited by `===== PAGE N =====` headers; `html_to_text.py` via Trafilatura (boilerplate-removal heuristics, falling back to a stdlib tag-stripper if Trafilatura returns nothing).
+- `html_to_text.py` fetches via a `--method` chain (`auto` by default: direct HTTP with curl_cffi browser-TLS impersonation -> r.jina.ai HTML render -> r.jina.ai Markdown render -> Wayback Machine -> Common Crawl archive), escalating past bot-protected, challenge-walled, or dead pages automatically (thin extraction OR a matched bot-challenge banner both trigger escalation, not just an outright fetch failure). `manifest.jsonl` records which method actually produced the `.txt` (`fetch_method`) and which extractor ran (`extractor`) — check these before trusting a citation, since a page fetched via the Markdown proxy is provenance-wise "Jina rendering the vendor's page," not the vendor's raw HTML. Force a specific method with `--method direct|proxy-html|proxy-md|wayback|cc` when you already know a domain needs it.
 - Append one line to the SAME `<domain>/runs/<product_id>/artifacts/manifest.jsonl` — url/local path of origin, sha256, byte size, capture timestamp, and `"kind": "pdf"` or `"html"` — everything needed to prove which version of the source was actually read.
 - Print the `.txt` absolute path as the last stdout line so you can pipe it into a `Read` call.
 
@@ -273,7 +294,8 @@ Run this after `validate_assessment.py` passes, once every cited source has
 been staged per the section above:
 
 ```bash
-python scripts/verify_citation_grounding.py --dir <domain>/runs/<product_id> --strict --require-staged
+python .claude/skills/provider-assessment/scripts/verify_citation_grounding.py \
+    --dir <domain>/runs/<product_id> --strict --require-staged
 ```
 
 Each evidence entry comes back as one of:
@@ -295,5 +317,5 @@ itself to be verbatim, not just accurate in substance.
 - **Do not** mark `not_applicable` on an item that has no `not_applicable_class` in `checklist.yaml` — on those items the verdict does not exist (rule 7). The validator rejects it.
 - **Do not** justify `not_applicable` by product class. That reasoning is about the vendor, not about the requirement, and it is exactly what rules 7–8 exist to stop. A boilerplate rationale repeated verbatim across several items is the tell.
 - **Do not** fill `numeric_value` with round numbers borrowed from the requirement. If the vendor gives only qualitative language, verdict is `partial` with `numeric_value: null` and `notes` explaining the imprecision.
-- **Do not** run `scripts/run_batch.py` (needs `--mode`) or `scripts/pdf_to_text.py`/`scripts/html_to_text.py` without `--domain` (or with the wrong one). `run_batch.py` errors out if `--domain`/`--mode` are omitted; `pdf_to_text.py`/`html_to_text.py` silently default to `microsegmentation` and will write into the wrong project tree.
+- **Do not** run `scripts/batch/run_batch.py` without an agent subcommand (`claude`/`pi`) or `--mode`, or `scripts/pdf_to_text.py`/`scripts/htmlstage/html_to_text.py` without `--domain` (or with the wrong one). `run_batch.py` errors out if the subcommand or `--domain`/`--mode` are omitted; `pdf_to_text.py`/`html_to_text.py` silently default to `microsegmentation` and will write into the wrong project tree.
 - **Do not** cite a source in `evidence.jsonl` before staging it with `pdf_to_text.py`/`html_to_text.py`, and **do not** write a quote from memory or from WebFetch's summary. `verify_citation_grounding.py` will report it `fabricated` or `unverifiable` and fail the run.
