@@ -2,7 +2,7 @@
 
 Reads the same runs/<pid>/pi_run.jsonl files `run_batch.py pi` already writes
 and formats events with the exact same PiHandler.summarize_event / truncate /
-safe_console helpers used by scripts/batch/driver.py — no duplicated
+safe_console helpers used by scripts/batch/core/driver.py - no duplicated
 formatting logic, so this can never drift from what the batch runner
 actually emits. The batch runner itself is untouched; this is a read-only
 viewer that can be started/stopped independently of the batch run.
@@ -32,11 +32,9 @@ import shutil
 import sys
 import time
 from collections import deque
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from batch import common  # noqa: E402  (reuse DOMAINS/select_domain/formatting helpers)
-from batch.handlers.pi_handler import PiHandler  # noqa: E402
+from scripts.batch.core import common  # reuse DOMAINS/select_domain/formatting helpers
+from scripts.batch.core.handlers.pi_handler import PiHandler
 
 _pi = PiHandler()
 
@@ -78,7 +76,7 @@ class Screen:
     """Redraws a fixed-size block (header + N content lines) in place.
 
     Content is always padded to win_size lines so the block's total height
-    never shrinks between redraws — otherwise a switch to a product with
+    never shrinks between redraws - otherwise a switch to a product with
     fewer buffered lines than the last one would leave stale lines from the
     previous block dangling below the new, shorter one.
     """
@@ -105,9 +103,9 @@ class LiveView:
     """Buffers the last N formatted lines of one product's log.
 
     Seeded from the last N *formatted* lines already in pi_run.jsonl (not
-    the last N raw JSON events — one event can fold into 0-2 display
+    the last N raw JSON events - one event can fold into 0-2 display
     lines), then kept live by polling for bytes appended after the seed.
-    Drawing is Screen's job, not this class's — it only holds state.
+    Drawing is Screen's job, not this class's - it only holds state.
     """
 
     def __init__(self, pid: str, win_size: int):
@@ -189,7 +187,7 @@ def main() -> int:
     common.select_domain(args.domain)
     products = discover_products(args.only)
     if not products:
-        print("no pi_run.jsonl files found yet under runs/ — start a batch first", file=sys.stderr)
+        print("no pi_run.jsonl files found yet under runs/ - start a batch first", file=sys.stderr)
         return 1
 
     common.enable_windows_ansi()

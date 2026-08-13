@@ -187,7 +187,7 @@ def build_product_sheet(
             ws.cell(row=row, column=5, value=cconf.capitalize() if cconf else "")
             nv = entry.get("numeric_value")
             unit = entry.get("unit", "")
-            ws.cell(row=row, column=6, value=f"{nv} {unit}".strip() if nv is not None else "—")
+            ws.cell(row=row, column=6, value=f"{nv} {unit}".strip() if nv is not None else "-")
             ws.cell(row=row, column=7, value=_evidence_text(iid, entry)).alignment = wrap_top
             row += 1
 

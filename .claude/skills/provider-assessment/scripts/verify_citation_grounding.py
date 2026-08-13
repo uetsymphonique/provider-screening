@@ -11,15 +11,15 @@ Purpose:
   support, etc.) that do not appear anywhere on the cited vendor pages,
   across items whose verdict rested entirely on that fabricated evidence.
 
-  This script closes that gap using the ground truth pdf_to_text.py /
-  html_to_text.py already stage: artifacts/manifest.jsonl maps each fetched
+  This script closes that gap using the ground truth tools/pdfstage/main.py /
+  tools/htmlstage/main.py already stage: artifacts/manifest.jsonl maps each fetched
   source's origin URL to a persisted .txt file with a sha256 anchor. For
   every evidence entry whose source was staged, this script normalizes and
   substring-matches the quote (split on "..." so legitimately elided quotes
   are checked fragment-by-fragment) against that persisted text.
 
-  Evidence citing a source that was NEVER staged (no pdf_to_text.py /
-  html_to_text.py run for it -- e.g. WebFetch was used directly, skipping
+  Evidence citing a source that was NEVER staged (no tools/pdfstage/main.py /
+  tools/htmlstage/main.py run for it -- e.g. WebFetch was used directly, skipping
   the mandated staging step) is reported separately as UNVERIFIABLE, not as
   grounded or fabricated -- there is no ground truth to check it against.
   A high UNVERIFIABLE rate means the prompt's staging requirement isn't
@@ -127,7 +127,7 @@ def check_evidence(
             results.append({
                 "evidence_id": eid, "item_id": item_id, "source_id": source_id,
                 "status": "unverifiable", "quote": quote,
-                "reason": "source not staged via pdf_to_text.py / html_to_text.py "
+                "reason": "source not staged via tools/pdfstage/main.py / tools/htmlstage/main.py "
                           f"(raw_url={raw_url!r})",
             })
             continue

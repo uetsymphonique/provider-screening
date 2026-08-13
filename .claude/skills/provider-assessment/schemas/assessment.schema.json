@@ -27,7 +27,7 @@
     "product_name": { "type": "string", "minLength": 1 },
     "product_version_reference": {
       "type": ["string", "null"],
-      "description": "Version, release, or datasheet edition the assessment is anchored to. Null if unknown — do NOT invent.",
+      "description": "Version, release, or datasheet edition the assessment is anchored to. Null if unknown - do NOT invent.",
       "default": null
     },
     "checklist_version": {
@@ -106,7 +106,7 @@
         "verdict": {
           "type": "string",
           "enum": ["supported", "partial", "not_supported", "unknown", "not_applicable"],
-          "description": "'unknown' is REQUIRED when no evidence was found; never invent 'not_supported' from absence. 'not_applicable' is opt-in per checklist item — permitted ONLY on items carrying a not_applicable_class in checklist.yaml, where the component the requirement names is absent from the product's architecture so there is nothing to measure. It is NEVER justified by product class. See GUIDE.md rules 7-8."
+          "description": "'unknown' is REQUIRED when no evidence was found; never invent 'not_supported' from absence. 'not_applicable' is opt-in per checklist item - permitted ONLY on items carrying a not_applicable_class in checklist.yaml, where the component the requirement names is absent from the product's architecture so there is nothing to measure. It is NEVER justified by product class. See GUIDE.md rules 7-8."
         },
         "confidence": {
           "type": "string",

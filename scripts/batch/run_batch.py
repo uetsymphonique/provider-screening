@@ -26,19 +26,17 @@ the --overwrite line-window (which redraws via ANSI cursor moves) is never
 driven by more than one thread at a time.
 
 Agent-specific behavior (CLI invocation, stream-event schema, meta fields)
-lives in scripts/batch/handlers/*; everything else is shared in
-scripts/batch/{common,driver}.py.
+lives in scripts/batch/core/handlers/*; everything else is shared in
+scripts/batch/core/{common,driver}.py.
 """
 
 from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from batch import driver  # noqa: E402
-from batch.handlers import HANDLERS, get_handler  # noqa: E402
+from scripts.batch.core import driver
+from scripts.batch.core.handlers import HANDLERS, get_handler
 
 
 def main() -> int:

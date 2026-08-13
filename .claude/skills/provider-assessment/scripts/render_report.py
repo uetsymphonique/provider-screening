@@ -19,7 +19,7 @@ and runs/ tree are resolved from --domain; templates live in the skill.
 Usage:
     python .claude/skills/provider-assessment/scripts/render_report.py \
         --domain bsg <path/to/assessment.json>
-        [--checklist <path>]            # default: <domain>/checklist.yaml
+        [--checklist <path>]            # default: providers-workspace/<domain>/checklist.yaml
         [--templates-dir <dir>]         # default: skill templates/
         [--out <path/to/report.md>]     # default: sibling report.md next to assessment.json
 """
@@ -87,7 +87,7 @@ def read_jsonl(path: Path) -> list[dict]:
 def parse_old_bibliography_numbers(old_text: str) -> dict[str, int]:
     """Map raw_url -> display number, parsed from an existing report.md's
     Bibliography section. Preserved narrative sections (1, 4, 5, 6) contain
-    hand-written [N] citations baked in as literal text — if the bibliography
+    hand-written [N] citations baked in as literal text - if the bibliography
     were renumbered on every regeneration, those citations would silently point
     at the wrong source. Reusing old numbers keeps them valid."""
     if not old_text:
@@ -161,7 +161,7 @@ def render_bibliography(sources: list[dict], display_map: dict[str, int]) -> str
 
 def normalize_heading(heading: str) -> str:
     """Strip a trailing editorial annotation like '(<= 200 words)' so the same
-    logical section matches whether or not that guidance text is present —
+    logical section matches whether or not that guidance text is present -
     the template carries it on section 1, but written reports typically drop it."""
     return re.sub(r"\s*\([^)]*\)\s*$", "", heading).strip()
 
@@ -254,26 +254,26 @@ def render_per_item_tables(items: list[dict], checklist: dict, display_map: dict
         cat_items = [ci for ci in checklist_items if ci["category"] == cat_id]
         if not cat_items:
             continue
-        chunks.append(f"### Category {cat_id} — {cat['name']}")
+        chunks.append(f"### Category {cat_id} - {cat['name']}")
         chunks.append("")
         chunks.append("| ID  | Requirement | Verdict | Conf | Value | Evidence |")
         chunks.append("|-----|-------------|:-------:|:----:|-------|----------|")
         for ci in cat_items:
             item = by_id.get(ci["id"])
             if item is None:
-                chunks.append(f"| {ci['id']} | {ci['requirement']} | — | — | — | not evaluated |")
+                chunks.append(f"| {ci['id']} | {ci['requirement']} | - | - | - | not evaluated |")
                 continue
 
             verdict = item.get("verdict", "unknown")
             badge = VERDICT_BADGE.get(verdict, "?")
-            conf = item.get("confidence") or "—"
+            conf = item.get("confidence") or "-"
 
             if ci.get("verdict_type") == "numeric_threshold" and item.get("numeric_value") is not None:
                 value = f"{item['numeric_value']} {item.get('unit', '')}".strip()
             elif ci.get("verdict_type") == "numeric_threshold" and verdict == "partial":
                 value = "n/a (qualitative)"
             else:
-                value = "—"
+                value = "-"
 
             if verdict == "unknown":
                 gaps = item.get("gaps")
@@ -374,16 +374,16 @@ def render_standard(assessment: dict, checklist: dict, sources: list[dict],
         "",
         "---",
         "",
-        "## Appendix A — Methodology",
+        "## Appendix A - Methodology",
         "",
         render_appendix_a(assessment, sources, run_manifest),
         "",
-        "## Appendix B — Machine-readable outputs",
+        "## Appendix B - Machine-readable outputs",
         "",
         "Companion files in this run directory:",
-        "- `assessment.json` — canonical verdict store (validated against `schemas/assessment.schema.json`)",
-        "- `sources.jsonl`, `evidence.jsonl`, `claims.jsonl` — inherited from deep-research skill",
-        "- `run_manifest.json` — research config and provenance",
+        "- `assessment.json` - canonical verdict store (validated against `schemas/assessment.schema.json`)",
+        "- `sources.jsonl`, `evidence.jsonl`, `claims.jsonl` - inherited from deep-research skill",
+        "- `run_manifest.json` - research config and provenance",
         "",
     ]
     return "\n".join(out)

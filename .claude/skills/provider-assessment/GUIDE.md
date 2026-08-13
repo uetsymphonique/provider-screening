@@ -1,9 +1,10 @@
-# Provider Assessment — Research Guide (shared)
+# Provider Assessment - Research Guide (shared)
 
 This is the shared machinery guide for the [`provider-assessment`](./SKILL.md)
-skill. It applies to every domain (currently `bsg/` and `microsegmentation/`);
-each domain's folder holds only its own `checklist.md`, `checklist.yaml`,
-`GUIDE.md` (domain-specific notes), `runs/`, and generated outputs.
+skill. It applies to every domain (currently `providers-workspace/bsg/` and
+`providers-workspace/microsegmentation/`); each domain's folder holds only
+its own `checklist.md`, `checklist.yaml`, `GUIDE.md` (domain-specific notes),
+`runs/`, and generated outputs.
 
 This project uses the [`deep-research`](../deep-research/) skill for per-product
 investigation but **replaces its default report contract** with a structured,
@@ -14,22 +15,22 @@ comparable one so all vendors in a domain can be aggregated into a single matrix
 | Concern | Default in deep-research | Project override |
 |---|---|---|
 | Report template | `templates/report_template.md` (prose Findings) | [`templates/product_report.md`](./templates/product_report.md) (per-item verdicts) |
-| Output "truth" | Markdown report | `assessment.json` (schema: [`schemas/assessment.schema.json`](./schemas/assessment.schema.json)) — Markdown derived from it |
-| Verify scripts | `validate_report.py`, `verify_citations.py`, `verify_claim_support.py` | Add: `scripts/validate_assessment.py` (structural — evidence_id/source_id referential integrity); `scripts/verify_citation_grounding.py` (quote-vs-fetched-text — catches fabricated quotes structural validation can't see); render `report.md`'s mechanical sections with `scripts/render_report.py`; then aggregate with `scripts/aggregate/aggregate_matrix.py` |
-| Evidence store | Shared `sources.jsonl` / `evidence.jsonl` per run | **Per-product**: each vendor gets its own directory under `<domain>/runs/<product_id>/` |
+| Output "truth" | Markdown report | `assessment.json` (schema: [`schemas/assessment.schema.json`](./schemas/assessment.schema.json)) - Markdown derived from it |
+| Verify scripts | `validate_report.py`, `verify_citations.py`, `verify_claim_support.py` | Add: `scripts/validate_assessment.py` (structural - evidence_id/source_id referential integrity); `scripts/verify_citation_grounding.py` (quote-vs-fetched-text - catches fabricated quotes structural validation can't see); render `report.md`'s mechanical sections with `scripts/render_report.py`; then aggregate with `scripts/aggregate/aggregate_matrix.py` |
+| Evidence store | Shared `sources.jsonl` / `evidence.jsonl` per run | **Per-product**: each vendor gets its own directory under `providers-workspace/<domain>/runs/<product_id>/` |
 
-The evidence/claims/source registries from deep-research are **kept as-is** — that's the anti-fabrication core. This project only adds a downstream contract that consumes them.
+The evidence/claims/source registries from deep-research are **kept as-is** - that's the anti-fabrication core. This project only adds a downstream contract that consumes them.
 
 ## Directory layout
 
 ```
-<domain>/                          # bsg/, microsegmentation/, ...
+providers-workspace/<domain>/      # bsg/, microsegmentation/, ...
 ├── checklist.md               # human-readable requirements (source of truth for wording)
 ├── checklist.yaml             # machine-readable with stable IDs, verdict_type, thresholds
 ├── GUIDE.md                   # domain-specific notes only (product classes, provider CSV, ...)
 ├── runs/                      # ONE SUBDIR PER PRODUCT
-│   ├── _pdf_cache/            # scripts/pdf_to_text.py default when no --product (shared, no manifest)
-│   ├── _html_cache/           # scripts/htmlstage/html_to_text.py default when no --product (shared, no manifest)
+│   ├── _pdf_cache/            # tools/pdfstage/main.py default when no --product (shared, no manifest)
+│   ├── _html_cache/           # tools/htmlstage/main.py default when no --product (shared, no manifest)
 │   └── <product_id>/
 │       ├── assessment.json    # canonical (validated)
 │       ├── report.md          # derived from assessment.json + template
@@ -76,10 +77,12 @@ All shared machinery lives in `.claude/skills/provider-assessment/`:
         └── styling.py          # xlsx styling helpers
 ```
 
-`pdf_to_text.py`, `html_to_text.py`, and `run_batch.py` are **not** under the
-skill's scripts/ — they live in the repo-root `scripts/` and are generic
-staging/batch tools shared across every domain and skill, selected at run
-time via `--domain`/`--product`. `verify_citation_grounding.py` is the
+`run_batch.py` is **not** under the skill's scripts/ - it lives in the
+repo-root `scripts/`. The PDF and HTML staging tools live under the
+repo-root `tools/`: `tools/pdfstage/main.py` and `tools/htmlstage/main.py`.
+All three are generic staging/batch tools shared across every domain and
+skill, selected at run time via `--domain`/`--product`.
+`verify_citation_grounding.py` is the
 provider-assessment-specific replacement for deep-research's own
 `verify_citations.py` (see the override table above), so it lives under the
 skill like its siblings `validate_assessment.py` and `render_report.py`,
@@ -87,7 +90,7 @@ even though it's invoked with `--dir` rather than `--domain`.
 
 ## Assessment mode
 
-**Standard / Deep mode** — full checklist (all items; count is domain-specific).
+**Standard / Deep mode** - full checklist (all items; count is domain-specific).
 - Deep-research invocation: `standard` (default) or `deep` for load-bearing procurement decisions.
 - Output: `assessment.json` with `assessment_mode: "standard"` or `"deep"` + `report.md` from `templates/product_report.md`.
 
@@ -97,38 +100,38 @@ The user (or you) picks the mode at run time. The validator requires every check
 
 Verdict enum: `supported | partial | not_supported | unknown | not_applicable`.
 
-Hard rules — enforced by `validate_assessment.py`, not just convention:
+Hard rules - enforced by `validate_assessment.py`, not just convention:
 
 1. **`unknown` is first-class.** If no evidence was found, verdict MUST be `unknown` with empty `evidence_ids` / `cited_source_ids`. Never fabricate `not_supported` from silence.
 2. **Every non-unknown verdict needs evidence.** `evidence_ids`, `cited_source_ids`, `source_types` all non-empty.
-3. **Numeric thresholds need actual numbers — except qualified `partial`.** Items with `verdict_type: numeric_threshold` MUST include `numeric_value` + matching `unit` when verdict is `supported`/`not_supported`. Qualitative marketing language is not evidence; a measured/cited number is. `verdict: partial` may leave `numeric_value: null` only when `notes` explains the qualitative/imprecise source — see the pitfall below.
+3. **Numeric thresholds need actual numbers - except qualified `partial`.** Items with `verdict_type: numeric_threshold` MUST include `numeric_value` + matching `unit` when verdict is `supported`/`not_supported`. Qualitative marketing language is not evidence; a measured/cited number is. `verdict: partial` may leave `numeric_value: null` only when `notes` explains the qualitative/imprecise source - see the pitfall below.
 4. **Vendor-only sources cap confidence at `medium`.** If `source_types` contains only `vendor_doc` / `vendor_datasheet` / `vendor_blog`, `confidence: "high"` is rejected. High confidence requires at least one third-party or independent source.
-5. **Notes are paraphrase-only, ≤ 2 sentences.** No cross-product comparison in per-item notes — that belongs in the aggregation layer, not per-product prose.
+5. **Notes are paraphrase-only, ≤ 2 sentences.** No cross-product comparison in per-item notes - that belongs in the aggregation layer, not per-product prose.
 6. **Checklist version pin.** `assessment.checklist_version` must equal `checklist.yaml` → `meta.version`. Bumping the checklist invalidates old assessments (as it should).
-7. **`not_applicable` vs `not_supported` — decided by the requirement's grammar, never by which vendor is being scored.** Both score `0.0` in `aggregate_matrix.py`, but `not_applicable` is excluded from `applicable_pct`'s denominator while `not_supported` stays in it and drags the score down — so calling an absent capability N/A silently inflates a score instead of penalizing it. Do not decide this per vendor by feel. Decide it once per checklist item, from the requirement's own sentence structure, before any vendor evidence is looked at:
+7. **`not_applicable` vs `not_supported` - decided by the requirement's grammar, never by which vendor is being scored.** Both score `0.0` in `aggregate_matrix.py`, but `not_applicable` is excluded from `applicable_pct`'s denominator while `not_supported` stays in it and drags the score down - so calling an absent capability N/A silently inflates a score instead of penalizing it. Do not decide this per vendor by feel. Decide it once per checklist item, from the requirement's own sentence structure, before any vendor evidence is looked at:
 
-   **Step 0 — classify the sentence, not the product.** Every requirement is asking one of two kinds of question. Read the requirement and identify which:
-   - **`mechanism`** — the sentence names a specific implementation component and asks about *a property of it* (its resource use, its failure behavior, its install/update behavior, the encryption on its communication channel). The named component is the grammatical subject.
-   - **`outcome`** — the sentence asks whether the product *can produce a result*, optionally at a stated depth/scope/threshold (an enforcement action, a visibility view, a certification, an integration). The result is the grammatical subject; any component that might produce it is incidental and unnamed.
+   **Step 0 - classify the sentence, not the product.** Every requirement is asking one of two kinds of question. Read the requirement and identify which:
+   - **`mechanism`** - the sentence names a specific implementation component and asks about *a property of it* (its resource use, its failure behavior, its install/update behavior, the encryption on its communication channel). The named component is the grammatical subject.
+   - **`outcome`** - the sentence asks whether the product *can produce a result*, optionally at a stated depth/scope/threshold (an enforcement action, a visibility view, a certification, an integration). The result is the grammatical subject; any component that might produce it is incidental and unnamed.
 
-   This classification is a property of the checklist item's wording — record it once as `not_applicable_class: mechanism | outcome` on the item in `checklist.yaml` when the item is authored or revised. It is never re-derived per vendor.
+   This classification is a property of the checklist item's wording - record it once as `not_applicable_class: mechanism | outcome` on the item in `checklist.yaml` when the item is authored or revised. It is never re-derived per vendor.
 
-   **For `mechanism` items:** does an instance of that component exist anywhere in the product's documented architecture, for *any* purpose — not only the purpose the item cares about? If the sentence's property only makes sense for a component in a particular position (e.g. "if it fails, does traffic stay uninterrupted" presupposes something sitting *in* the traffic path), that positioning is part of reading the sentence correctly, not an extra rule to memorize.
-   - No such component exists (in the position the sentence requires) → `not_applicable`. There is nothing to have measured — this is not a shortfall, it's an undefined question.
+   **For `mechanism` items:** does an instance of that component exist anywhere in the product's documented architecture, for *any* purpose - not only the purpose the item cares about? If the sentence's property only makes sense for a component in a particular position (e.g. "if it fails, does traffic stay uninterrupted" presupposes something sitting *in* the traffic path), that positioning is part of reading the sentence correctly, not an extra rule to memorize.
+   - No such component exists (in the position the sentence requires) → `not_applicable`. There is nothing to have measured - this is not a shortfall, it's an undefined question.
    - Such a component exists → evaluate the stated property against evidence as normal (`supported` / `partial` / `not_supported` / `unknown`), even if that component's primary purpose is something other than what the item is checking.
-   - Check the rest of *this same assessment* before concluding "no such component": if another item for the same product already relies on that component's existence (e.g. it's the basis for a `supported`/`partial` verdict elsewhere), `not_applicable` here would contradict it — the component exists, so the correct verdict is `unknown` (referent exists, property unpublished), not `not_applicable`.
+   - Check the rest of *this same assessment* before concluding "no such component": if another item for the same product already relies on that component's existence (e.g. it's the basis for a `supported`/`partial` verdict elsewhere), `not_applicable` here would contradict it - the component exists, so the correct verdict is `unknown` (referent exists, property unpublished), not `not_applicable`.
 
    **For `outcome` items,** apply in strict order:
-   1. Does the product produce this outcome through **any** means, not only the means the wording happens to suggest? A source explicitly confirming it produces no version of the outcome at all → `not_supported` (still needs explicit-absence evidence per rule 1 — never inferred from silence, which stays `unknown`). A product that itself applies or pushes the outcome to an enforcement point — even through a narrower mechanism than the item asks about — counts as producing it (continue to step 2); a product that only emits information, rules, or recommendations for some *other*, separately-operated system to apply does not, on that basis alone, count as producing the outcome.
-   2. If the outcome is produced only at a narrower scope than asked, is that narrower scope **ruled out by definition** by the very mechanism already producing the outcome the product does deliver — i.e. closing the gap would require *swapping the mechanism*, not improving it? → `not_applicable`. Or is it simply a scope the current mechanism hasn't been built out to cover yet? → `partial` (or `not_supported` if no scope at all is delivered).
+   1. Does the product produce this outcome through **any** means, not only the means the wording happens to suggest? A source explicitly confirming it produces no version of the outcome at all → `not_supported` (still needs explicit-absence evidence per rule 1 - never inferred from silence, which stays `unknown`). A product that itself applies or pushes the outcome to an enforcement point - even through a narrower mechanism than the item asks about - counts as producing it (continue to step 2); a product that only emits information, rules, or recommendations for some *other*, separately-operated system to apply does not, on that basis alone, count as producing the outcome.
+   2. If the outcome is produced only at a narrower scope than asked, is that narrower scope **ruled out by definition** by the very mechanism already producing the outcome the product does deliver - i.e. closing the gap would require *swapping the mechanism*, not improving it? → `not_applicable`. Or is it simply a scope the current mechanism hasn't been built out to cover yet? → `partial` (or `not_supported` if no scope at all is delivered).
 
    **Universal self-check, usable on any item without knowing anything about the vendor in advance:** *"Could I, in principle, go find a fact to answer this exact question for this vendor?"* No referent exists to even ask the question of → `not_applicable`. The question is answerable and a source says the answer is no → `not_supported`. Nobody has published the answer → `unknown`.
 
-8. **`not_supported` vs `unknown` — decided by logical exclusion, never by product class.** Both score `0.0` and both stay in the denominator, so this choice never moves a score. It governs something else: whether the report states a finding or admits a gap. Mark `not_supported` when a source explicitly states the capability is absent, **or when a documented fact about the product logically excludes it** — the two must be genuinely contradictory, not merely uncommon together. Otherwise `unknown`.
+8. **`not_supported` vs `unknown` - decided by logical exclusion, never by product class.** Both score `0.0` and both stay in the denominator, so this choice never moves a score. It governs something else: whether the report states a finding or admits a gap. Mark `not_supported` when a source explicitly states the capability is absent, **or when a documented fact about the product logically excludes it** - the two must be genuinely contradictory, not merely uncommon together. Otherwise `unknown`.
 
-   Worked example of the distinction — an illustration of the test, not a rule about particular items:
+   Worked example of the distinction - an illustration of the test, not a rule about particular items:
    - *Sound:* a datapath documented as routing IP between its interfaces cannot also terminate every session at the boundary. The two cannot both be true, so the routing evidence **is** explicit-absence evidence for the protocol-break requirement.
-   - *Unsound:* "it is a rugged NGFW, therefore it has no anti-steganography engine." Nothing about being an NGFW precludes that feature — product class predicts how *common* a capability is, it never *contradicts* one. Nobody documented it either way → `unknown`.
+   - *Unsound:* "it is a rugged NGFW, therefore it has no anti-steganography engine." Nothing about being an NGFW precludes that feature - product class predicts how *common* a capability is, it never *contradicts* one. Nobody documented it either way → `unknown`.
 
    Product class never supplies the exclusion on its own. **If you cannot name the specific documented fact that contradicts the capability, the verdict is `unknown`.**
 
@@ -136,29 +139,29 @@ Hard rules — enforced by `validate_assessment.py`, not just convention:
 
 ```bash
 # 1. Kick off deep-research skill scoped to one product; instruct it to
-#    - write outputs to <domain>/runs/<product_id>/
+#    - write outputs to providers-workspace/<domain>/runs/<product_id>/
 #    - write assessment.json per this GUIDE.md's schema/rules
 #    - write ONLY report.md's 4 narrative sections by hand (1. Overview,
 #      4. Notable Strengths, 5. Notable Gaps / Risks, 6. Evidence Quality
-#      Notes) — everything else in report.md is generated by step 3 below
+#      Notes) - everything else in report.md is generated by step 3 below
 #      and will be overwritten if hand-written
 #
 # 2. Validate
 python .claude/skills/provider-assessment/scripts/validate_assessment.py \
     --domain <domain> \
-    <domain>/runs/<product_id>/assessment.json \
-    --evidence-store <domain>/runs/<product_id>
+    providers-workspace/<domain>/runs/<product_id>/assessment.json \
+    --evidence-store providers-workspace/<domain>/runs/<product_id>
 
 # 3. Render report.md's mechanical sections from the validated assessment.json
-#    (safe to re-run any time assessment.json changes — narrative sections
+#    (safe to re-run any time assessment.json changes - narrative sections
 #    written in step 1 are preserved verbatim, see render_report.py docstring)
 python .claude/skills/provider-assessment/scripts/render_report.py \
     --domain <domain> \
-    <domain>/runs/<product_id>/assessment.json
+    providers-workspace/<domain>/runs/<product_id>/assessment.json
 
 # 4. Once ≥ 1 product is validated, aggregate
 python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py --domain <domain>
-#   -> <domain>/comparison_matrix.xlsx (Legend, Comparison Matrix,
+#   -> providers-workspace/<domain>/comparison_matrix.xlsx (Legend, Comparison Matrix,
 #      Coverage Summary, Raw/Weighted Scores, top-10 product sheets)
 
 # 5. Filter to just deep-mode results if desired
@@ -167,34 +170,34 @@ python .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py 
 
 ## Batch runner (`scripts/batch/run_batch.py`)
 
-One entrypoint, one subcommand per code agent — `claude` or `pi`. Both
+One entrypoint, one subcommand per code agent - `claude` or `pi`. Both
 subcommands share the same product loop, validator call, and summary
-aggregation (`scripts/batch/driver.py`); only the CLI invocation, stream-event
-schema, and per-agent meta fields differ (`scripts/batch/handlers/`). Each
+aggregation (`scripts/batch/core/driver.py`); only the CLI invocation, stream-event
+schema, and per-agent meta fields differ (`scripts/batch/core/handlers/`). Each
 run is a fresh session per product (no context leakage between vendors).
 
 `claude` subcommand: by default uses `--permission-mode acceptEdits` + a
-scoped `--allowedTools` list — no prompts, no full bypass. Pass
+scoped `--allowedTools` list - no prompts, no full bypass. Pass
 `--dangerously-skip-permissions` to swap that for
-`claude -p --dangerously-skip-permissions` instead — no prompt for ANY tool
+`claude -p --dangerously-skip-permissions` instead - no prompt for ANY tool
 call, in or out of the project tree; off by default, opt in per invocation
 since it removes all guardrails for an unattended batch run. Optional
 `--max-turns`/`--max-budget-usd` cap agentic turns/spend per product; both
-unset by default — check a real run's `claude_run.meta.json` for actual
+unset by default - check a real run's `claude_run.meta.json` for actual
 `num_turns`/`total_cost_usd` before picking a cap, since a standard-mode pass
 over the full checklist needs meaningfully more than a typical single-skill
-task. Full stream-json trace goes to `<domain>/runs/<pid>/claude_run.jsonl`;
-per-run summary to `<domain>/runs/<pid>/claude_run.meta.json`.
+task. Full stream-json trace goes to `providers-workspace/<domain>/runs/<pid>/claude_run.jsonl`;
+per-run summary to `providers-workspace/<domain>/runs/<pid>/claude_run.meta.json`.
 
 `pi` subcommand: drives `pi --mode json --no-session`. Full stream trace goes
-to `<domain>/runs/<pid>/pi_run.jsonl`; per-run summary to
-`<domain>/runs/<pid>/pi_run.meta.json`. `scripts/batch/tail_run_logs.py` live-tails
+to `providers-workspace/<domain>/runs/<pid>/pi_run.jsonl`; per-run summary to
+`providers-workspace/<domain>/runs/<pid>/pi_run.meta.json`. `scripts/batch/tail_run_logs.py` live-tails
 these using the same `PiHandler` formatting the batch runner uses, so the two
 can never drift apart.
 
 Both subcommands: `--skip-done` skips products whose existing
 `assessment.json`'s `assessment_mode` matches the current run. `--domain` and
-`--mode` are required (no default) — the CLI errors out immediately if either
+`--mode` are required (no default) - the CLI errors out immediately if either
 is omitted.
 
 ```bash
@@ -209,8 +212,8 @@ venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain <domain> --mo
     --start-at <product_id> --skip-done
 ```
 
-Global summary + total cost dumped to `<domain>/runs/_batch/summary-<ts>.json`
-(claude) or `summary-pi-<ts>.json` (pi) — mode + queue_file recorded so the
+Global summary + total cost dumped to `providers-workspace/<domain>/runs/_batch/summary-<ts>.json`
+(claude) or `summary-pi-<ts>.json` (pi) - mode + queue_file recorded so the
 batch is reproducible.
 
 Docs cross-checked: <https://code.claude.com/docs/en/headless.md>,
@@ -238,53 +241,53 @@ Use the narrowest applicable tag on each item's `source_types` array:
 ## Handling PDF and web-page sources
 
 WebFetch either can't read the content at all (raw binary for `application/pdf`
-— you'll see "binary content saved to …" in the tool output) or fetches AND
+- you'll see "binary content saved to …" in the tool output) or fetches AND
 summarizes a web page through a small model in the same call, so nothing raw
 survives to check later. **Every source cited in `sources.jsonl` /
-`evidence.jsonl` — PDF or web page — must be staged first** with the matching
+`evidence.jsonl` - PDF or web page - must be staged first** with the matching
 helper, so a persisted, hash-anchored `.txt` exists for
 `.claude/skills/provider-assessment/scripts/verify_citation_grounding.py` to
 check quotes against.
 
 ```bash
-# PDF — stage into <domain>/runs/<product>/artifacts/ + append manifest.jsonl
-python scripts/pdf_to_text.py https://example.com/datasheet.pdf \
+# PDF - stage into providers-workspace/<domain>/runs/<product>/artifacts/ + append manifest.jsonl
+python tools/pdfstage/main.py https://example.com/datasheet.pdf \
     --product <product_id> --domain <domain>
 
-# Web page — same staging contract, HTML instead of PDF
-python scripts/htmlstage/html_to_text.py https://example.com/product-page/ \
+# Web page - same staging contract, HTML instead of PDF
+python tools/htmlstage/main.py https://example.com/product-page/ \
     --product <product_id> --domain <domain>
 
-# Local file (e.g. re-processing a WebFetch-cached PDF the harness saved) —
+# Local file (e.g. re-processing a WebFetch-cached PDF the harness saved) -
 # the file is COPIED into artifacts/, the original is not touched.
-python scripts/pdf_to_text.py C:/path/to/webfetch-cached.pdf \
+python tools/pdfstage/main.py C:/path/to/webfetch-cached.pdf \
     --product <product_id> --domain <domain> --slug some-readable-name
 
 # Ad-hoc / shared cache (no product context, no manifest)
-python scripts/pdf_to_text.py https://example.com/datasheet.pdf --domain <domain>
-python scripts/htmlstage/html_to_text.py https://example.com/product-page/ --domain <domain>
+python tools/pdfstage/main.py https://example.com/datasheet.pdf --domain <domain>
+python tools/htmlstage/main.py https://example.com/product-page/ --domain <domain>
 ```
 
 For each invocation with `--product`, the scripts:
-- Download (or copy, for local input) the raw file into `<domain>/runs/<product_id>/artifacts/<slug>.{pdf,html}`.
-- Extract text into `<slug>.txt` — `pdf_to_text.py` page-by-page via `pypdf`, delimited by `===== PAGE N =====` headers; `html_to_text.py` via Trafilatura (boilerplate-removal heuristics, falling back to a stdlib tag-stripper if Trafilatura returns nothing).
-- `html_to_text.py` fetches via a `--method` chain (`auto` by default: direct HTTP with curl_cffi browser-TLS impersonation -> r.jina.ai HTML render -> r.jina.ai Markdown render -> Wayback Machine -> Common Crawl archive), escalating past bot-protected, challenge-walled, or dead pages automatically (thin extraction OR a matched bot-challenge banner both trigger escalation, not just an outright fetch failure). `manifest.jsonl` records which method actually produced the `.txt` (`fetch_method`) and which extractor ran (`extractor`) — check these before trusting a citation, since a page fetched via the Markdown proxy is provenance-wise "Jina rendering the vendor's page," not the vendor's raw HTML. Force a specific method with `--method direct|proxy-html|proxy-md|wayback|cc` when you already know a domain needs it.
-- Append one line to the SAME `<domain>/runs/<product_id>/artifacts/manifest.jsonl` — url/local path of origin, sha256, byte size, capture timestamp, and `"kind": "pdf"` or `"html"` — everything needed to prove which version of the source was actually read.
+- Download (or copy, for local input) the raw file into `providers-workspace/<domain>/runs/<product_id>/artifacts/<slug>.{pdf,html}`.
+- Extract text into `<slug>.txt` - `tools/pdfstage/main.py` page-by-page via `pypdf`, delimited by `===== PAGE N =====` headers; `tools/htmlstage/main.py` via Trafilatura (boilerplate-removal heuristics, falling back to a stdlib tag-stripper if Trafilatura returns nothing).
+- `tools/htmlstage/main.py` fetches via a `--method` chain (`auto` by default: direct HTTP with curl_cffi browser-TLS impersonation -> r.jina.ai HTML render -> r.jina.ai Markdown render -> Wayback Machine -> Common Crawl archive), escalating past bot-protected, challenge-walled, or dead pages automatically (thin extraction OR a matched bot-challenge banner both trigger escalation, not just an outright fetch failure). `manifest.jsonl` records which method actually produced the `.txt` (`fetch_method`) and which extractor ran (`extractor`) - check these before trusting a citation, since a page fetched via the Markdown proxy is provenance-wise "Jina rendering the vendor's page," not the vendor's raw HTML. Force a specific method with `--method direct|proxy-html|proxy-md|wayback|cc` when you already know a domain needs it.
+- Append one line to the SAME `providers-workspace/<domain>/runs/<product_id>/artifacts/manifest.jsonl` - url/local path of origin, sha256, byte size, capture timestamp, and `"kind": "pdf"` or `"html"` - everything needed to prove which version of the source was actually read.
 - Print the `.txt` absolute path as the last stdout line so you can pipe it into a `Read` call.
 
-WebFetch is still fine for initial discovery — deciding which pages are worth
-staging — but the evidence quote itself must come from the staged `.txt`,
+WebFetch is still fine for initial discovery - deciding which pages are worth
+staging - but the evidence quote itself must come from the staged `.txt`,
 never from WebFetch's own summary.
 
 **Citation etiquette for staged evidence:**
-- `source.raw_url` in `sources.jsonl` must point at the **original URL** (PDF or page), not the local artifact path — and must match exactly what was passed to `pdf_to_text.py`/`html_to_text.py`, since `verify_citation_grounding.py` matches on it.
+- `source.raw_url` in `sources.jsonl` must point at the **original URL** (PDF or page), not the local artifact path - and must match exactly what was passed to `tools/pdfstage/main.py`/`tools/htmlstage/main.py`, since `verify_citation_grounding.py` matches on it.
 - `evidence.jsonl.locator` should identify the page for PDFs (e.g. `"page 3, 'throughput' section"`) or a section heading for web pages, so a reader can jump straight to the quote in the staged file.
-- `evidence.jsonl.quote` must be an **exact substring** of the staged `.txt`, not a paraphrase. If quoting two non-adjacent sentences, join them with `" ... "` so the elision is visible — never silently stitch text that wasn't contiguous in the source.
-- The `artifacts/manifest.jsonl` sha256 is the integrity anchor — if the vendor rewrites the page/PDF, the hash mismatch is your signal that evidence needs re-validation.
+- `evidence.jsonl.quote` must be an **exact substring** of the staged `.txt`, not a paraphrase. If quoting two non-adjacent sentences, join them with `" ... "` so the elision is visible - never silently stitch text that wasn't contiguous in the source.
+- The `artifacts/manifest.jsonl` sha256 is the integrity anchor - if the vendor rewrites the page/PDF, the hash mismatch is your signal that evidence needs re-validation.
 
 ## Citation grounding check
 
-`validate_assessment.py` only checks REFERENTIAL integrity — that an
+`validate_assessment.py` only checks REFERENTIAL integrity - that an
 `evidence_id`/`source_id` exists somewhere in `evidence.jsonl`/`sources.jsonl`.
 It never checks whether a quote is real, which is exactly how fabricated
 evidence has slipped through: a model can invent a plausible-sounding quote
@@ -295,17 +298,17 @@ been staged per the section above:
 
 ```bash
 python .claude/skills/provider-assessment/scripts/verify_citation_grounding.py \
-    --dir <domain>/runs/<product_id> --strict --require-staged
+    --dir providers-workspace/<domain>/runs/<product_id> --strict --require-staged
 ```
 
 Each evidence entry comes back as one of:
-- `grounded` — every quote fragment (split on `" ... "`) found verbatim, normalized, in the staged text for its source
-- `fabricated` — the source WAS staged, but the quote (or part of it) is absent from it. This is not real evidence — go back to the `.txt`, fix the quote to an exact substring, or downgrade the item's verdict
-- `unverifiable` — `source_id` has no staged artifact to check against, meaning a source was cited without going through `pdf_to_text.py`/`html_to_text.py` first — go stage it, then re-run
+- `grounded` - every quote fragment (split on `" ... "`) found verbatim, normalized, in the staged text for its source
+- `fabricated` - the source WAS staged, but the quote (or part of it) is absent from it. This is not real evidence - go back to the `.txt`, fix the quote to an exact substring, or downgrade the item's verdict
+- `unverifiable` - `source_id` has no staged artifact to check against, meaning a source was cited without going through `tools/pdfstage/main.py`/`tools/htmlstage/main.py` first - go stage it, then re-run
 
 `--strict` fails the run on any `fabricated` evidence; `--require-staged` also
 fails on `unverifiable`. Note: quote-vs-text matching is exact-substring, not
-semantic — a quote that's a real paraphrase (true fact, reworded) will also
+semantic - a quote that's a real paraphrase (true fact, reworded) will also
 report `fabricated`, since the anti-fabrication contract requires the quote
 itself to be verbatim, not just accurate in substance.
 
@@ -314,8 +317,8 @@ itself to be verbatim, not just accurate in substance.
 - **Do not** turn "vendor claims X" into "product does X" in the `notes` field. Paraphrase with attribution.
 - **Do not** aggregate across products in per-item `notes`. The matrix does that.
 - **Do not** mark `not_supported` because the docs "don't mention it." That is `unknown`. Mark `not_supported` only when a source explicitly states the capability is absent or a documented fact logically excludes it (rule 8).
-- **Do not** mark `not_applicable` on an item that has no `not_applicable_class` in `checklist.yaml` — on those items the verdict does not exist (rule 7). The validator rejects it.
+- **Do not** mark `not_applicable` on an item that has no `not_applicable_class` in `checklist.yaml` - on those items the verdict does not exist (rule 7). The validator rejects it.
 - **Do not** justify `not_applicable` by product class. That reasoning is about the vendor, not about the requirement, and it is exactly what rules 7–8 exist to stop. A boilerplate rationale repeated verbatim across several items is the tell.
 - **Do not** fill `numeric_value` with round numbers borrowed from the requirement. If the vendor gives only qualitative language, verdict is `partial` with `numeric_value: null` and `notes` explaining the imprecision.
-- **Do not** run `scripts/batch/run_batch.py` without an agent subcommand (`claude`/`pi`) or `--mode`, or `scripts/pdf_to_text.py`/`scripts/htmlstage/html_to_text.py` without `--domain` (or with the wrong one). `run_batch.py` errors out if the subcommand or `--domain`/`--mode` are omitted; `pdf_to_text.py`/`html_to_text.py` silently default to `microsegmentation` and will write into the wrong project tree.
-- **Do not** cite a source in `evidence.jsonl` before staging it with `pdf_to_text.py`/`html_to_text.py`, and **do not** write a quote from memory or from WebFetch's summary. `verify_citation_grounding.py` will report it `fabricated` or `unverifiable` and fail the run.
+- **Do not** run `scripts/batch/run_batch.py` without an agent subcommand (`claude`/`pi`) or `--mode`, or `tools/pdfstage/main.py`/`tools/htmlstage/main.py` without `--domain` (or with the wrong one). `run_batch.py` errors out if the subcommand or `--domain`/`--mode` are omitted; `tools/pdfstage/main.py`/`tools/htmlstage/main.py` silently default to `microsegmentation` and will write into the wrong project tree.
+- **Do not** cite a source in `evidence.jsonl` before staging it with `tools/pdfstage/main.py`/`tools/htmlstage/main.py`, and **do not** write a quote from memory or from WebFetch's summary. `verify_citation_grounding.py` will report it `fabricated` or `unverifiable` and fail the run.

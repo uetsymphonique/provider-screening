@@ -38,7 +38,7 @@ def _fmt_dur(ms: int | None, elapsed_s: float | None = None) -> str:
 
 def _fmt_tok(n: int | None) -> str:
     if n is None:
-        return "—"
+        return "-"
     if n >= 1_000_000:
         return f"{n / 1_000_000:.1f}M"
     if n >= 1_000:
@@ -48,7 +48,7 @@ def _fmt_tok(n: int | None) -> str:
 
 def _fmt_cost(c: float | None) -> str:
     if c is None:
-        return "—"
+        return "-"
     return f"${c:.4f}"
 
 
@@ -59,10 +59,8 @@ def _fmt_cost(c: float | None) -> str:
 def collect_runs(domain_filter: str | None = None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
 
-    for domain_dir in sorted(REPO.glob("*/runs")):
+    for domain_dir in sorted((REPO / "providers-workspace").glob("*/runs")):
         domain = domain_dir.parent.name
-        if domain in ("_batch", ".pi", ".claude", "venv", "scripts"):
-            continue
         if domain_filter and domain != domain_filter:
             continue
 

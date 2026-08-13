@@ -8,7 +8,7 @@ description: Use when you need to search the web for information -- find pages, 
 ## How to call it
 
 Run this via the Bash tool, from the project root (`venv/` is relative to it, same
-convention as `scripts/htmlstage/README.md`'s Usage section):
+convention as `tools/htmlstage/README.md`'s Usage section):
 
 ```
 venv/Scripts/python.exe -c "
@@ -29,7 +29,7 @@ answered reliably; `duckduckgo`, `mojeek`, and `startpage` returned "No
 results found", and the library's own `backend='auto'` default picked
 `yahoo` and timed out. Always pass `backend='bing,brave'` explicitly
 instead of relying on the default -- ddgs tries them in order and falls
-through on failure, same fallback-chain idea as `scripts/htmlstage`'s
+through on failure, same fallback-chain idea as `tools/htmlstage`'s
 `AUTO_CHAIN`.
 
 For a quick human-readable look instead of JSON (e.g. deciding which
@@ -63,11 +63,11 @@ Never quote `evidence.jsonl` text from a `body` snippet. Once a result
 looks worth citing, stage the actual page first:
 
 ```
-venv/Scripts/python.exe scripts/htmlstage/html_to_text.py <href> \
+venv/Scripts/python.exe tools/htmlstage/main.py <href> \
   --product {product_id} --domain {DOMAIN}
 ```
 
-and quote only from the staged `.txt` (see `scripts/htmlstage/README.md`
+and quote only from the staged `.txt` (see `tools/htmlstage/README.md`
 and `provider-assessment/GUIDE.md`'s source-staging rule).
 
 ## Caveats

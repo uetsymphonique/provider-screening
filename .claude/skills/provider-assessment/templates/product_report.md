@@ -56,7 +56,7 @@ One row per item in checklist.yaml (in ID order). Do not skip items.
 
 | ID  | Requirement | Verdict | Conf | Value | Evidence |
 |-----|-------------|:-------:|:----:|-------|----------|
-| 1.1 | [Requirement wording] | Supported | high | — | [1] |
+| 1.1 | [Requirement wording] | Supported | high | - | [1] |
 
 <!-- Repeat one table per category. Item order MUST match checklist.yaml. -->
 

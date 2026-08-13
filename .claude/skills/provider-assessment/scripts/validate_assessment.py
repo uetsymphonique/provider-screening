@@ -6,7 +6,7 @@ and runs/ tree are resolved from --domain.
 Usage:
     python .claude/skills/provider-assessment/scripts/validate_assessment.py \
         --domain bsg <path/to/assessment.json>
-        [--checklist <path>]            # default: <domain>/checklist.yaml
+        [--checklist <path>]            # default: providers-workspace/<domain>/checklist.yaml
         [--schema <path>]               # default: skill schemas/assessment.schema.json
         [--evidence-store <dir>]        # optional: cross-check evidence_ids
 
@@ -135,7 +135,7 @@ def check_custom_rules(
         if verdict == "not_applicable" and "not_applicable_class" not in checklist_item:
             errors.append(
                 f"{prefix} verdict='not_applicable' but checklist item has no "
-                f"not_applicable_class — not_applicable is not a legitimate verdict "
+                f"not_applicable_class - not_applicable is not a legitimate verdict "
                 f"for this item (see GUIDE.md rule 7)"
             )
 

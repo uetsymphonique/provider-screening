@@ -1,9 +1,10 @@
 # Adding a New Provider Group (Domain)
 
 A "provider group" (called a **domain** everywhere else in this repo - `bsg`,
-`microsegmentation`, `ngfw`, ...) is a self-contained vendor-screening track:
-its own vendor CSV, its own `checklist.yaml`, its own `<domain>/runs/` tree,
-aggregated into its own `<domain>/comparison_matrix.xlsx`. All the scoring
+`microsegmentation`, `ngfw`, ...) is a self-contained vendor-screening track,
+living under `providers-workspace/<domain>/`: its own vendor CSV, its own
+`checklist.yaml`, its own `runs/` tree, aggregated into its own
+`comparison_matrix.xlsx`. All the scoring
 machinery (`deep-research` + `provider-assessment` skills, validators,
 renderer, aggregator, batch runner) is shared and selected at run time via
 `--domain <name>`.
@@ -11,12 +12,12 @@ renderer, aggregator, batch runner) is shared and selected at run time via
 This guide is the checklist for adding one. It was written while adding
 `ngfw`, which surfaced a footgun since fixed: the domain name used to be
 hard-coded as an allow-list in six separate files, so missing one made a
-script fail late with a confusing `invalid choice` error. `scripts/domains.py`
+script fail late with a confusing `invalid choice` error. `shared/domains.py`
 is now the single registry every one of those files imports from - see below.
 
 ## 1. Vendor CSV - `providers/<NAME>.csv`
 
-Read by `scripts/batch/common.py`'s `load_products()`. Required shape:
+Read by `scripts/batch/core/common.py`'s `load_products()`. Required shape:
 
 ```
 <optional free-text title row>,,,
@@ -33,32 +34,33 @@ STT,Company,Product Name,product_id
   Other columns some CSVs carry (`Country`, `Founded`, `Product Category`,
   `Website`, `Short Description`) are display-only for humans - no script
   reads them, so don't fabricate values for them just to match column count.
-- `product_id` must be a unique slug (kebab-case, matches `<domain>/runs/<product_id>/`
-  once assessed). No uniqueness check runs automatically - a duplicate
+- `product_id` must be a unique slug (kebab-case, matches
+  `providers-workspace/<domain>/runs/<product_id>/` once assessed). No
+  uniqueness check runs automatically - a duplicate
   silently makes two CSV rows collide onto the same run directory.
 
 ## 2. Register the domain - one place
 
-`scripts/domains.py` is the single source of truth for the `DOMAINS` registry
+`shared/domains.py` is the single source of truth for the `DOMAINS` registry
 (`{name: {"csv": Path, "dir": Path}}`). Add one entry:
 
 ```python
 "<name>": {
     "csv": REPO_ROOT / "providers" / "<NAME>.csv",
-    "dir": REPO_ROOT / "<name>",
+    "dir": PROVIDERS_WORKSPACE / "<name>",
 },
 ```
 
 Everything else imports `DOMAINS` from there instead of carrying its own
-copy: `scripts/batch/common.py`, `scripts/pdf_to_text.py`,
-`scripts/htmlstage/html_to_text.py`, and
+copy: `scripts/batch/core/common.py`, `tools/pdfstage/main.py`,
+`tools/htmlstage/main.py`, and
 `.claude/skills/provider-assessment/scripts/constants.py` (which re-exports
 `DOMAINS`/`domain_dir`/`domain_paths`, so `validate_assessment.py`,
 `render_report.py`, and `aggregate/aggregate_matrix.py` pick up the new
 domain automatically with no changes of their own - they only import from
-`constants.py`, never from `scripts/domains.py` directly).
+`constants.py`, never from `shared/domains.py` directly).
 
-`deep-research` does not import `scripts/domains.py` or anything else touched
+`deep-research` does not import `shared/domains.py` or anything else touched
 here - it stays fully independent of this registry by design, unlike
 `provider-assessment`, which only applies to this repo.
 
@@ -67,7 +69,7 @@ adding `ngfw` - worth knowing so you don't go hunting for a second place
 that doesn't exist:
 - `scripts/batch/tail_run_logs.py` - its `--domain` reads
   `common.DOMAINS.keys()` directly, so it inherits the registry automatically
-  through `scripts/batch/common.py` (verify with `--help`, the choices list
+  through `scripts/batch/core/common.py` (verify with `--help`, the choices list
   should already show the new name).
 - `scripts/stats.py --domain` - a free-text filter with no `choices=`
   restriction at all; any domain name works immediately, the mention of
@@ -76,22 +78,23 @@ that doesn't exist:
 
 If a future domain addition still trips a `choices=[...]` error somewhere
 else, that's a new copy that slipped in and should import `DOMAINS` from
-`scripts/domains.py` (directly, or transitively via `common.py`/
+`shared/domains.py` (directly, or transitively via `common.py`/
 `constants.py`) instead of hard-coding a fresh list.
 
-## 3. Domain folder - `<domain>/`
+## 3. Domain folder - `providers-workspace/<domain>/`
 
-Mirror an existing domain (`bsg/` is the smaller reference):
+Mirror an existing domain (`providers-workspace/bsg/` is the smaller reference):
 
 ```
-<domain>/
+providers-workspace/<domain>/
 ├── checklist.md        # human-readable wording (source of truth for wording)
 ├── checklist.yaml       # machine-readable: stable IDs, verdict_type, thresholds
 ├── GUIDE.md              # domain-specific notes ONLY (provider list, checklist source notes) -
 │                          #   the shared rules (verdict contract, workflow, staging, pitfalls)
 │                          #   live in .claude/skills/provider-assessment/GUIDE.md; link to it,
 │                          #   don't repeat it
-├── .gitignore            # copy verbatim from bsg/.gitignore or microsegmentation/.gitignore
+├── .gitignore            # copy verbatim from providers-workspace/bsg/.gitignore or
+│                          #   providers-workspace/microsegmentation/.gitignore
 └── runs/                  # created on demand by the first product run - don't pre-create by hand
 ```
 
@@ -112,9 +115,9 @@ Mirror an existing domain (`bsg/` is the smaller reference):
   simply fail, or penalizes it for an undefined question it was never fair
   to ask - read rules 7-8's worked examples before assigning one.
 - Full field-by-field semantics are documented as comments at the top of any
-  existing `checklist.yaml` (`bsg/checklist.yaml` or
-  `microsegmentation/checklist.yaml`) - copy that comment block as the
-  starting point for a new one rather than re-deriving it.
+  existing `checklist.yaml` (`providers-workspace/bsg/checklist.yaml` or
+  `providers-workspace/microsegmentation/checklist.yaml`) - copy that comment
+  block as the starting point for a new one rather than re-deriving it.
 
 ### Authoring the checklist
 
@@ -125,15 +128,17 @@ none should be inferred from `bsg`/`microsegmentation`'s current numbers.
 - `checklist.md` is the same content as `checklist.yaml`, as plain
   `### category` / `+ item` Markdown - keep the two in sync by hand (there is
   no generator).
-- If a vendor datasheet is used as seed material (as `ngfw/vNGFW.md` was for
-  `ngfw/checklist.yaml`), note that explicitly in the domain's `GUIDE.md` -
+- If a vendor datasheet is used as seed material (as
+  `providers-workspace/ngfw/vNGFW.md` was for
+  `providers-workspace/ngfw/checklist.yaml`), note that explicitly in the
+  domain's `GUIDE.md` -
   whether the checklist stays close to that one vendor's feature list or is
   deliberately generalized beyond it is, again, the author's call, not
   something this guide prescribes.
 
 ### `GUIDE.md`
 
-Copy `bsg/GUIDE.md`'s structure: one line pointing at the shared GUIDE for
+Copy `providers-workspace/bsg/GUIDE.md`'s structure: one line pointing at the shared GUIDE for
 everything generic (verdict contract, workflow, batch runner, staging), then
 domain-specific facts only - provider CSV path and vendor count, checklist
 item/category count, any product-class notes relevant to *where to look for
@@ -152,19 +157,19 @@ venv/Scripts/python.exe scripts/batch/run_batch.py claude --domain <name> --mode
 # checklist.yaml parses, IDs are unique
 venv/Scripts/python.exe -c "
 import yaml
-d = yaml.safe_load(open('<name>/checklist.yaml', encoding='utf-8'))
+d = yaml.safe_load(open('providers-workspace/<name>/checklist.yaml', encoding='utf-8'))
 ids = [i['id'] for i in d['items']]
 assert len(ids) == len(set(ids)), 'duplicate item id'
 print('categories:', len(d['categories']), 'items:', len(d['items']))
 "
 
-# --domain <name> is accepted everywhere (confirms the registration in scripts/domains.py took)
+# --domain <name> is accepted everywhere (confirms the registration in shared/domains.py took)
 venv/Scripts/python.exe .claude/skills/provider-assessment/scripts/validate_assessment.py --help | head -1
 venv/Scripts/python.exe .claude/skills/provider-assessment/scripts/aggregate/aggregate_matrix.py --domain <name>
 ```
 
 The aggregate command above is expected to print `No assessment.json found
-under <domain>/runs` on a brand-new domain - that's success, not failure; it
+under providers-workspace/<domain>/runs` on a brand-new domain - that's success, not failure; it
 means the domain resolved correctly and there's just nothing to aggregate
 yet.
 

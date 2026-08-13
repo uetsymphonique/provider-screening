@@ -1,2 +1,5 @@
 __pycache__
 claude-code-test/
+*.egg-info/
+build/
+dist/

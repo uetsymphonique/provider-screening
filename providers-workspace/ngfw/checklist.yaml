@@ -1,0 +1,201 @@
+# Canonical Next-Generation Firewall (NGFW) evaluation checklist.
+# IDs are stable - never renumber. Add new items with new IDs.
+#
+# verdict_type semantics:
+#   boolean            → supported | partial | not_supported | unknown | not_applicable
+#   numeric_threshold  → same verdicts, but items[].numeric_value + unit MUST be present
+#                        (validator rejects the assessment otherwise)
+#
+# threshold.op:  "<" | "<=" | ">" | ">="   (evaluated against numeric_value + unit)
+#
+# not_applicable_class - classifies the REQUIREMENT SENTENCE, not any vendor
+# (see .claude/skills/provider-assessment/GUIDE.md "Verdicts" rules 7-8 for the
+# governing test). Set once when an item is authored/revised; never re-derived
+# per product. Only items that can legitimately receive verdict: not_applicable
+# carry this field - most items below deliberately do not, since the capability
+# they ask about IS what an NGFW procurement is buying (absence is a shortfall,
+# not an undefined question).
+#   mechanism → the sentence names a specific component (e.g. "its VPN engine")
+#       and asks about A PROPERTY OF IT. Test: does an instance of that
+#       component exist in the documented architecture, for any purpose?
+#       Absent -> not_applicable (no referent to measure).
+#       Present -> evaluate the property normally.
+# na_test_scope (mechanism class only): "broad" = any instance of the named
+#   component counts, whatever purpose it serves.
+
+meta:
+  version: 1
+  source: providers-workspace/ngfw/checklist.md
+  language: vi
+  updated: 2026-08-13
+
+categories:
+  - id: "1"
+    name: "Architecture & Policy"
+  - id: "2"
+    name: "Threat Prevention"
+  - id: "3"
+    name: "Content & Application Inspection"
+  - id: "4"
+    name: "VPN & Secure Connectivity"
+  - id: "5"
+    name: "Performance & High Availability"
+  - id: "6"
+    name: "Management & Compliance"
+
+items:
+  # 1. Architecture & Policy
+  - id: "1.1"
+    category: "1"
+    requirement: "Kiểm soát chính sách theo ứng dụng lớp 7 (App-ID / Application-based Policy Control), nhận diện độc lập với cổng/giao thức truyền tải."
+    verdict_type: boolean
+
+  - id: "1.2"
+    category: "1"
+    requirement: "Phân vùng bảo mật (Security Zone) theo interface vật lý/logic, mỗi zone quản lý chính sách, log và thống kê riêng."
+    verdict_type: boolean
+
+  - id: "1.3"
+    category: "1"
+    requirement: "Chính sách dựa trên danh tính người dùng (Identity-based Policy): tích hợp AD/LDAP/RADIUS, hỗ trợ xác thực agentless không cần cài đặt client riêng."
+    verdict_type: boolean
+
+  - id: "1.4"
+    category: "1"
+    requirement: "Hỗ trợ đa dạng phương thức NAT (SNAT, DNAT, NAT64, ...) và đối tượng địa chỉ động theo tên miền (FQDN object)."
+    verdict_type: boolean
+
+  - id: "1.5"
+    category: "1"
+    requirement: "Chế độ triển khai linh hoạt: Transparent/Bridge mode không yêu cầu thay đổi cấu hình mạng hiện có, và Router/L3 mode."
+    verdict_type: boolean
+
+  # 2. Threat Prevention
+  - id: "2.1"
+    category: "2"
+    requirement: "IPS phát hiện và chặn tấn công dựa trên signature, phân tích giao thức và bất thường lưu lượng (protocol/traffic anomaly)."
+    verdict_type: boolean
+
+  - id: "2.2"
+    category: "2"
+    requirement: "Chống tấn công từ chối dịch vụ (Anti-DDoS): phát hiện và chặn TCP/UDP/ICMP/HTTP/DNS/SIP flooding."
+    verdict_type: boolean
+
+  - id: "2.3"
+    category: "2"
+    requirement: "Antivirus / Anti-malware tích hợp inline, quét payload thời gian thực."
+    verdict_type: boolean
+
+  - id: "2.4"
+    category: "2"
+    requirement: "Sandbox nội bộ hoặc tích hợp Cloud Sandbox để phân tích file trong môi trường cách ly, phát hiện mối đe dọa zero-day (Advanced Threat Protection)."
+    verdict_type: boolean
+
+  - id: "2.5"
+    category: "2"
+    requirement: "Cập nhật signature / threat intelligence tự động, thời gian thực, không yêu cầu khởi động lại thiết bị."
+    verdict_type: boolean
+
+  # 3. Content & Application Inspection
+  - id: "3.1"
+    category: "3"
+    requirement: "Giải mã SSL/TLS tự động, hỗ trợ loại trừ chọn lọc theo nguồn/đích/dịch vụ (SSL Inspection with selective bypass)."
+    verdict_type: boolean
+
+  - id: "3.2"
+    category: "3"
+    requirement: "Kiểm soát ứng dụng cho các dịch vụ rủi ro cao: P2P, IM, webmail, proxy bypass, remote access tools."
+    verdict_type: boolean
+
+  - id: "3.3"
+    category: "3"
+    requirement: "Lọc Web/URL dựa trên cơ sở dữ liệu phân loại được cập nhật định kỳ."
+    verdict_type: boolean
+
+  - id: "3.4"
+    category: "3"
+    requirement: "Lọc DNS / chặn truy vấn tới tên miền độc hại đã biết."
+    verdict_type: boolean
+
+  - id: "3.5"
+    category: "3"
+    requirement: "Chống rò rỉ dữ liệu (DLP): nhận diện và chặn nội dung nhạy cảm theo từ khóa, mẫu định danh, hoặc regex tùy biến."
+    verdict_type: boolean
+
+  # 4. VPN & Secure Connectivity
+  - id: "4.1"
+    category: "4"
+    requirement: "IPsec VPN tuân thủ chuẩn, hỗ trợ cả IKEv1 và IKEv2."
+    verdict_type: boolean
+
+  - id: "4.2"
+    category: "4"
+    requirement: "SSL VPN cho truy cập từ xa (remote access), qua client hoặc clientless."
+    verdict_type: boolean
+
+  - id: "4.3"
+    category: "4"
+    requirement: "Sẵn sàng Mật mã Hậu lượng tử (Post-Quantum Cryptography) cho kênh VPN, độc lập hoặc kết hợp với thuật toán truyền thống (Hybrid PQC)."
+    verdict_type: boolean
+    # Grammatical subject is "kênh VPN" (its crypto). No VPN engine of any kind
+    # (IPsec or SSL) in the documented architecture -> no referent to ask this
+    # about. Parallel to providers-workspace/bsg/checklist.yaml 4.1 (CDR throughput needs a CDR engine).
+    not_applicable_class: mechanism
+    na_test_scope: broad
+
+  - id: "4.4"
+    category: "4"
+    requirement: "Zero Trust Network Access (ZTNA) tích hợp sẵn trong hệ điều hành firewall, kiểm soát truy cập theo danh tính mà không phụ thuộc hoàn toàn vào VPN truyền thống."
+    verdict_type: boolean
+
+  # 5. Performance & High Availability
+  - id: "5.1"
+    category: "5"
+    requirement: "Băng thông xử lý Firewall (FW Throughput) ở cấu hình entry-level tối thiểu ≥ 4 Gbps."
+    verdict_type: numeric_threshold
+    threshold: { op: ">=", value: 4000, unit: "Mbps" }
+
+  - id: "5.2"
+    category: "5"
+    requirement: "Băng thông xử lý VPN (VPN Throughput) ở cấu hình entry-level tối thiểu ≥ 1.5 Gbps."
+    verdict_type: numeric_threshold
+    threshold: { op: ">=", value: 1500, unit: "Mbps" }
+    # Property of the VPN engine's throughput; no VPN engine -> not_applicable.
+    not_applicable_class: mechanism
+    na_test_scope: broad
+
+  - id: "5.3"
+    category: "5"
+    requirement: "Cụm dự phòng cao (HA Active-Standby hoặc Active-Active): failover tự động không làm gián đoạn phiên (session) đang chạy."
+    verdict_type: boolean
+
+  - id: "5.4"
+    category: "5"
+    requirement: "Hỗ trợ gộp liên kết mạng (Link Aggregation / Line Bonding, ví dụ 802.3ad LACP) và giao thức dự phòng định tuyến (VRRP hoặc tương đương)."
+    verdict_type: boolean
+
+  # 6. Management & Compliance
+  - id: "6.1"
+    category: "6"
+    requirement: "Quản trị qua GUI web và CLI (SSH/Telnet), cung cấp REST API đầy đủ cho tự động hóa."
+    verdict_type: boolean
+
+  - id: "6.2"
+    category: "6"
+    requirement: "Tích hợp SIEM/SOAR: đẩy log thời gian thực dạng Syslog/CEF qua kênh mã hóa."
+    verdict_type: boolean
+
+  - id: "6.3"
+    category: "6"
+    requirement: "Phân quyền quản trị theo vai trò (RBAC): tách biệt admin hệ thống, admin chính sách và auditor an ninh."
+    verdict_type: boolean
+
+  - id: "6.4"
+    category: "6"
+    requirement: "Đa miền ảo hóa (Virtual Domain/VDOM) hoặc cơ chế multi-tenancy tương đương, cho phép cấu hình định tuyến và thống kê độc lập theo miền."
+    verdict_type: boolean
+
+  - id: "6.5"
+    category: "6"
+    requirement: "Đạt chứng nhận bảo mật quốc tế (Common Criteria EAL4+, FIPS 140-2/140-3 hoặc tương đương) và có sẵn báo cáo tuân thủ theo chuẩn ngành (ISO 27001, PCI-DSS, NIST)."
+    verdict_type: boolean
